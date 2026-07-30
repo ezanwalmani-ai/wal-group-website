@@ -1,0 +1,6 @@
+{
+  "name": "Wal Group",
+  "description": "Backend operations and outsourcing for Amazon DSPs, Amazon Freight Partners, and trucking businesses.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,691 @@
+{
+  "SESS-MS1N77D7": {
+    "sessionId": "SESS-MS1N77D7",
+    "createdAt": "2026-07-26T10:16:34.120Z",
+    "updatedAt": "2026-07-26T10:16:38.509Z",
+    "pageVisited": "/raise-ticket",
+    "userBehaviorSummary": "Pages: /, /about, /raise-ticket | Services:  | Time: 660s",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "I need dispatch operations.",
+        "timestamp": "10:16 AM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Wal Group provides 24/7 Amazon DSP dispatch coverage using official portals like Cortex, Geotab, and Netradyne. Our team actively monitors safety scores, manages route delays, and coordinates roadside assistance so you maintain an Amazon Super Fantastic rating. Would you like to schedule a 30-minute discovery call with our DSP operations lead?",
+        "timestamp": "10:16 AM"
+      },
+      {
+        "sender": "user",
+        "text": "Book a Discovery Call.",
+        "timestamp": "10:16 AM"
+      },
+      {
+        "sender": "assistant",
+        "text": "I'd be happy to arrange a Discovery Call for you with our executive team. You can click \"Book Discovery Call\" right here or let me know your preferred date and business email!",
+        "timestamp": "10:16 AM"
+      }
+    ],
+    "leadDetails": {},
+    "unansweredQuestions": []
+  },
+  "SESS-1785063682766-egu5": {
+    "sessionId": "SESS-1785063682766-egu5",
+    "createdAt": "2026-07-26T11:01:22.766Z",
+    "updatedAt": "2026-07-26T11:01:23.327Z",
+    "pageVisited": "/services/dsp-dispatch",
+    "userBehaviorSummary": "Pages: /, /services/dsp-dispatch | Services: Amazon DSP Dispatch | Time: 120s",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Hello, what services does Wal Group offer for Amazon DSPs?",
+        "timestamp": "11:01 AM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Wal Group provides 24/7 Amazon DSP dispatch coverage using official portals like Cortex, Geotab, and Netradyne. Our team actively monitors safety scores, manages route delays, and coordinates roadside assistance so you maintain an Amazon Super Fantastic rating. Would you like to schedule a 30-minute discovery call with our DSP operations lead?",
+        "timestamp": "11:01 AM"
+      },
+      {
+        "sender": "user",
+        "text": "We manage 30 vans in Dallas. You can reach me at robert@dallasdispatch.com or +1 214-555-0199 to discuss booking a demo.",
+        "timestamp": "11:01 AM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Wal Group provides 24/7 Amazon DSP dispatch coverage using official portals like Cortex, Geotab, and Netradyne. Our team actively monitors safety scores, manages route delays, and coordinates roadside assistance so you maintain an Amazon Super Fantastic rating. Would you like to schedule a 30-minute discovery call with our DSP operations lead?",
+        "timestamp": "11:01 AM"
+      }
+    ],
+    "leadDetails": {
+      "email": "robert@dallasdispatch.com",
+      "phone": "+1 214-555-0199",
+      "fleetSize": "30 vans"
+    },
+    "unansweredQuestions": []
+  },
+  "SESS-1785063704894-mww5": {
+    "sessionId": "SESS-1785063704894-mww5",
+    "createdAt": "2026-07-26T11:01:44.894Z",
+    "updatedAt": "2026-07-26T11:01:45.159Z",
+    "pageVisited": "/services/dsp-dispatch",
+    "userBehaviorSummary": "Pages: /, /services/dsp-dispatch | Services: Amazon DSP Dispatch | Time: 120s",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Hello, what services does Wal Group offer for Amazon DSPs?",
+        "timestamp": "11:01 AM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Wal Group provides 24/7 Amazon DSP dispatch coverage using official portals like Cortex, Geotab, and Netradyne. Our team actively monitors safety scores, manages route delays, and coordinates roadside assistance so you maintain an Amazon Super Fantastic rating. Would you like to schedule a 30-minute discovery call with our DSP operations lead?",
+        "timestamp": "11:01 AM"
+      },
+      {
+        "sender": "user",
+        "text": "We manage 30 vans in Dallas. You can reach me at robert@dallasdispatch.com or +1 214-555-0199 to discuss booking a demo.",
+        "timestamp": "11:01 AM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Wal Group provides 24/7 Amazon DSP dispatch coverage using official portals like Cortex, Geotab, and Netradyne. Our team actively monitors safety scores, manages route delays, and coordinates roadside assistance so you maintain an Amazon Super Fantastic rating. Would you like to schedule a 30-minute discovery call with our DSP operations lead?",
+        "timestamp": "11:01 AM"
+      }
+    ],
+    "leadDetails": {
+      "email": "robert@dallasdispatch.com",
+      "phone": "+1 214-555-0199",
+      "fleetSize": "30 vans"
+    },
+    "unansweredQuestions": []
+  },
+  "SESS-1785064421150-orbc": {
+    "sessionId": "SESS-1785064421150-orbc",
+    "createdAt": "2026-07-26T11:13:41.150Z",
+    "updatedAt": "2026-07-26T11:13:41.356Z",
+    "pageVisited": "/services/dsp-dispatch",
+    "userBehaviorSummary": "Pages: /, /services/dsp-dispatch | Services: Amazon DSP Dispatch | Time: 120s",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Hello, what services does Wal Group offer for Amazon DSPs?",
+        "timestamp": "11:13 AM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Wal Group provides 24/7 Amazon DSP dispatch coverage using official portals like Cortex, Geotab, and Netradyne. Our team actively monitors safety scores, manages route delays, and coordinates roadside assistance so you maintain an Amazon Super Fantastic rating. Would you like to schedule a 30-minute discovery call with our DSP operations lead?",
+        "timestamp": "11:13 AM"
+      },
+      {
+        "sender": "user",
+        "text": "We manage 30 vans in Dallas. You can reach me at robert@dallasdispatch.com or +1 214-555-0199 to discuss booking a demo.",
+        "timestamp": "11:13 AM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Wal Group provides 24/7 Amazon DSP dispatch coverage using official portals like Cortex, Geotab, and Netradyne. Our team actively monitors safety scores, manages route delays, and coordinates roadside assistance so you maintain an Amazon Super Fantastic rating. Would you like to schedule a 30-minute discovery call with our DSP operations lead?",
+        "timestamp": "11:13 AM"
+      }
+    ],
+    "leadDetails": {
+      "email": "robert@dallasdispatch.com",
+      "phone": "+1 214-555-0199",
+      "fleetSize": "30 vans"
+    },
+    "unansweredQuestions": []
+  },
+  "SESS-1785064581704-wmem": {
+    "sessionId": "SESS-1785064581704-wmem",
+    "createdAt": "2026-07-26T11:16:21.704Z",
+    "updatedAt": "2026-07-26T11:16:21.905Z",
+    "pageVisited": "/services/dsp-dispatch",
+    "userBehaviorSummary": "Pages: /, /services/dsp-dispatch | Services: Amazon DSP Dispatch | Time: 120s",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Hello, what services does Wal Group offer for Amazon DSPs?",
+        "timestamp": "11:16 AM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Wal Group provides 24/7 Amazon DSP dispatch coverage using official portals like Cortex, Geotab, and Netradyne. Our team actively monitors safety scores, manages route delays, and coordinates roadside assistance so you maintain an Amazon Super Fantastic rating. Would you like to schedule a 30-minute discovery call with our DSP operations lead?",
+        "timestamp": "11:16 AM"
+      },
+      {
+        "sender": "user",
+        "text": "We manage 30 vans in Dallas. You can reach me at robert@dallasdispatch.com or +1 214-555-0199 to discuss booking a demo.",
+        "timestamp": "11:16 AM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Wal Group provides 24/7 Amazon DSP dispatch coverage using official portals like Cortex, Geotab, and Netradyne. Our team actively monitors safety scores, manages route delays, and coordinates roadside assistance so you maintain an Amazon Super Fantastic rating. Would you like to schedule a 30-minute discovery call with our DSP operations lead?",
+        "timestamp": "11:16 AM"
+      }
+    ],
+    "leadDetails": {
+      "email": "robert@dallasdispatch.com",
+      "phone": "+1 214-555-0199",
+      "fleetSize": "30 vans"
+    },
+    "unansweredQuestions": []
+  },
+  "SESS-1785069982335-44y6": {
+    "sessionId": "SESS-1785069982335-44y6",
+    "createdAt": "2026-07-26T12:46:22.335Z",
+    "updatedAt": "2026-07-26T12:46:22.753Z",
+    "pageVisited": "/services/dsp-dispatch",
+    "userBehaviorSummary": "Pages: /, /services/dsp-dispatch | Services: Amazon DSP Dispatch | Time: 120s",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Hello, what services does Wal Group offer for Amazon DSPs?",
+        "timestamp": "12:46 PM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Wal Group provides 24/7 Amazon DSP dispatch coverage using official portals like Cortex, Geotab, and Netradyne. Our team actively monitors safety scores, manages route delays, and coordinates roadside assistance so you maintain an Amazon Super Fantastic rating. Would you like to schedule a 30-minute discovery call with our DSP operations lead?",
+        "timestamp": "12:46 PM"
+      },
+      {
+        "sender": "user",
+        "text": "We manage 30 vans in Dallas. You can reach me at robert@dallasdispatch.com or +1 214-555-0199 to discuss booking a demo.",
+        "timestamp": "12:46 PM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Wal Group provides 24/7 Amazon DSP dispatch coverage using official portals like Cortex, Geotab, and Netradyne. Our team actively monitors safety scores, manages route delays, and coordinates roadside assistance so you maintain an Amazon Super Fantastic rating. Would you like to schedule a 30-minute discovery call with our DSP operations lead?",
+        "timestamp": "12:46 PM"
+      }
+    ],
+    "leadDetails": {
+      "email": "robert@dallasdispatch.com",
+      "phone": "+1 214-555-0199",
+      "fleetSize": "30 vans"
+    },
+    "unansweredQuestions": []
+  },
+  "SESS-MS1SNRKI": {
+    "sessionId": "SESS-MS1SNRKI",
+    "createdAt": "2026-07-26T12:48:46.443Z",
+    "updatedAt": "2026-07-26T12:51:18.256Z",
+    "pageVisited": "/",
+    "userBehaviorSummary": "Pages: /, /about, /raise-ticket, /digital-marketing, /dsp-dispatch-support, /afp-dispatch-support, /contact, /privacy-policy, /terms-and-conditions, /afp-accounting-tms, /dedicated-lane-services, /dsp-accounting-payroll, /services, /hr-bpo-services | Services:  | Time: 3751s",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "We have problems hiring dispatchers.",
+        "timestamp": "12:48 PM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Wal Group provides 24/7 Amazon DSP dispatch coverage using official portals like Cortex, Geotab, and Netradyne. Our team actively monitors safety scores, manages route delays, and coordinates roadside assistance so you maintain an Amazon Super Fantastic rating. Would you like to schedule a 30-minute discovery call with our DSP operations lead?",
+        "timestamp": "12:48 PM"
+      },
+      {
+        "sender": "user",
+        "text": "Tell me about Amazon DSP Dispatch.",
+        "timestamp": "12:49 PM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Wal Group provides 24/7 Amazon DSP dispatch coverage using official portals like Cortex, Geotab, and Netradyne. Our team actively monitors safety scores, manages route delays, and coordinates roadside assistance so you maintain an Amazon Super Fantastic rating. Would you like to schedule a 30-minute discovery call with our DSP operations lead?",
+        "timestamp": "12:49 PM"
+      },
+      {
+        "sender": "user",
+        "text": "what is your company name",
+        "timestamp": "12:51 PM"
+      },
+      {
+        "sender": "assistant",
+        "text": "At Wal Group, we serve as the operational backbone for Amazon DSPs, Freight fleets, and growing businesses globally. We handle 24/7 dispatch, accounting & payroll, driver recruiting, virtual assistants, and web development. How can we support your business goals today?",
+        "timestamp": "12:51 PM"
+      }
+    ],
+    "leadDetails": {},
+    "unansweredQuestions": []
+  },
+  "SESS-1785070442989-qdop": {
+    "sessionId": "SESS-1785070442989-qdop",
+    "createdAt": "2026-07-26T12:54:02.989Z",
+    "updatedAt": "2026-07-26T12:54:08.580Z",
+    "pageVisited": "/services/dsp-dispatch",
+    "userBehaviorSummary": "Pages: /, /services/dsp-dispatch | Services: Amazon DSP Dispatch | Time: 120s",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Hello, what services does Wal Group offer for Amazon DSPs?",
+        "timestamp": "12:54 PM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Welcome! At Wal Group, we specialize in comprehensive backend and operational solutions tailored specifically to help Amazon Delivery Service Partners (DSPs) streamline operations and protect their scorecards. \n\nOur core DSP offerings include:\n* **24/7 Dispatch & Fleet Management:** Real-time monitoring using Amazon Cortex, Geotab, Netradyne, and eMaint.\n* **DSP Accounting & Payroll:** Automated 14-day Amazon scorecard reconciliations, expense tracking, and seamless integrations with ADP, Gusto, and QuickBooks.\n* **AI Driver Recruitment & HR Onboarding:** Continuous driver pipeline management, vetting, and streamlined onboarding to keep your routes fully covered.\n\nBy taking the operational heavy lifting off your hands, we help you reduce overhead and focus on scaling your business. To help me suggest the best support model for your setup, could you share how many daily routes or drivers your DSP is currently managing?",
+        "timestamp": "12:54 PM"
+      }
+    ],
+    "leadDetails": {},
+    "unansweredQuestions": []
+  },
+  "SESS-1785070496902-36vy": {
+    "sessionId": "SESS-1785070496902-36vy",
+    "createdAt": "2026-07-26T12:54:56.902Z",
+    "updatedAt": "2026-07-26T12:55:03.927Z",
+    "pageVisited": "/services/dsp-dispatch",
+    "userBehaviorSummary": "Pages: /, /services/dsp-dispatch | Services: Amazon DSP Dispatch | Time: 120s",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Hello, what services does Wal Group offer for Amazon DSPs?",
+        "timestamp": "12:54 PM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Wal Group provides 24/7 Amazon DSP dispatch coverage using official portals like Cortex, Geotab, and Netradyne. Our team actively monitors safety scores, manages route delays, and coordinates roadside assistance so you maintain an Amazon Super Fantastic rating. Would you like to schedule a 30-minute discovery call with our DSP operations lead?",
+        "timestamp": "12:55 PM"
+      },
+      {
+        "sender": "user",
+        "text": "We manage 30 vans in Dallas. You can reach me at robert@dallasdispatch.com or +1 214-555-0199 to discuss booking a demo.",
+        "timestamp": "12:55 PM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Wal Group provides 24/7 Amazon DSP dispatch coverage using official portals like Cortex, Geotab, and Netradyne. Our team actively monitors safety scores, manages route delays, and coordinates roadside assistance so you maintain an Amazon Super Fantastic rating. Would you like to schedule a 30-minute discovery call with our DSP operations lead?",
+        "timestamp": "12:55 PM"
+      }
+    ],
+    "leadDetails": {
+      "email": "robert@dallasdispatch.com",
+      "phone": "+1 214-555-0199",
+      "fleetSize": "30 vans"
+    },
+    "unansweredQuestions": []
+  },
+  "SESS-1785070558637-go5c": {
+    "sessionId": "SESS-1785070558637-go5c",
+    "createdAt": "2026-07-26T12:55:58.638Z",
+    "updatedAt": "2026-07-26T12:56:05.665Z",
+    "pageVisited": "/services/dsp-dispatch",
+    "userBehaviorSummary": "Pages: /, /services/dsp-dispatch | Services: Amazon DSP Dispatch | Time: 120s",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Hello, what services does Wal Group offer for Amazon DSPs?",
+        "timestamp": "12:55 PM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Wal Group provides 24/7 Amazon DSP dispatch coverage using official portals like Cortex, Geotab, and Netradyne. Our team actively monitors safety scores, manages route delays, and coordinates roadside assistance so you maintain an Amazon Super Fantastic rating. Would you like to schedule a 30-minute discovery call with our DSP operations lead?",
+        "timestamp": "12:56 PM"
+      },
+      {
+        "sender": "user",
+        "text": "We manage 30 vans in Dallas. You can reach me at robert@dallasdispatch.com or +1 214-555-0199 to discuss booking a demo.",
+        "timestamp": "12:56 PM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Wal Group provides 24/7 Amazon DSP dispatch coverage using official portals like Cortex, Geotab, and Netradyne. Our team actively monitors safety scores, manages route delays, and coordinates roadside assistance so you maintain an Amazon Super Fantastic rating. Would you like to schedule a 30-minute discovery call with our DSP operations lead?",
+        "timestamp": "12:56 PM"
+      }
+    ],
+    "leadDetails": {
+      "email": "robert@dallasdispatch.com",
+      "phone": "+1 214-555-0199",
+      "fleetSize": "30 vans"
+    },
+    "unansweredQuestions": []
+  },
+  "SESS-1785070774029-evik": {
+    "sessionId": "SESS-1785070774029-evik",
+    "createdAt": "2026-07-26T12:59:34.029Z",
+    "updatedAt": "2026-07-26T12:59:41.054Z",
+    "pageVisited": "/services/dsp-dispatch",
+    "userBehaviorSummary": "Pages: /, /services/dsp-dispatch | Services: Amazon DSP Dispatch | Time: 120s",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Hello, what services does Wal Group offer for Amazon DSPs?",
+        "timestamp": "12:59 PM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Wal Group provides 24/7 Amazon DSP dispatch coverage using official portals like Cortex, Geotab, and Netradyne. Our team actively monitors safety scores, manages route delays, and coordinates roadside assistance so you maintain an Amazon Super Fantastic rating. Would you like to schedule a 30-minute discovery call with our DSP operations lead?",
+        "timestamp": "12:59 PM"
+      },
+      {
+        "sender": "user",
+        "text": "We manage 30 vans in Dallas. You can reach me at robert@dallasdispatch.com or +1 214-555-0199 to discuss booking a demo.",
+        "timestamp": "12:59 PM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Wal Group provides 24/7 Amazon DSP dispatch coverage using official portals like Cortex, Geotab, and Netradyne. Our team actively monitors safety scores, manages route delays, and coordinates roadside assistance so you maintain an Amazon Super Fantastic rating. Would you like to schedule a 30-minute discovery call with our DSP operations lead?",
+        "timestamp": "12:59 PM"
+      }
+    ],
+    "leadDetails": {
+      "company": "Amazon DSPs",
+      "email": "robert@dallasdispatch.com",
+      "phone": "+1 214-555-0199",
+      "fleetSize": "30 vans"
+    },
+    "unansweredQuestions": []
+  },
+  "SESS-MS1T2L1Y": {
+    "sessionId": "SESS-MS1T2L1Y",
+    "createdAt": "2026-07-26T13:00:13.219Z",
+    "updatedAt": "2026-07-26T13:00:36.109Z",
+    "pageVisited": "/",
+    "userBehaviorSummary": "Pages: /, /about, /raise-ticket, /digital-marketing, /dsp-dispatch-support, /afp-dispatch-support, /contact, /privacy-policy, /terms-and-conditions, /afp-accounting-tms, /dedicated-lane-services, /dsp-accounting-payroll, /services, /hr-bpo-services | Services:  | Time: 4370s",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "We have problems hiring dispatchers.",
+        "timestamp": "01:00 PM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Wal Group provides 24/7 Amazon DSP dispatch coverage using official portals like Cortex, Geotab, and Netradyne. Our team actively monitors safety scores, manages route delays, and coordinates roadside assistance so you maintain an Amazon Super Fantastic rating. Would you like to schedule a 30-minute discovery call with our DSP operations lead?",
+        "timestamp": "01:00 PM"
+      },
+      {
+        "sender": "user",
+        "text": "I need Dedicated Virtual Assistants.",
+        "timestamp": "01:00 PM"
+      },
+      {
+        "sender": "assistant",
+        "text": "At Wal Group, we serve as the operational backbone for Amazon DSPs, Freight fleets, and growing businesses globally. We handle 24/7 dispatch, accounting & payroll, driver recruiting, virtual assistants, and web development. How can we support your business goals today?",
+        "timestamp": "01:00 PM"
+      }
+    ],
+    "leadDetails": {},
+    "unansweredQuestions": []
+  },
+  "SESS-MS1T4B5G": {
+    "sessionId": "SESS-MS1T4B5G",
+    "createdAt": "2026-07-26T13:01:33.955Z",
+    "updatedAt": "2026-07-26T13:01:37.456Z",
+    "pageVisited": "/",
+    "userBehaviorSummary": "Pages: /, /about, /raise-ticket, /digital-marketing, /dsp-dispatch-support, /afp-dispatch-support, /contact, /privacy-policy, /terms-and-conditions, /afp-accounting-tms, /dedicated-lane-services, /dsp-accounting-payroll, /services, /hr-bpo-services | Services:  | Time: 4450s",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "We have problems hiring dispatchers.",
+        "timestamp": "01:01 PM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Wal Group provides 24/7 Amazon DSP dispatch coverage using official portals like Cortex, Geotab, and Netradyne. Our team actively monitors safety scores, manages route delays, and coordinates roadside assistance so you maintain an Amazon Super Fantastic rating. Would you like to schedule a 30-minute discovery call with our DSP operations lead?",
+        "timestamp": "01:01 PM"
+      }
+    ],
+    "leadDetails": {},
+    "unansweredQuestions": []
+  },
+  "SESS-1785071013738-sosw": {
+    "sessionId": "SESS-1785071013738-sosw",
+    "createdAt": "2026-07-26T13:03:33.738Z",
+    "updatedAt": "2026-07-26T13:03:40.765Z",
+    "pageVisited": "/services/dsp-dispatch",
+    "userBehaviorSummary": "Pages: /, /services/dsp-dispatch | Services: Amazon DSP Dispatch | Time: 120s",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Hello, what services does Wal Group offer for Amazon DSPs?",
+        "timestamp": "01:03 PM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Wal Group provides 24/7 Amazon DSP dispatch coverage using official portals like Cortex, Geotab, and Netradyne. Our team actively monitors safety scores, manages route delays, and coordinates roadside assistance so you maintain an Amazon Super Fantastic rating. Would you like to schedule a 30-minute discovery call with our DSP operations lead?",
+        "timestamp": "01:03 PM"
+      },
+      {
+        "sender": "user",
+        "text": "We manage 30 vans in Dallas. You can reach me at robert@dallasdispatch.com or +1 214-555-0199 to discuss booking a demo.",
+        "timestamp": "01:03 PM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Wal Group provides 24/7 Amazon DSP dispatch coverage using official portals like Cortex, Geotab, and Netradyne. Our team actively monitors safety scores, manages route delays, and coordinates roadside assistance so you maintain an Amazon Super Fantastic rating. Would you like to schedule a 30-minute discovery call with our DSP operations lead?",
+        "timestamp": "01:03 PM"
+      }
+    ],
+    "leadDetails": {
+      "company": "Amazon DSPs",
+      "email": "robert@dallasdispatch.com",
+      "phone": "+1 214-555-0199",
+      "fleetSize": "30 vans"
+    },
+    "unansweredQuestions": []
+  },
+  "SESS-MS1T8RRG": {
+    "sessionId": "SESS-MS1T8RRG",
+    "createdAt": "2026-07-26T13:05:05.473Z",
+    "updatedAt": "2026-07-26T13:05:20.425Z",
+    "pageVisited": "/",
+    "userBehaviorSummary": "Pages: /, /about, /raise-ticket, /digital-marketing, /dsp-dispatch-support, /afp-dispatch-support, /contact, /privacy-policy, /terms-and-conditions, /afp-accounting-tms, /dedicated-lane-services, /dsp-accounting-payroll, /services, /hr-bpo-services | Services:  | Time: 4660s",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Tell me about Amazon DSP Dispatch.",
+        "timestamp": "01:05 PM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Wal Group provides 24/7 Amazon DSP dispatch coverage using official portals like Cortex, Geotab, and Netradyne. Our team actively monitors safety scores, manages route delays, and coordinates roadside assistance so you maintain an Amazon Super Fantastic rating. Would you like to schedule a 30-minute discovery call with our DSP operations lead?",
+        "timestamp": "01:05 PM"
+      },
+      {
+        "sender": "user",
+        "text": "Book a Discovery Call.",
+        "timestamp": "01:05 PM"
+      },
+      {
+        "sender": "assistant",
+        "text": "I would be delighted to get that complimentary 30-minute Discovery Call scheduled for you with our Amazon DSP operations team!\n\nTo ensure we pair you with the right specialist and prepare for our discussion, could you please share your **full name** and the **name of your DSP or company**?",
+        "timestamp": "01:05 PM"
+      }
+    ],
+    "leadDetails": {},
+    "unansweredQuestions": []
+  },
+  "SESS-MS1TJXMT": {
+    "sessionId": "SESS-MS1TJXMT",
+    "createdAt": "2026-07-26T13:13:42.714Z",
+    "updatedAt": "2026-07-26T13:13:46.235Z",
+    "pageVisited": "/",
+    "userBehaviorSummary": "Pages: /, /about, /raise-ticket, /digital-marketing, /dsp-dispatch-support, /afp-dispatch-support, /contact, /privacy-policy, /terms-and-conditions, /afp-accounting-tms, /dedicated-lane-services, /dsp-accounting-payroll, /services, /hr-bpo-services | Services:  | Time: 5126s",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Book a Discovery Call.",
+        "timestamp": "01:13 PM"
+      },
+      {
+        "sender": "assistant",
+        "text": "I'd be happy to arrange a Discovery Call for you with our executive team. You can click \"Book Discovery Call\" right here or let me know your preferred date and business email!",
+        "timestamp": "01:13 PM"
+      }
+    ],
+    "leadDetails": {},
+    "unansweredQuestions": []
+  },
+  "SESS-1785072117409-4ky6": {
+    "sessionId": "SESS-1785072117409-4ky6",
+    "createdAt": "2026-07-26T13:21:57.410Z",
+    "updatedAt": "2026-07-26T13:22:04.437Z",
+    "pageVisited": "/services/dsp-dispatch",
+    "userBehaviorSummary": "Pages: /, /services/dsp-dispatch | Services: Amazon DSP Dispatch | Time: 120s",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Hello, what services does Wal Group offer for Amazon DSPs?",
+        "timestamp": "01:21 PM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Wal Group provides 24/7 Amazon DSP dispatch coverage using official portals like Cortex, Geotab, and Netradyne. Our team actively monitors safety scores, manages route delays, and coordinates roadside assistance so you maintain an Amazon Super Fantastic rating. Would you like to schedule a 30-minute discovery call with our DSP operations lead?",
+        "timestamp": "01:22 PM"
+      },
+      {
+        "sender": "user",
+        "text": "We manage 30 vans in Dallas. You can reach me at robert@dallasdispatch.com or +1 214-555-0199 to discuss booking a demo.",
+        "timestamp": "01:22 PM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Wal Group provides 24/7 Amazon DSP dispatch coverage using official portals like Cortex, Geotab, and Netradyne. Our team actively monitors safety scores, manages route delays, and coordinates roadside assistance so you maintain an Amazon Super Fantastic rating. Would you like to schedule a 30-minute discovery call with our DSP operations lead?",
+        "timestamp": "01:22 PM"
+      }
+    ],
+    "leadDetails": {
+      "company": "Amazon DSPs",
+      "email": "robert@dallasdispatch.com",
+      "phone": "+1 214-555-0199",
+      "fleetSize": "30 vans"
+    },
+    "unansweredQuestions": []
+  },
+  "SESS-1785072282676-7une": {
+    "sessionId": "SESS-1785072282676-7une",
+    "createdAt": "2026-07-26T13:24:42.676Z",
+    "updatedAt": "2026-07-26T13:24:46.286Z",
+    "pageVisited": "/services/dsp-dispatch",
+    "userBehaviorSummary": "Pages: /, /services/dsp-dispatch | Services: Amazon DSP Dispatch | Time: 120s",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Hello, what services does Wal Group offer for Amazon DSPs?",
+        "timestamp": "01:24 PM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Wal Group provides 24/7 Amazon DSP dispatch coverage using official portals like Cortex, Geotab, and Netradyne. Our team actively monitors safety scores, manages route delays, and coordinates roadside assistance so you maintain an Amazon Super Fantastic rating. Would you like to schedule a 30-minute discovery call with our DSP operations lead?",
+        "timestamp": "01:24 PM"
+      },
+      {
+        "sender": "user",
+        "text": "We manage 30 vans in Dallas. You can reach me at robert@dallasdispatch.com or +1 214-555-0199 to discuss booking a demo.",
+        "timestamp": "01:24 PM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Wal Group provides 24/7 Amazon DSP dispatch coverage using official portals like Cortex, Geotab, and Netradyne. Our team actively monitors safety scores, manages route delays, and coordinates roadside assistance so you maintain an Amazon Super Fantastic rating. Would you like to schedule a 30-minute discovery call with our DSP operations lead?",
+        "timestamp": "01:24 PM"
+      }
+    ],
+    "leadDetails": {
+      "company": "Amazon DSPs",
+      "email": "robert@dallasdispatch.com",
+      "phone": "+1 214-555-0199",
+      "fleetSize": "30 vans"
+    },
+    "unansweredQuestions": []
+  },
+  "SESS-1785072639446-5k45": {
+    "sessionId": "SESS-1785072639446-5k45",
+    "createdAt": "2026-07-26T13:30:39.446Z",
+    "updatedAt": "2026-07-26T13:30:46.470Z",
+    "pageVisited": "/services/dsp-dispatch",
+    "userBehaviorSummary": "Pages: /, /services/dsp-dispatch | Services: Amazon DSP Dispatch | Time: 120s",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Hello, what services does Wal Group offer for Amazon DSPs?",
+        "timestamp": "01:30 PM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Wal Group provides 24/7 Amazon DSP dispatch coverage using official portals like Cortex, Geotab, and Netradyne. Our team actively monitors safety scores, manages route delays, and coordinates roadside assistance so you maintain an Amazon Super Fantastic rating. Would you like to schedule a 30-minute discovery call with our DSP operations lead?",
+        "timestamp": "01:30 PM"
+      },
+      {
+        "sender": "user",
+        "text": "We manage 30 vans in Dallas. You can reach me at robert@dallasdispatch.com or +1 214-555-0199 to discuss booking a demo.",
+        "timestamp": "01:30 PM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Wal Group provides 24/7 Amazon DSP dispatch coverage using official portals like Cortex, Geotab, and Netradyne. Our team actively monitors safety scores, manages route delays, and coordinates roadside assistance so you maintain an Amazon Super Fantastic rating. Would you like to schedule a 30-minute discovery call with our DSP operations lead?",
+        "timestamp": "01:30 PM"
+      }
+    ],
+    "leadDetails": {
+      "company": "Amazon DSPs",
+      "email": "robert@dallasdispatch.com",
+      "phone": "+1 214-555-0199",
+      "fleetSize": "30 vans"
+    },
+    "unansweredQuestions": []
+  },
+  "SESS-MS1VB755": {
+    "sessionId": "SESS-MS1VB755",
+    "createdAt": "2026-07-26T14:03:00.662Z",
+    "updatedAt": "2026-07-26T14:03:07.236Z",
+    "pageVisited": "/",
+    "userBehaviorSummary": "Pages: /, /about, /raise-ticket, /digital-marketing, /dsp-dispatch-support, /afp-dispatch-support, /contact, /privacy-policy, /terms-and-conditions, /afp-accounting-tms, /dedicated-lane-services, /dsp-accounting-payroll, /services, /hr-bpo-services, /website-design-development | Services:  | Time: 6330s",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Book a Discovery Call.",
+        "timestamp": "02:03 PM"
+      },
+      {
+        "sender": "assistant",
+        "text": "I'd be happy to arrange a Discovery Call for you with our executive team. You can click \"Book Discovery Call\" right here or let me know your preferred date and business email!",
+        "timestamp": "02:03 PM"
+      },
+      {
+        "sender": "user",
+        "text": "Tell me about Amazon DSP Dispatch.",
+        "timestamp": "02:03 PM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Wal Group provides 24/7 Amazon DSP dispatch coverage using official portals like Cortex, Geotab, and Netradyne. Our team actively monitors safety scores, manages route delays, and coordinates roadside assistance so you maintain an Amazon Super Fantastic rating. Would you like to schedule a 30-minute discovery call with our DSP operations lead?",
+        "timestamp": "02:03 PM"
+      }
+    ],
+    "leadDetails": {},
+    "unansweredQuestions": []
+  },
+  "SESS-1785074589957-2h6r": {
+    "sessionId": "SESS-1785074589957-2h6r",
+    "createdAt": "2026-07-26T14:03:09.957Z",
+    "updatedAt": "2026-07-26T14:03:10.352Z",
+    "pageVisited": "/services/dsp-dispatch",
+    "userBehaviorSummary": "Pages: /, /services/dsp-dispatch | Services: Amazon DSP Dispatch | Time: 120s",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Hello, what services does Wal Group offer for Amazon DSPs?",
+        "timestamp": "02:03 PM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Wal Group provides 24/7 Amazon DSP dispatch coverage using official portals like Cortex, Geotab, and Netradyne. Our team actively monitors safety scores, manages route delays, and coordinates roadside assistance so you maintain an Amazon Super Fantastic rating. Would you like to schedule a 30-minute discovery call with our DSP operations lead?",
+        "timestamp": "02:03 PM"
+      },
+      {
+        "sender": "user",
+        "text": "We manage 30 vans in Dallas. You can reach me at robert@dallasdispatch.com or +1 214-555-0199 to discuss booking a demo.",
+        "timestamp": "02:03 PM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Wal Group provides 24/7 Amazon DSP dispatch coverage using official portals like Cortex, Geotab, and Netradyne. Our team actively monitors safety scores, manages route delays, and coordinates roadside assistance so you maintain an Amazon Super Fantastic rating. Would you like to schedule a 30-minute discovery call with our DSP operations lead?",
+        "timestamp": "02:03 PM"
+      }
+    ],
+    "leadDetails": {
+      "company": "Amazon DSPs",
+      "email": "robert@dallasdispatch.com",
+      "phone": "+1 214-555-0199",
+      "fleetSize": "30 vans"
+    },
+    "unansweredQuestions": []
+  }
+}
