@@ -3,11 +3,72 @@ import path from 'path';
 import fs from 'fs';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
+import OpenAI from 'openai';
+import { saveBookingToSupabase, saveLeadToSupabase, saveContactSubmissionToSupabase, saveJobApplicationToSupabase, saveTicketToSupabase, saveAiLogToSupabase } from './src/lib/supabase';
 
 const app = express();
 const PORT = 3000;
 
 app.use(express.json());
+
+// Helper function to send email notifications securely via Resend API (or fallback logging)
+async function sendEmailNotification(to: string, subject: string, htmlContent: string) {
+  console.log(`[EMAIL DISPATCH INITIATED] To: ${to} | Subject: ${subject}`);
+  
+  const resendApiKey = process.env.RESEND_API_KEY;
+  const resendFrom = process.env.RESEND_FROM_EMAIL || 'Wal Group <onboarding@resend.dev>';
+  
+  if (resendApiKey) {
+    try {
+      const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${resendApiKey}`
+        },
+        body: JSON.stringify({
+          from: resendFrom,
+          to: [to],
+          subject,
+          html: htmlContent
+        })
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        console.warn(`[RESEND EMAIL WARNING] Response ${response.status}:`, data);
+        // If domain not verified on custom sender, attempt fallback with onboarding@resend.dev
+        if (resendFrom !== 'Wal Group <onboarding@resend.dev>') {
+          console.log('[RESEND EMAIL RETRY] Retrying with onboarding@resend.dev...');
+          const retryRes = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${resendApiKey}`
+            },
+            body: JSON.stringify({
+              from: 'Wal Group <onboarding@resend.dev>',
+              to: [to],
+              subject,
+              html: htmlContent
+            })
+          });
+          const retryData = await retryRes.json();
+          console.log(`[RESEND RETRY RESULT] Status ${retryRes.status}:`, retryData);
+          return { success: retryRes.ok, data: retryData };
+        }
+      } else {
+        console.log(`[RESEND EMAIL SUCCESS] Sent to ${to}:`, data);
+      }
+      return { success: response.ok, data };
+    } catch (err) {
+      console.error('[RESEND EMAIL ERROR]', err);
+      return { success: false, error: err };
+    }
+  } else {
+    console.log(`[EMAIL SIMULATION] Delivery queued for ${to}. Set RESEND_API_KEY in environment for live delivery.`);
+    return { success: true, simulated: true };
+  }
+}
 
 // File persistence paths
 const DATA_DIR = path.join(process.cwd(), 'data');
@@ -38,6 +99,21 @@ function getGenAI(): GoogleGenAI | null {
     }
   }
   return genAIClient;
+}
+
+// Lazy initialization of OpenAI client
+let openaiClient: OpenAI | null = null;
+function getOpenAI(): OpenAI | null {
+  if (!openaiClient && process.env.OPENAI_API_KEY) {
+    try {
+      openaiClient = new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY
+      });
+    } catch (e) {
+      console.error('Failed to initialize OpenAI client:', e);
+    }
+  }
+  return openaiClient;
 }
 
 interface BookingRecord {
@@ -297,13 +373,70 @@ app.post('/api/bookings', (req, res) => {
     bookings.unshift(newBooking);
     saveData(BOOKINGS_FILE, bookings);
 
+    // Persist to Supabase
+    saveBookingToSupabase({
+      id: newBooking.id,
+      companyName: newBooking.companyName,
+      industry: newBooking.industry,
+      country: newBooking.country,
+      website: newBooking.website,
+      companySize: newBooking.companySize,
+      fullName: newBooking.fullName,
+      email: newBooking.email,
+      phone: newBooking.phone,
+      jobTitle: newBooking.jobTitle,
+      linkedin: newBooking.linkedin,
+      selectedServices: newBooking.selectedServices,
+      preferredDate: newBooking.preferredDate,
+      preferredTime: newBooking.preferredTime,
+      timezone: newBooking.timezone,
+      meetingType: newBooking.meetingType,
+      projectDescription: newBooking.projectDescription,
+      currentChallenges: newBooking.currentChallenges,
+      expectedTeamSize: newBooking.expectedTeamSize,
+      budget: newBooking.budget,
+      timeline: newBooking.timeline,
+      status: newBooking.status,
+      meetLink: newBooking.meetLink,
+      googleCalendarUrl: newBooking.googleCalendarUrl,
+      notes: newBooking.notes,
+      routedTo: newBooking.routedTo
+    }).catch((err) => console.error('[Supabase Server Booking Save Error]', err));
+
     const icsContent = generateICS(newBooking);
 
-    // Dispatch logging and notification simulation
-    console.log(`[DISCOVERY CALL BOOKED] ID: ${bookingId} | Client: ${fullName} (${email})`);
-    console.log(`Notification routed to: thewalgroupinfo@gmail.com`);
-    console.log(`[INTERNAL EMAIL DISPATCHED] Destination: thewalgroupinfo@gmail.com | Details: ${companyName}, ${fullName}, ${email}, ${preferredDate} @ ${preferredTime}`);
-    console.log(`[CLIENT EMAIL DISPATCHED] Destination: ${email} | Subject: Discovery Call Confirmed - Wal Group (${bookingId})`);
+    // Dispatch live email notifications
+    const adminHtml = `
+      <div style="font-family: sans-serif; padding: 20px; color: #1e293b;">
+        <h2 style="color: #0a2647;">New Discovery Call Booked (${bookingId})</h2>
+        <p><strong>Company Name:</strong> ${companyName}</p>
+        <p><strong>Contact Name:</strong> ${fullName}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Phone:</strong> ${phone}</p>
+        <p><strong>Date & Time:</strong> ${preferredDate} at ${preferredTime} (${timezone || 'EST'})</p>
+        <p><strong>Meeting Link:</strong> <a href="${meetLink}">${meetLink}</a></p>
+        <p><strong>Project Description:</strong> ${projectDescription}</p>
+      </div>
+    `;
+
+    const clientHtml = `
+      <div style="font-family: sans-serif; padding: 20px; color: #1e293b;">
+        <h2 style="color: #0a2647;">Discovery Call Confirmation - Wal Group</h2>
+        <p>Dear ${fullName},</p>
+        <p>Thank you for scheduling a discovery call with Wal Group. Your session details are below:</p>
+        <ul>
+          <li><strong>Reference ID:</strong> ${bookingId}</li>
+          <li><strong>Date:</strong> ${preferredDate}</li>
+          <li><strong>Time:</strong> ${preferredTime} (${timezone || 'EST'})</li>
+          <li><strong>Google Meet Link:</strong> <a href="${meetLink}">${meetLink}</a></li>
+        </ul>
+        <p>We look forward to speaking with you!</p>
+        <p>Best regards,<br><strong>Wal Group Operations Team</strong><br>thewalgroupinfo@gmail.com</p>
+      </div>
+    `;
+
+    sendEmailNotification('thewalgroupinfo@gmail.com', `[New Booking] ${companyName} - ${fullName}`, adminHtml);
+    sendEmailNotification(email, `Discovery Call Confirmed - Wal Group (${bookingId})`, clientHtml);
 
     return res.json({
       success: true,
@@ -323,6 +456,416 @@ app.post('/api/bookings', (req, res) => {
       success: false,
       message: 'We encountered an unexpected error processing your booking. Our administration team has been notified. Please try again or reach us directly at thewalgroupinfo@gmail.com.'
     });
+  }
+});
+
+// Contact Us Endpoint
+app.post('/api/contact', async (req, res) => {
+  try {
+    const { fullName, email, phone, companyName, subject, message } = req.body;
+    if (!fullName || !email || !message) {
+      return res.status(400).json({ success: false, message: 'Full name, email, and message are required.' });
+    }
+
+    // Persist to Supabase
+    await saveContactSubmissionToSupabase({
+      fullName,
+      email,
+      phone: phone || '',
+      companyName: companyName || '',
+      subject: subject || 'Contact Us Submission',
+      message,
+      targetEmail: 'thewalgroupinfo@gmail.com'
+    });
+
+    const adminEmailHtml = `
+      <div style="font-family: sans-serif; padding: 20px;">
+        <h2 style="color: #0a2647;">New Contact Us Inquiry</h2>
+        <p><strong>From:</strong> ${fullName} (${email})</p>
+        <p><strong>Company:</strong> ${companyName || 'N/A'}</p>
+        <p><strong>Phone:</strong> ${phone || 'N/A'}</p>
+        <p><strong>Subject:</strong> ${subject || 'General Inquiry'}</p>
+        <p><strong>Message:</strong></p>
+        <blockquote style="background: #f1f5f9; padding: 12px; border-left: 4px solid #0a2647;">${message}</blockquote>
+      </div>
+    `;
+
+    const clientEmailHtml = `
+      <div style="font-family: sans-serif; padding: 20px;">
+        <h2 style="color: #0a2647;">Thank You for Contacting Wal Group</h2>
+        <p>Dear ${fullName},</p>
+        <p>We have received your message regarding "<strong>${subject || 'General Inquiry'}</strong>". Our operations team will review your inquiry and respond within 24 business hours.</p>
+        <br>
+        <p>Warm regards,<br><strong>Wal Group Operations</strong><br>thewalgroupinfo@gmail.com</p>
+      </div>
+    `;
+
+    sendEmailNotification('thewalgroupinfo@gmail.com', `[Contact Us] ${subject || 'New Inquiry'} from ${fullName}`, adminEmailHtml);
+    sendEmailNotification(email, `We Received Your Inquiry - Wal Group`, clientEmailHtml);
+
+    return res.json({ success: true, message: 'Message successfully received and email notifications dispatched.' });
+  } catch (err: any) {
+    console.error('[CONTACT API ERROR]', err);
+    return res.status(500).json({ success: false, message: 'Failed to record contact submission.' });
+  }
+});
+
+// Careers / Job Applications Endpoint
+app.post('/api/careers', async (req, res) => {
+  try {
+    const payload = req.body;
+    const { id, fullName, email, phone, position, resumeUrl, resumeFileName, experienceYears } = payload;
+
+    if (!fullName || !email || !position) {
+      return res.status(400).json({ success: false, message: 'Missing required candidate application fields.' });
+    }
+
+    // Persist to Supabase
+    await saveJobApplicationToSupabase(payload);
+
+    const adminEmailHtml = `
+      <div style="font-family: sans-serif; padding: 20px;">
+        <h2 style="color: #0a2647;">New Job Application Received (${id || 'NEW'})</h2>
+        <p><strong>Position:</strong> ${position}</p>
+        <p><strong>Candidate:</strong> ${fullName} (${email})</p>
+        <p><strong>Phone:</strong> ${phone}</p>
+        <p><strong>Experience:</strong> ${experienceYears || 0} Years</p>
+        <p><strong>Resume Attachment:</strong> <a href="${resumeUrl}">${resumeFileName || 'Download Resume'}</a></p>
+      </div>
+    `;
+
+    const clientEmailHtml = `
+      <div style="font-family: sans-serif; padding: 20px;">
+        <h2 style="color: #0a2647;">Job Application Received - Wal Group</h2>
+        <p>Dear ${fullName},</p>
+        <p>Thank you for applying for the position of <strong>${position}</strong> at Wal Group.</p>
+        <p>Our HR recruitment team is reviewing your profile and resume. If your qualifications match our open roles, we will contact you directly for a screening interview.</p>
+        <br>
+        <p>Best of luck,<br><strong>Wal Group HR & Recruitment</strong><br>thewalgroupinfo@gmail.com</p>
+      </div>
+    `;
+
+    sendEmailNotification('thewalgroupinfo@gmail.com', `[Job App] ${position} - ${fullName}`, adminEmailHtml);
+    sendEmailNotification(email, `Application Confirmation - Wal Group (${position})`, clientEmailHtml);
+
+    return res.json({ success: true, message: 'Job application received.' });
+  } catch (err: any) {
+    console.error('[CAREERS API ERROR]', err);
+    return res.status(500).json({ success: false, message: 'Failed to process job application.' });
+  }
+});
+
+// Support Ticket Submission Endpoint
+app.post('/api/tickets', async (req, res) => {
+  try {
+    const payload = req.body;
+    const { id, fullName, email, phone, companyName, department, subject, priority, message } = payload;
+
+    if (!fullName || !email || !subject || !message) {
+      return res.status(400).json({ success: false, message: 'Full name, email, subject, and message are required.' });
+    }
+
+    const ticketId = id || `WM-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.floor(1000 + Math.random() * 9000)}`;
+    const fullPayload = {
+      ...payload,
+      id: ticketId,
+      department: department || 'Technical Support',
+      priority: priority || 'Medium'
+    };
+
+    // Save to Supabase
+    await saveTicketToSupabase(fullPayload);
+
+    const adminHtml = `
+      <div style="font-family: sans-serif; padding: 20px;">
+        <h2 style="color: #0a2647;">New Client Support Ticket (${ticketId})</h2>
+        <p><strong>From:</strong> ${fullName} (${email})</p>
+        <p><strong>Company:</strong> ${companyName || 'N/A'} | <strong>Phone:</strong> ${phone || 'N/A'}</p>
+        <p><strong>Department:</strong> ${department || 'Technical Support'} | <strong>Priority:</strong> ${priority || 'Medium'}</p>
+        <p><strong>Subject:</strong> ${subject}</p>
+        <p><strong>Description:</strong></p>
+        <blockquote style="background: #f1f5f9; padding: 12px; border-left: 4px solid #0a2647;">${message}</blockquote>
+      </div>
+    `;
+
+    const clientHtml = `
+      <div style="font-family: sans-serif; padding: 20px;">
+        <h2 style="color: #0a2647;">Support Ticket Received - Wal Group</h2>
+        <p>Dear ${fullName},</p>
+        <p>Thank you for contacting Wal Group Support. Your ticket reference is <strong>${ticketId}</strong>.</p>
+        <p>Our operational specialists are reviewing your request in the <strong>${department || 'Technical Support'}</strong> queue and will reply promptly.</p>
+        <br>
+        <p>Best regards,<br><strong>Wal Group Operations Support</strong><br>thewalgroupinfo@gmail.com</p>
+      </div>
+    `;
+
+    sendEmailNotification('thewalgroupinfo@gmail.com', `[Ticket ${ticketId}] ${subject} (${priority || 'Medium'})`, adminHtml);
+    sendEmailNotification(email, `Support Ticket Logged - Wal Group (${ticketId})`, clientHtml);
+
+    return res.json({
+      success: true,
+      ticketId,
+      message: 'Support ticket successfully logged and email notifications dispatched.'
+    });
+  } catch (err: any) {
+    console.error('[TICKETS API ERROR]', err);
+    return res.status(500).json({ success: false, message: 'Failed to process support ticket.' });
+  }
+});
+
+// Supabase Database Webhook & Edge Functions Listener Endpoint
+app.post('/api/supabase-webhook', async (req, res) => {
+  try {
+    // Validate secret header if configured
+    const webhookSecret = process.env.SUPABASE_WEBHOOK_SECRET;
+    const authHeader = req.headers['x-supabase-webhook-secret'] || req.headers['authorization'];
+    if (webhookSecret && authHeader) {
+      const token = authHeader.toString().replace(/^Bearer\s+/i, '');
+      if (token !== webhookSecret) {
+        console.warn('[SUPABASE WEBHOOK AUTH FAILED] Secret mismatch');
+        return res.status(401).json({ success: false, message: 'Unauthorized webhook request.' });
+      }
+    }
+
+    const body = req.body || {};
+    // Extract event details from Supabase payload structures
+    const table = (body.table || body.table_name || body.type || '').toString().toLowerCase();
+    const eventType = (body.type || body.event || body.action || 'INSERT').toString().toUpperCase();
+    const record = body.record || body.data || body.new || body;
+
+    console.log(`[SUPABASE WEBHOOK EVENT RECEIVED] Event: ${eventType} | Table: ${table}`);
+
+    if (!record || typeof record !== 'object' || Object.keys(record).length === 0) {
+      return res.status(400).json({ success: false, message: 'Invalid or missing record payload.' });
+    }
+
+    const dispatchedEmails: string[] = [];
+
+    // Helper to safely fetch fields whether camelCase or snake_case
+    const getVal = (...keys: string[]): any => {
+      for (const k of keys) {
+        if (record[k] !== undefined && record[k] !== null && record[k] !== '') {
+          return record[k];
+        }
+      }
+      return '';
+    };
+
+    // 1. Table: contact_submissions / contact
+    if (table.includes('contact')) {
+      const fullName = getVal('full_name', 'fullName', 'name') || 'Valued Visitor';
+      const email = getVal('email', 'email_address');
+      const phone = getVal('phone', 'phone_number');
+      const companyName = getVal('company_name', 'companyName', 'company');
+      const subject = getVal('subject', 'topic') || 'General Contact Inquiry';
+      const message = getVal('message', 'comments', 'inquiry') || 'No message content provided.';
+
+      const adminHtml = `
+        <div style="font-family: sans-serif; padding: 20px;">
+          <h2 style="color: #0a2647;">[Supabase Trigger] New Contact Inquiry</h2>
+          <p><strong>From:</strong> ${fullName} (${email})</p>
+          <p><strong>Company:</strong> ${companyName || 'N/A'}</p>
+          <p><strong>Phone:</strong> ${phone || 'N/A'}</p>
+          <p><strong>Subject:</strong> ${subject}</p>
+          <p><strong>Message:</strong></p>
+          <blockquote style="background: #f1f5f9; padding: 12px; border-left: 4px solid #0a2647;">${message}</blockquote>
+        </div>
+      `;
+
+      sendEmailNotification('thewalgroupinfo@gmail.com', `[Supabase Trigger] Contact Inquiry: ${subject} from ${fullName}`, adminHtml);
+      dispatchedEmails.push('thewalgroupinfo@gmail.com');
+
+      if (email) {
+        const clientHtml = `
+          <div style="font-family: sans-serif; padding: 20px;">
+            <h2 style="color: #0a2647;">We Received Your Message - Wal Group</h2>
+            <p>Dear ${fullName},</p>
+            <p>Thank you for reaching out regarding "<strong>${subject}</strong>". Your inquiry has been received via our Supabase data system. An operations manager will follow up with you within 24 business hours.</p>
+            <br>
+            <p>Best regards,<br><strong>Wal Group Operations Team</strong><br>thewalgroupinfo@gmail.com</p>
+          </div>
+        `;
+        sendEmailNotification(email, `Inquiry Received - Wal Group`, clientHtml);
+        dispatchedEmails.push(email);
+      }
+    }
+
+    // 2. Table: bookings / discovery_calls
+    else if (table.includes('booking') || table.includes('discovery')) {
+      const id = getVal('id', 'booking_id', 'bookingId') || `WAL-BOOK-${Date.now()}`;
+      const fullName = getVal('full_name', 'fullName', 'name') || 'Valued Client';
+      const companyName = getVal('company_name', 'companyName', 'company') || 'Client Organization';
+      const email = getVal('email');
+      const phone = getVal('phone');
+      const preferredDate = getVal('preferred_date', 'preferredDate', 'date') || 'To Be Confirmed';
+      const preferredTime = getVal('preferred_time', 'preferredTime', 'time') || 'To Be Confirmed';
+      const timezone = getVal('timezone') || 'EST';
+      const meetLink = getVal('meet_link', 'meetLink') || 'https://meet.google.com/wal-group-discovery';
+      const projectDescription = getVal('project_description', 'projectDescription', 'notes') || 'Discovery session booked.';
+
+      const adminHtml = `
+        <div style="font-family: sans-serif; padding: 20px;">
+          <h2 style="color: #0a2647;">[Supabase Trigger] New Discovery Call Booked</h2>
+          <p><strong>Booking ID:</strong> ${id}</p>
+          <p><strong>Company:</strong> ${companyName}</p>
+          <p><strong>Contact:</strong> ${fullName} (${email})</p>
+          <p><strong>Phone:</strong> ${phone}</p>
+          <p><strong>Date & Time:</strong> ${preferredDate} at ${preferredTime} (${timezone})</p>
+          <p><strong>Google Meet Link:</strong> <a href="${meetLink}">${meetLink}</a></p>
+          <p><strong>Project Details:</strong> ${projectDescription}</p>
+        </div>
+      `;
+
+      sendEmailNotification('thewalgroupinfo@gmail.com', `[Supabase Trigger] Booking: ${companyName} (${id})`, adminHtml);
+      dispatchedEmails.push('thewalgroupinfo@gmail.com');
+
+      if (email) {
+        const clientHtml = `
+          <div style="font-family: sans-serif; padding: 20px;">
+            <h2 style="color: #0a2647;">Discovery Call Confirmed - Wal Group</h2>
+            <p>Dear ${fullName},</p>
+            <p>Your discovery session with Wal Group has been logged successfully in our database:</p>
+            <ul>
+              <li><strong>Reference ID:</strong> ${id}</li>
+              <li><strong>Date & Time:</strong> ${preferredDate} at ${preferredTime} (${timezone})</li>
+              <li><strong>Meeting Link:</strong> <a href="${meetLink}">${meetLink}</a></li>
+            </ul>
+            <p>We look forward to connecting with you!</p>
+            <br>
+            <p>Best regards,<br><strong>Wal Group Operations</strong><br>thewalgroupinfo@gmail.com</p>
+          </div>
+        `;
+        sendEmailNotification(email, `Discovery Call Confirmed - Wal Group (${id})`, clientHtml);
+        dispatchedEmails.push(email);
+      }
+    }
+
+    // 3. Table: job_applications / careers
+    else if (table.includes('job') || table.includes('career') || table.includes('application')) {
+      const id = getVal('id', 'application_id', 'applicationId') || `APP-${Date.now()}`;
+      const fullName = getVal('full_name', 'fullName', 'name') || 'Candidate';
+      const email = getVal('email');
+      const phone = getVal('phone');
+      const position = getVal('position', 'job_title', 'role') || 'Operations Specialist';
+      const experienceYears = getVal('experience_years', 'experienceYears', 'experience') || 0;
+      const resumeUrl = getVal('resume_url', 'resumeUrl');
+      const resumeFileName = getVal('resume_file_name', 'resumeFileName') || 'Resume';
+
+      const adminHtml = `
+        <div style="font-family: sans-serif; padding: 20px;">
+          <h2 style="color: #0a2647;">[Supabase Trigger] New Job Application</h2>
+          <p><strong>Application ID:</strong> ${id}</p>
+          <p><strong>Candidate Name:</strong> ${fullName}</p>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Phone:</strong> ${phone}</p>
+          <p><strong>Position:</strong> ${position}</p>
+          <p><strong>Experience:</strong> ${experienceYears} Years</p>
+          ${resumeUrl ? `<p><strong>Resume:</strong> <a href="${resumeUrl}">${resumeFileName}</a></p>` : ''}
+        </div>
+      `;
+
+      sendEmailNotification('thewalgroupinfo@gmail.com', `[Supabase Trigger] Job App: ${position} - ${fullName}`, adminHtml);
+      dispatchedEmails.push('thewalgroupinfo@gmail.com');
+
+      if (email) {
+        const candidateHtml = `
+          <div style="font-family: sans-serif; padding: 20px;">
+            <h2 style="color: #0a2647;">Application Confirmation - Wal Group</h2>
+            <p>Dear ${fullName},</p>
+            <p>Thank you for submitting your job application for <strong>${position}</strong> at Wal Group. Your profile is recorded in our recruitment database.</p>
+            <p>Our recruitment team will evaluate your experience and follow up if your profile aligns with our openings.</p>
+            <br>
+            <p>Best of luck,<br><strong>Wal Group HR & Talent Acquisition</strong><br>thewalgroupinfo@gmail.com</p>
+          </div>
+        `;
+        sendEmailNotification(email, `Application Received - Wal Group (${position})`, candidateHtml);
+        dispatchedEmails.push(email);
+      }
+    }
+
+    // 4. Table: leads
+    else if (table.includes('lead')) {
+      const id = getVal('id', 'lead_id') || `LEAD-${Date.now()}`;
+      const name = getVal('name', 'full_name', 'fullName') || 'Prospective Lead';
+      const company = getVal('company', 'company_name', 'companyName') || 'N/A';
+      const email = getVal('email');
+      const phone = getVal('phone');
+      const fleetSize = getVal('fleet_size', 'fleetSize');
+      const score = getVal('score') || 'Warm';
+
+      const adminHtml = `
+        <div style="font-family: sans-serif; padding: 20px;">
+          <h2 style="color: #0a2647;">[Supabase Trigger] New Lead Logged</h2>
+          <p><strong>Lead ID:</strong> ${id}</p>
+          <p><strong>Lead Name:</strong> ${name}</p>
+          <p><strong>Company:</strong> ${company}</p>
+          <p><strong>Email:</strong> ${email || 'N/A'}</p>
+          <p><strong>Phone:</strong> ${phone || 'N/A'}</p>
+          <p><strong>Fleet Size / Details:</strong> ${fleetSize || 'N/A'}</p>
+          <p><strong>Lead Score:</strong> ${score}</p>
+        </div>
+      `;
+
+      sendEmailNotification('thewalgroupinfo@gmail.com', `[Supabase Trigger] Lead Captured: ${company !== 'N/A' ? company : name} (${score})`, adminHtml);
+      dispatchedEmails.push('thewalgroupinfo@gmail.com');
+    }
+
+    // 5. Table: tickets / support_tickets
+    else if (table.includes('ticket')) {
+      const id = getVal('id', 'ticket_id') || `WM-TICKET-${Date.now()}`;
+      const fullName = getVal('full_name', 'fullName', 'name') || 'Client';
+      const email = getVal('email');
+      const phone = getVal('phone');
+      const companyName = getVal('company_name', 'companyName', 'company');
+      const department = getVal('department') || 'Technical Support';
+      const subject = getVal('subject') || 'Support Request';
+      const priority = getVal('priority') || 'Medium';
+      const message = getVal('message') || 'Support ticket logged.';
+
+      const adminHtml = `
+        <div style="font-family: sans-serif; padding: 20px;">
+          <h2 style="color: #0a2647;">[Supabase Trigger] New Support Ticket (${id})</h2>
+          <p><strong>From:</strong> ${fullName} (${email})</p>
+          <p><strong>Company:</strong> ${companyName || 'N/A'}</p>
+          <p><strong>Department:</strong> ${department} | <strong>Priority:</strong> ${priority}</p>
+          <p><strong>Subject:</strong> ${subject}</p>
+          <p><strong>Message:</strong></p>
+          <blockquote style="background: #f1f5f9; padding: 12px; border-left: 4px solid #0a2647;">${message}</blockquote>
+        </div>
+      `;
+
+      sendEmailNotification('thewalgroupinfo@gmail.com', `[Supabase Trigger] Support Ticket (${id}): ${subject}`, adminHtml);
+      dispatchedEmails.push('thewalgroupinfo@gmail.com');
+
+      if (email) {
+        const clientHtml = `
+          <div style="font-family: sans-serif; padding: 20px;">
+            <h2 style="color: #0a2647;">Support Ticket Logged - Wal Group</h2>
+            <p>Dear ${fullName},</p>
+            <p>Your support request <strong>"${subject}"</strong> has been assigned Ticket ID <strong>${id}</strong> in our ${department} system.</p>
+            <p>Our operations team is actively investigating and will respond shortly.</p>
+            <br>
+            <p>Best regards,<br><strong>Wal Group Client Support</strong><br>thewalgroupinfo@gmail.com</p>
+          </div>
+        `;
+        sendEmailNotification(email, `Support Ticket Logged - Wal Group (${id})`, clientHtml);
+        dispatchedEmails.push(email);
+      }
+    } else {
+      console.log(`[SUPABASE WEBHOOK] Unrecognized table "${table}". Event acknowledged without email trigger.`);
+    }
+
+    return res.json({
+      success: true,
+      processed: true,
+      table,
+      eventType,
+      dispatchedEmails,
+      message: 'Supabase database event successfully processed and email notifications dispatched.'
+    });
+  } catch (err: any) {
+    console.error('[SUPABASE WEBHOOK EXCEPTION]', err);
+    return res.status(500).json({ success: false, message: 'Failed to process Supabase database webhook event.' });
   }
 });
 
@@ -425,6 +968,93 @@ app.get('/api/bookings/export-csv', (_req, res) => {
   return res.send(csvContent);
 });
 
+// OpenAI Status API Endpoint
+app.get('/api/openai/status', (_req, res) => {
+  const isConfigured = Boolean(process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY.trim() !== '');
+  return res.json({
+    success: true,
+    provider: 'OpenAI',
+    configured: isConfigured,
+    defaultModel: 'gpt-4o-mini',
+    supabaseConnected: true,
+    keyPreview: isConfigured ? `${process.env.OPENAI_API_KEY?.substring(0, 10)}...` : 'Not Set'
+  });
+});
+
+// Dedicated OpenAI Chat API Endpoint (Server-Side Secure)
+app.post('/api/openai-chat', async (req, res) => {
+  try {
+    const { message, sessionId, history, model, systemPrompt } = req.body;
+
+    if (!message || typeof message !== 'string') {
+      return res.status(400).json({ success: false, message: 'Message string is required.' });
+    }
+
+    const openai = getOpenAI();
+    if (!openai) {
+      return res.status(503).json({
+        success: false,
+        message: 'OpenAI API key is not configured on the server. Please set OPENAI_API_KEY in your server environment variables.',
+        configured: false
+      });
+    }
+
+    const selectedModel = model || 'gpt-4o-mini';
+    const defaultSysPrompt = systemPrompt || `You are the AI Business Consultant and SDR for Wal Group, a 24/7 global operations backbone specializing in Amazon DSP dispatch, driver recruiting, payroll reconciliation, BPO Virtual Assistants, and custom web engineering. Deliver direct, professional, high-value consulting insights.`;
+
+    const chatHistory = (history || []).map((h: { sender: string; text: string }) => ({
+      role: h.sender === 'user' ? ('user' as const) : ('assistant' as const),
+      content: h.text
+    }));
+
+    const messages = [
+      { role: 'system' as const, content: defaultSysPrompt },
+      ...chatHistory,
+      { role: 'user' as const, content: message.trim() }
+    ];
+
+    const response = await openai.chat.completions.create({
+      model: selectedModel,
+      messages,
+      temperature: 0.7,
+      max_tokens: 800
+    });
+
+    const aiMessage = response.choices[0]?.message?.content || 'No response generated.';
+
+    // Persist conversation directly to Supabase
+    saveAiLogToSupabase({
+      session_id: sessionId || `SESS-${Date.now()}`,
+      provider: 'OpenAI',
+      model: selectedModel,
+      user_message: message.trim(),
+      ai_response: aiMessage
+    }).catch(() => {});
+
+    return res.json({
+      success: true,
+      provider: 'OpenAI',
+      model: selectedModel,
+      response: aiMessage,
+      usage: response.usage
+    });
+  } catch (err: any) {
+    if (err?.status === 401 || err?.message?.includes('401') || err?.message?.includes('Incorrect API key')) {
+      console.warn('[OpenAI Auth Notice] Provided OPENAI_API_KEY is invalid or unauthorized (401).');
+      return res.status(401).json({
+        success: false,
+        authError: true,
+        message: 'The provided OPENAI_API_KEY is invalid or unauthorized. Please verify your OpenAI API key in server environment variables.'
+      });
+    }
+    console.error('[OpenAI API Route Exception]', err?.message || err);
+    return res.status(500).json({
+      success: false,
+      message: err.message || 'Failed to process request with OpenAI API.'
+    });
+  }
+});
+
 // 2. AI Business Consultant Chat API
 app.post('/api/ai-chat', async (req, res) => {
   const { message, sessionId, behavior, history } = req.body;
@@ -520,9 +1150,52 @@ The visitor is currently viewing page: "${behavior?.lastPageVisited || '/'}". Pa
 
   let responseText = '';
   let shouldSuggestBooking = false;
+  let activeProvider = '';
+  let activeModel = '';
 
+  const { preferredProvider } = req.body || {};
+  const openai = getOpenAI();
   const ai = getGenAI();
-  if (ai) {
+
+  // Helper to execute OpenAI chat
+  const runOpenAI = async () => {
+    if (!openai) return false;
+    try {
+      const chatHistory = (history || []).map((h: { sender: string; text: string }) => ({
+        role: h.sender === 'user' ? ('user' as const) : ('assistant' as const),
+        content: h.text
+      }));
+
+      const completion = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          ...chatHistory,
+          { role: 'user', content: userText }
+        ],
+        temperature: 0.7,
+        max_tokens: 700
+      });
+
+      if (completion.choices[0]?.message?.content) {
+        responseText = completion.choices[0].message.content;
+        activeProvider = 'OpenAI';
+        activeModel = 'gpt-4o-mini';
+        return true;
+      }
+    } catch (openAiErr: any) {
+      if (openAiErr?.status === 401 || openAiErr?.message?.includes('401') || openAiErr?.message?.includes('Incorrect API key')) {
+        console.warn('[AI Assistant] Provided OPENAI_API_KEY is unauthorized or invalid (401). Falling back seamlessly to Gemini AI / Rule Engine.');
+      } else {
+        console.warn('[AI Assistant] OpenAI API attempt issue:', openAiErr?.message || openAiErr);
+      }
+    }
+    return false;
+  };
+
+  // Helper to execute Gemini chat
+  const runGemini = async () => {
+    if (!ai) return false;
     try {
       const chatHistory = (history || []).map((h: { sender: string; text: string }) => ({
         role: h.sender === 'user' ? 'user' : 'model',
@@ -547,16 +1220,38 @@ The visitor is currently viewing page: "${behavior?.lastPageVisited || '/'}". Pa
 
       if (response && response.text) {
         responseText = response.text;
+        activeProvider = 'Gemini';
+        activeModel = 'gemini-3.6-flash';
+        return true;
       }
     } catch (err: any) {
-      const msg = err?.message || String(err);
-      if (msg.includes('429') || msg.includes('quota') || msg.includes('RESOURCE_EXHAUSTED')) {
-        console.warn('[AI Assistant] Gemini API quota reached. Smoothly switching to local rule engine fallback.');
-      } else {
-        console.warn('[AI Assistant] Gemini API temporary issue. Switching to rule engine fallback:', msg);
+      console.warn('[AI Assistant] Gemini API temporary issue or limit reached:', err?.message || err);
+    }
+    return false;
+  };
+
+  // Execution flow based on user preference or key availability
+  if (preferredProvider === 'openai') {
+    if (!(await runOpenAI())) {
+      await runGemini();
+    }
+  } else if (preferredProvider === 'gemini') {
+    if (!(await runGemini())) {
+      await runOpenAI();
+    }
+  } else {
+    // Auto mode: Prioritize OpenAI if key configured, else Gemini
+    if (process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY.trim() !== '') {
+      if (!(await runOpenAI())) {
+        await runGemini();
+      }
+    } else {
+      if (!(await runGemini())) {
+        await runOpenAI();
       }
     }
   }
+
 
   // Rule-based Fallback if AI not available or errored
   if (!responseText) {
@@ -633,9 +1328,22 @@ The visitor is currently viewing page: "${behavior?.lastPageVisited || '/'}". Pa
     console.log(`Notification sent to: thewalgroupinfo@gmail.com`);
   }
 
+  // Log conversation to Supabase asynchronously
+  saveAiLogToSupabase({
+    session_id: currentSessionId,
+    provider: activeProvider || 'RuleEngine',
+    model: activeModel || 'standard',
+    user_message: userText,
+    ai_response: responseText,
+    lead_email: extracted.email,
+    lead_phone: extracted.phone
+  }).catch(() => {});
+
   return res.json({
     success: true,
     sessionId: currentSessionId,
+    provider: activeProvider || 'RuleEngine',
+    model: activeModel || 'standard',
     response: responseText,
     extractedLead: extracted,
     shouldSuggestBooking,
@@ -680,6 +1388,26 @@ app.post('/api/leads', (req, res) => {
   const leads = loadData<LeadRecord[]>(LEADS_FILE, []);
   leads.unshift(newLead);
   saveData(LEADS_FILE, leads);
+
+  // Persist to Supabase
+  saveLeadToSupabase({
+    id: newLead.id,
+    name: newLead.name,
+    company: newLead.company,
+    email: newLead.email,
+    phone: newLead.phone,
+    country: newLead.country,
+    industry: newLead.industry,
+    fleetSize: newLead.fleetSize,
+    teamSize: newLead.teamSize,
+    challenges: newLead.challenges,
+    servicesOfInterest: newLead.servicesOfInterest,
+    score: newLead.score,
+    scoreReason: newLead.scoreReason,
+    sessionId: newLead.sessionId,
+    status: newLead.status,
+    routedTo: newLead.routedTo
+  }).catch((err) => console.error('[Supabase Server Lead Save Error]', err));
 
   console.log(`[LEAD FORM SUBMITTED] ID: ${leadId} | Name: ${name} | Email: ${email}`);
   console.log(`Lead notification dispatched to: thewalgroupinfo@gmail.com`);

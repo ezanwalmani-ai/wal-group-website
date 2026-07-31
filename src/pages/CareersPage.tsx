@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { JobApplication } from '../types';
 import { EmailLink } from '../components/EmailLink';
-import { Users, CheckCircle2, Upload, Send, ArrowLeft, Briefcase, FileText, Globe, Mail } from 'lucide-react';
+import { Users, CheckCircle2, Upload, Send, ArrowLeft, Briefcase, FileText, Globe, Mail, Loader2, AlertCircle } from 'lucide-react';
+import { saveJobApplicationToSupabase, uploadResumeToSupabaseStorage } from '../lib/supabase';
 
 interface Props {
   navigate: (path: string) => void;
@@ -20,12 +21,31 @@ export const CareersPage: React.FC<Props> = ({ navigate }) => {
   const [expectedSalary, setExpectedSalary] = useState('');
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [coverLetter, setCoverLetter] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const [fileError, setFileError] = useState('');
 
   const [submittedApp, setSubmittedApp] = useState<JobApplication | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!fullName || !email || !phone || !position || !expectedSalary) return;
+
+    setFileError('');
+    setUploading(true);
+
+    let resumeUrl = '';
+    let resumeFileName = resumeFile ? resumeFile.name : 'Resume.pdf';
+
+    // 1. Handle resume file upload if provided
+    if (resumeFile) {
+      const uploadRes = await uploadResumeToSupabaseStorage(resumeFile);
+      if (!uploadRes.success) {
+        setFileError(uploadRes.error || 'Failed to upload resume file.');
+        setUploading(false);
+        return;
+      }
+      resumeUrl = uploadRes.url || '';
+    }
 
     const appId = `WM-APP-${Math.floor(100000 + Math.random() * 900000)}`;
     const nowISO = new Date().toLocaleString();
@@ -42,7 +62,7 @@ export const CareersPage: React.FC<Props> = ({ navigate }) => {
       currentCompany,
       noticePeriod,
       expectedSalary,
-      resumeFileName: resumeFile ? resumeFile.name : 'Resume.pdf',
+      resumeFileName,
       coverLetter,
       appliedAt: nowISO,
       status: 'New'
@@ -53,6 +73,23 @@ export const CareersPage: React.FC<Props> = ({ navigate }) => {
     existing.unshift(app);
     localStorage.setItem('wal_groups_careers', JSON.stringify(existing));
 
+    // Save directly to Supabase
+    await saveJobApplicationToSupabase({
+      ...app,
+      resumeUrl
+    }).catch((err) => console.error('Supabase career app save error:', err));
+
+    // Trigger backend server route for email notifications
+    fetch('/api/careers', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...app,
+        resumeUrl
+      })
+    }).catch((err) => console.error('Server email trigger error:', err));
+
+    setUploading(false);
     setSubmittedApp(app);
   };
 
@@ -276,19 +313,29 @@ export const CareersPage: React.FC<Props> = ({ navigate }) => {
                 {/* Section 3 */}
                 <div className="space-y-4">
                   <h4 className="text-sm font-bold text-[#0A2647] uppercase tracking-wider border-b border-slate-100 pb-2">3. Resume Upload</h4>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Attach Resume (PDF, DOC, DOCX up to 5MB) <span className="text-red-500">*</span></label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Attach Resume (PDF, DOC, DOCX up to 10MB) <span className="text-red-500">*</span></label>
+                  
+                  {fileError && (
+                    <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 flex items-center gap-2 font-medium">
+                      <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
+                      <span>{fileError}</span>
+                    </div>
+                  )}
+
                   <label className="cursor-pointer bg-slate-50 hover:bg-slate-100 border-2 border-dashed border-slate-300 rounded-xl p-6 flex flex-col items-center text-center transition-colors">
                     <Upload className="w-8 h-8 text-[#2271B1] mb-2" />
                     <span className="text-xs font-bold text-slate-700">
                       {resumeFile ? resumeFile.name : 'Click or Drag File to Upload Resume'}
                     </span>
-                    <span className="text-[11px] text-slate-400 mt-1">Accepted formats: PDF, DOC, DOCX</span>
+                    <span className="text-[11px] text-slate-400 mt-1">Accepted formats: PDF, DOC, DOCX (Max 10 MB)</span>
                     <input
                       type="file"
+                      accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                       className="hidden"
                       onChange={(e) => {
                         if (e.target.files?.[0]) {
                           setResumeFile(e.target.files[0]);
+                          setFileError('');
                         }
                       }}
                     />
@@ -309,10 +356,20 @@ export const CareersPage: React.FC<Props> = ({ navigate }) => {
 
                 <button
                   type="submit"
-                  className="w-full bg-[#0A2647] hover:bg-[#051A30] text-white font-extrabold text-sm py-3.5 px-6 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2"
+                  disabled={uploading}
+                  className="w-full bg-[#0A2647] hover:bg-[#051A30] text-white font-extrabold text-sm py-3.5 px-6 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
                 >
-                  <Send className="w-4 h-4 text-amber-400" />
-                  <span>Submit Application</span>
+                  {uploading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 text-amber-400 animate-spin" />
+                      <span>Uploading Resume & Submitting...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4 text-amber-400" />
+                      <span>Submit Application</span>
+                    </>
+                  )}
                 </button>
 
               </form>

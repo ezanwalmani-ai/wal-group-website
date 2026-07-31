@@ -7,7 +7,8 @@ import { InteractiveOfficeLocations } from '../components/InteractiveOfficeLocat
 import { SectionDivider } from '../components/SectionDivider';
 import { EmailLink } from '../components/EmailLink';
 import { InstagramLink } from '../components/InstagramLink';
-import { MapPin, Mail, Phone, Send, CheckCircle2, Calendar, ShieldCheck, Sparkles } from 'lucide-react';
+import { MapPin, Mail, Phone, Send, CheckCircle2, Calendar, ShieldCheck, Sparkles, Loader2 } from 'lucide-react';
+import { saveContactSubmissionToSupabase } from '../lib/supabase';
 
 interface Props {
   navigate: (path: string) => void;
@@ -21,16 +22,17 @@ export const ContactPage: React.FC<Props> = ({ navigate }) => {
   const [companyName, setCompanyName] = useState('');
   const [subject, setSubject] = useState('Sales Question');
   const [message, setMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
   // Intelligent Routing Logic
-  const getRoutedEmail = (subj: string): 'thewalgroupinfo@gmail.com' | 'thewalgroup@gmail.com' => {
+  const getRoutedEmail = (subj: string): 'thewalgroupinfo@gmail.com' | 'thewalgroups@gmail.com' => {
     switch (subj) {
       case 'Careers Question':
       case 'Partnership Opportunity':
       case 'Media & Press':
       case 'General Inquiry':
-        return 'thewalgroup@gmail.com';
+        return 'thewalgroups@gmail.com';
       case 'Sales Question':
       case 'Support Request':
       case 'Existing Client Support':
@@ -41,10 +43,57 @@ export const ContactPage: React.FC<Props> = ({ navigate }) => {
 
   const targetEmail = getRoutedEmail(subject);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!fullName || !email || !phone || !companyName || !message) return;
-    setSubmitted(true);
+
+    setIsSubmitting(true);
+
+    try {
+      // Save directly to Supabase
+      await saveContactSubmissionToSupabase({
+        fullName,
+        email,
+        phone,
+        companyName,
+        subject,
+        message,
+        targetEmail
+      });
+
+      // Dispatch to backend API to trigger email notifications
+      fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fullName,
+          email,
+          phone,
+          companyName,
+          subject,
+          message
+        })
+      }).catch((err) => console.error('Error triggering email API:', err));
+
+      // Also record as business lead for admin tracking
+      fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: fullName,
+          email,
+          phone,
+          company: companyName,
+          challenges: message,
+          servicesOfInterest: [subject]
+        })
+      }).catch(() => {});
+    } catch (err) {
+      console.error('Error submitting contact form:', err);
+    } finally {
+      setIsSubmitting(false);
+      setSubmitted(true);
+    }
   };
 
   return (
@@ -226,10 +275,20 @@ export const ContactPage: React.FC<Props> = ({ navigate }) => {
                       whileHover={{ scale: 1.02, y: -2 }}
                       whileTap={{ scale: 0.98 }}
                       type="submit"
-                      className="w-full bg-[#ff6600] hover:bg-[#ff8800] text-black font-extrabold text-sm py-3.5 rounded-xl shadow-[0_0_20px_rgba(255,102,0,0.4)] transition-all flex items-center justify-center gap-2 cursor-pointer"
+                      disabled={isSubmitting}
+                      className="w-full bg-[#ff6600] hover:bg-[#ff8800] disabled:opacity-50 text-black font-extrabold text-sm py-3.5 rounded-xl shadow-[0_0_20px_rgba(255,102,0,0.4)] transition-all flex items-center justify-center gap-2 cursor-pointer"
                     >
-                      <Send className="w-4 h-4 text-black" />
-                      <span>Send Direct Message</span>
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="w-4 h-4 text-black animate-spin" />
+                          <span>Saving to Database...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Send className="w-4 h-4 text-black" />
+                          <span>Send Direct Message</span>
+                        </>
+                      )}
                     </motion.button>
                   </form>
                 )}
@@ -265,7 +324,7 @@ export const ContactPage: React.FC<Props> = ({ navigate }) => {
                 <div className="space-y-4">
                   <h4 className="text-xs font-bold uppercase tracking-wider text-[#ff7700] px-1">Official Contact Channels</h4>
                   <EmailLink email="thewalgroupinfo@gmail.com" />
-                  <EmailLink email="thewalgroup@gmail.com" />
+                  <EmailLink email="thewalgroups@gmail.com" />
                   <InstagramLink variant="card" />
                 </div>
               </div>

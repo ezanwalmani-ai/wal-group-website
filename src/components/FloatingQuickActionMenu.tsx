@@ -44,6 +44,8 @@ export const FloatingQuickActionMenu: React.FC<FloatingQuickActionMenuProps> = (
   const [isTyping, setIsTyping] = useState(false);
   const [sessionId, setSessionId] = useState<string>('');
   const [leadCaptured, setLeadCaptured] = useState(false);
+  const [preferredEngine, setPreferredEngine] = useState<'openai' | 'gemini' | 'auto'>('openai');
+  const [currentProviderBadge, setCurrentProviderBadge] = useState<string>('OpenAI GPT-4o-mini');
   
   // Lead quick capture fields inside chat
   const [leadEmail, setLeadEmail] = useState('');
@@ -167,6 +169,7 @@ export const FloatingQuickActionMenu: React.FC<FloatingQuickActionMenuProps> = (
           message: text,
           sessionId,
           behavior,
+          preferredProvider: preferredEngine,
           history: updatedMessages.map((m) => ({ sender: m.sender, text: m.text }))
         })
       });
@@ -174,6 +177,10 @@ export const FloatingQuickActionMenu: React.FC<FloatingQuickActionMenuProps> = (
       const data = await response.json();
 
       if (data.success && data.response) {
+        if (data.provider) {
+          const providerStr = data.provider === 'OpenAI' ? `OpenAI ${data.model || 'GPT-4o-mini'}` : (data.provider === 'Gemini' ? `Gemini ${data.model || '3.6-flash'}` : 'Wal Group AI');
+          setCurrentProviderBadge(providerStr);
+        }
         streamResponse(data.response, data.shouldSuggestBooking);
 
         if (data.shouldSuggestBooking && !leadCaptured) {
@@ -268,9 +275,17 @@ export const FloatingQuickActionMenu: React.FC<FloatingQuickActionMenuProps> = (
                     </span>
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   </div>
-                  <p className="text-[9.5px] text-slate-400">
-                    {activeView === 'chat' ? 'Executive Operations Consultant' : 'Select a support channel below'}
-                  </p>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <p className="text-[9.5px] text-slate-400">
+                      {activeView === 'chat' ? 'Operations Consultant' : 'Select a support channel below'}
+                    </p>
+                    {activeView === 'chat' && (
+                      <span className="text-[8.5px] px-1.5 py-0.5 rounded bg-emerald-950/90 border border-emerald-500/50 text-emerald-300 font-semibold tracking-wide flex items-center gap-1 shadow-sm">
+                        <span className="w-1 h-1 rounded-full bg-emerald-400" />
+                        <span>{currentProviderBadge}</span>
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
 

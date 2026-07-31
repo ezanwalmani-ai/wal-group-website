@@ -178,7 +178,7 @@ export const Footer: React.FC<FooterProps> = ({ navigate }) => {
             {/* Official Email Routing & Social Links */}
             <div className="pt-1 space-y-2">
               <EmailLink email="thewalgroupinfo@gmail.com" variant="inline" />
-              <EmailLink email="thewalgroup@gmail.com" variant="inline" />
+              <EmailLink email="thewalgroups@gmail.com" variant="inline" />
               <InstagramLink variant="inline" />
             </div>
 

@@ -687,5 +687,53 @@
       "fleetSize": "30 vans"
     },
     "unansweredQuestions": []
+  },
+  "SESS-LEAD-TEST-1785477543432": {
+    "sessionId": "SESS-LEAD-TEST-1785477543432",
+    "createdAt": "2026-07-31T05:59:03.436Z",
+    "updatedAt": "2026-07-31T05:59:07.185Z",
+    "pageVisited": "/",
+    "userBehaviorSummary": "Direct Visit",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Hi, I represent FastLogistics DSP. Please contact me at test.lead.1785477543432@walgroup-test.com or +1-555-019-2834 regarding dispatch expansion.",
+        "timestamp": "05:59 AM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Wal Group provides 24/7 Amazon DSP dispatch coverage using official portals like Cortex, Geotab, and Netradyne. Our team actively monitors safety scores, manages route delays, and coordinates roadside assistance so you maintain an Amazon Super Fantastic rating. Would you like to schedule a 30-minute discovery call with our DSP operations lead?",
+        "timestamp": "05:59 AM"
+      }
+    ],
+    "leadDetails": {
+      "email": "test.lead.1785477543432@walgroup-test.com",
+      "phone": "1785477543432"
+    },
+    "unansweredQuestions": []
+  },
+  "SESS-LEAD-TEST-1785477865308": {
+    "sessionId": "SESS-LEAD-TEST-1785477865308",
+    "createdAt": "2026-07-31T06:04:25.312Z",
+    "updatedAt": "2026-07-31T06:04:29.003Z",
+    "pageVisited": "/",
+    "userBehaviorSummary": "Direct Visit",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Hi, I represent FastLogistics DSP. Please contact me at test.lead.1785477865308@walgroup-test.com or +1-555-019-2834 regarding dispatch expansion.",
+        "timestamp": "06:04 AM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Wal Group provides 24/7 Amazon DSP dispatch coverage using official portals like Cortex, Geotab, and Netradyne. Our team actively monitors safety scores, manages route delays, and coordinates roadside assistance so you maintain an Amazon Super Fantastic rating. Would you like to schedule a 30-minute discovery call with our DSP operations lead?",
+        "timestamp": "06:04 AM"
+      }
+    ],
+    "leadDetails": {
+      "email": "test.lead.1785477865308@walgroup-test.com",
+      "phone": "1785477865308"
+    },
+    "unansweredQuestions": []
   }
 }

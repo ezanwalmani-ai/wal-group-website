@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Ticket, TicketMessage } from '../types';
+import { saveTicketToSupabase } from '../lib/supabase';
 import { 
   PlusCircle, 
   Search, 
@@ -103,6 +104,12 @@ export const TicketSystem: React.FC = () => {
     };
 
     saveTicketToStorage(newTicket);
+    fetch('/api/tickets', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newTicket)
+    }).catch(err => console.error('Ticket API submission error:', err));
+    saveTicketToSupabase(newTicket).catch((err) => console.error('Supabase ticket save error:', err));
     setSubmittedTicket(newTicket);
   };
 
