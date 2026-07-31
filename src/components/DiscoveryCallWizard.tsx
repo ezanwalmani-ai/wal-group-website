@@ -370,7 +370,7 @@ export const DiscoveryCallWizard: React.FC<DiscoveryCallWizardProps> = ({ onSucc
           {/* Follow Us on Instagram Prompt */}
           <div className="max-w-md mx-auto pt-1">
             <a
-              href="https://www.instagram.com/thewalgroup?igsh=MW10OXZqM2N4YXhvbQ=="
+              href="https://www.instagram.com/thewalgroups/"
               target="_blank"
               rel="noopener noreferrer"
               className="p-3 rounded-xl bg-white/[0.03] border border-white/10 hover:border-[#ff7700]/50 hover:bg-[#ff7700]/10 transition-all flex items-center justify-between gap-3 text-left group"
@@ -380,7 +380,7 @@ export const DiscoveryCallWizard: React.FC<DiscoveryCallWizardProps> = ({ onSucc
                   <Instagram className="w-4 h-4 stroke-[2.2]" />
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-white group-hover:text-[#ff7700] transition-colors">Follow Us on Instagram @thewalgroup</div>
+                  <div className="text-xs font-bold text-white group-hover:text-[#ff7700] transition-colors">Follow Us on Instagram @thewalgroups</div>
                   <div className="text-[10px] text-slate-400">Get live DSP operations insights &amp; fleet updates</div>
                 </div>
               </div>

@@ -10,9 +10,435 @@
     color: #f1f5f9;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  /* Light Mode Base Override */
+  html.light body {
+    background-color: #ffffff !important;
+    color: #163a63 !important;
   }
 }
 
+/* ==========================================================================
+   FLAGSHIP ENTERPRISE LIGHT MODE SYSTEM (WCAG AAA Compliant)
+   Fortune 500 Aesthetic: Apple, Stripe, Microsoft, AWS, IBM, Notion
+   ========================================================================== */
+
+html.light {
+  color-scheme: light;
+}
+
+/* 1. SECTION BACKGROUNDS & RHYTHM */
+html.light main {
+  background-color: #ffffff !important;
+}
+
+html.light section {
+  background-color: #ffffff;
+}
+
+html.light section:nth-of-type(even) {
+  background-color: #f4f7fb;
+}
+
+/* 2. HEADERS, NAV, & DROPDOWN MENUS (Deep Navy Surface) */
+html.light header,
+html.light header nav {
+  background-color: #041e42 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 4px 20px rgba(4, 30, 66, 0.25) !important;
+}
+
+/* Text and buttons inside header nav */
+html.light header nav a,
+html.light header nav button,
+html.light header nav span,
+html.light header nav p,
+html.light header nav h1,
+html.light header nav h2,
+html.light header nav h3 {
+  color: #ffffff !important;
+}
+
+html.light header nav a:hover,
+html.light header nav button:hover {
+  color: #0073a8 !important;
+}
+
+/* Dropdown menus inside Header */
+html.light header .absolute,
+html.light header [role="menu"],
+html.light header nav .bg-\[\#121212\]\/98,
+html.light header nav .bg-\[\#0a0a0a\],
+html.light header nav .bg-slate-900 {
+  background-color: #041e42 !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 20px 45px rgba(4, 30, 66, 0.35) !important;
+}
+
+html.light header .absolute *,
+html.light header nav .bg-\[\#121212\]\/98 * {
+  color: #ffffff !important;
+}
+
+html.light header .absolute .text-slate-400,
+html.light header .absolute .text-slate-300 {
+  color: #d6dee8 !important;
+}
+
+html.light header .absolute button:hover,
+html.light header .absolute a:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* 3. HERO SECTION (Dark Navy Hero Surface) */
+html.light section:first-of-type,
+html.light .hero-section {
+  background-color: #041e42 !important;
+  color: #ffffff !important;
+}
+
+html.light section:first-of-type h1,
+html.light section:first-of-type h2,
+html.light section:first-of-type h3,
+html.light section:first-of-type p,
+html.light section:first-of-type span,
+html.light section:first-of-type div {
+  color: #ffffff;
+}
+
+html.light section:first-of-type p {
+  color: #e2e8f0 !important;
+}
+
+html.light section:first-of-type .text-slate-300,
+html.light section:first-of-type .text-slate-400 {
+  color: #cbd5e1 !important;
+}
+
+/* Hero Badge */
+html.light section:first-of-type .bg-white\/5 {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 179, 0, 0.5) !important;
+  color: #ffb300 !important;
+}
+
+/* Hero Right Side Card (Live Control Center) - Pure White Pop-out Card */
+html.light section:first-of-type .glass-panel,
+html.light section:first-of-type .stat-card {
+  background-color: #ffffff !important;
+  border: 1px solid rgba(4, 30, 66, 0.15) !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25) !important;
+}
+
+html.light section:first-of-type .glass-panel *,
+html.light section:first-of-type .stat-card * {
+  color: #041e42 !important;
+}
+
+html.light section:first-of-type .glass-panel .text-slate-400,
+html.light section:first-of-type .stat-card .text-slate-400 {
+  color: #44546a !important;
+}
+
+/* 4. FOOTER (Deep Navy Surface) */
+html.light footer {
+  background-color: #041e42 !important;
+  color: #ffffff !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.18) !important;
+}
+
+html.light footer h1,
+html.light footer h2,
+html.light footer h3,
+html.light footer h4,
+html.light footer h5,
+html.light footer h6,
+html.light footer p,
+html.light footer span,
+html.light footer div,
+html.light footer label {
+  color: #ffffff !important;
+}
+
+html.light footer p,
+html.light footer .text-slate-300,
+html.light footer .text-slate-400 {
+  color: #d6dee8 !important;
+}
+
+html.light footer a,
+html.light footer button {
+  color: #ffffff !important;
+  transition: color 250ms ease !important;
+}
+
+html.light footer a:hover,
+html.light footer button:hover {
+  color: #ffb300 !important;
+}
+
+html.light footer .border-white\/10,
+html.light footer .border-white\/20,
+html.light footer .border-slate-800 {
+  border-color: rgba(255, 255, 255, 0.18) !important;
+}
+
+html.light footer .bg-white\/5 {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* 5. GENERAL TYPOGRAPHY IN LIGHT MODE (Light Surfaces) */
+html.light main h1,
+html.light main h2,
+html.light main h3,
+html.light main h4,
+html.light main h5,
+html.light main h6 {
+  color: #041e42;
+}
+
+html.light main section:not(:first-of-type) h1,
+html.light main section:not(:first-of-type) h2,
+html.light main section:not(:first-of-type) h3,
+html.light main section:not(:first-of-type) h4,
+html.light main section:not(:first-of-type) h5,
+html.light main section:not(:first-of-type) h6 {
+  color: #041e42 !important;
+}
+
+html.light main section:not(:first-of-type) p {
+  color: #163a63 !important;
+}
+
+html.light main section:not(:first-of-type) .text-white {
+  color: #041e42 !important;
+}
+
+html.light main section:not(:first-of-type) .text-slate-100,
+html.light main section:not(:first-of-type) .text-slate-200 {
+  color: #041e42 !important;
+}
+
+html.light main section:not(:first-of-type) .text-slate-300,
+html.light main section:not(:first-of-type) .text-slate-400 {
+  color: #163a63 !important;
+}
+
+html.light main section:not(:first-of-type) .text-slate-500,
+html.light main section:not(:first-of-type) .text-slate-600 {
+  color: #44546a !important;
+}
+
+/* 6. LINKS ON LIGHT SURFACES */
+html.light main section:not(:first-of-type) a:not(.btn) {
+  color: #0073a8;
+  transition: color 250ms ease;
+}
+
+html.light main section:not(:first-of-type) a:not(.btn):hover {
+  color: #005e89;
+  text-decoration: underline;
+}
+
+/* 7. CARDS & PANELS ON LIGHT SURFACES */
+html.light main section:not(:first-of-type) .glass-panel,
+html.light main section:not(:first-of-type) .stat-card,
+html.light main section:not(:first-of-type) .bg-\[\#0a0a0a\],
+html.light main section:not(:first-of-type) .bg-\[\#000000\],
+html.light main section:not(:first-of-type) .bg-\[\#050b14\],
+html.light main section:not(:first-of-type) .bg-\[\#080d18\],
+html.light main section:not(:first-of-type) .bg-\[\#0d1527\],
+html.light main section:not(:first-of-type) .bg-\[\#121212\],
+html.light main section:not(:first-of-type) .bg-\[\#0a0f1d\],
+html.light main section:not(:first-of-type) .bg-slate-950,
+html.light main section:not(:first-of-type) .bg-slate-900,
+html.light main section:not(:first-of-type) .bg-slate-900\/90,
+html.light main section:not(:first-of-type) .bg-slate-900\/80,
+html.light main section:not(:first-of-type) .bg-slate-900\/50,
+html.light main section:not(:first-of-type) .bg-slate-800,
+html.light main section:not(:first-of-type) .bg-slate-800\/50 {
+  background-color: #ffffff !important;
+  border: 1px solid rgba(4, 30, 66, 0.15) !important;
+  box-shadow: 0 12px 30px rgba(4, 30, 66, 0.08) !important;
+  color: #163a63 !important;
+}
+
+html.light main section:not(:first-of-type) .glass-panel:hover,
+html.light main section:not(:first-of-type) .stat-card:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 20px 45px rgba(4, 30, 66, 0.12) !important;
+  border-color: rgba(4, 30, 66, 0.28) !important;
+}
+
+/* 8. BUTTONS & CTA SYSTEM */
+/* Primary Buttons (Filled Azure Blue) */
+html.light button.bg-\[\#ff7700\],
+html.light a.bg-\[\#ff7700\],
+html.light button.bg-\[\#0077c5\],
+html.light a.bg-\[\#0077c5\],
+html.light .bg-sky-600,
+html.light .bg-blue-600,
+html.light .btn-primary {
+  background-color: #0073a8 !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 4px 14px rgba(0, 115, 168, 0.28) !important;
+  transition: all 250ms ease !important;
+}
+
+html.light button.bg-\[\#ff7700\] *,
+html.light a.bg-\[\#ff7700\] *,
+html.light button.bg-\[\#0077c5\] *,
+html.light a.bg-\[\#0077c5\] * {
+  color: #ffffff !important;
+}
+
+html.light button.bg-\[\#ff7700\]:hover,
+html.light a.bg-\[\#ff7700\]:hover,
+html.light button.bg-\[\#0077c5\]:hover,
+html.light a.bg-\[\#0077c5\]:hover,
+html.light .bg-sky-600:hover,
+html.light .bg-blue-600:hover,
+html.light .btn-primary:hover {
+  background-color: #005e89 !important;
+  color: #ffffff !important;
+  transform: translateY(-3px) !important;
+  box-shadow: 0 8px 22px rgba(0, 115, 168, 0.38) !important;
+}
+
+html.light button.bg-\[\#ff7700\]:active,
+html.light a.bg-\[\#ff7700\]:active,
+html.light button.bg-\[\#0077c5\]:active,
+html.light a.bg-\[\#0077c5\]:active,
+html.light .btn-primary:active {
+  background-color: #00496d !important;
+  transform: translateY(0px) !important;
+}
+
+/* Secondary Buttons (White with Navy Border) */
+html.light .btn-secondary,
+html.light main section:not(:first-of-type) button.border-white\/20,
+html.light main section:not(:first-of-type) a.border-white\/20,
+html.light main section:not(:first-of-type) button.border-white\/10,
+html.light main section:not(:first-of-type) a.border-white\/10,
+html.light main section:not(:first-of-type) button.border-slate-800,
+html.light main section:not(:first-of-type) a.border-slate-800 {
+  background-color: #ffffff !important;
+  border: 2px solid #041e42 !important;
+  color: #041e42 !important;
+  transition: all 250ms ease !important;
+}
+
+html.light .btn-secondary *,
+html.light main section:not(:first-of-type) button.border-white\/20 *,
+html.light main section:not(:first-of-type) a.border-white\/20 * {
+  color: #041e42 !important;
+}
+
+html.light .btn-secondary:hover,
+html.light main section:not(:first-of-type) button.border-white\/20:hover,
+html.light main section:not(:first-of-type) a.border-white\/20:hover {
+  background-color: #041e42 !important;
+  color: #ffffff !important;
+  border-color: #041e42 !important;
+}
+
+html.light .btn-secondary:hover *,
+html.light main section:not(:first-of-type) button.border-white\/20:hover * {
+  color: #ffffff !important;
+}
+
+/* 9. GOLDEN YELLOW ACCENTS (#FFB300) */
+html.light .text-[#ff7700],
+html.light .text-amber-400,
+html.light .text-amber-500,
+html.light .text-yellow-400,
+html.light .accent-text {
+  color: #ffb300 !important;
+}
+
+html.light .bg-[#ff7700]\/10,
+html.light .bg-amber-400\/10,
+html.light .bg-yellow-400\/10 {
+  background-color: rgba(255, 179, 0, 0.12) !important;
+  color: #041e42 !important;
+  border: 1px solid rgba(255, 179, 0, 0.3) !important;
+}
+
+/* 10. FORMS & INPUTS */
+html.light input,
+html.light textarea,
+html.light select {
+  background-color: #ffffff !important;
+  color: #041e42 !important;
+  border: 1px solid #c8d1dc !important;
+  transition: border-color 250ms ease, box-shadow 250ms ease !important;
+}
+
+html.light input::placeholder,
+html.light textarea::placeholder {
+  color: #44546a !important;
+}
+
+html.light input:focus,
+html.light textarea:focus,
+html.light select:focus {
+  outline: none !important;
+  border-color: #0073a8 !important;
+  box-shadow: 0 0 0 3px rgba(0, 115, 168, 0.2) !important;
+}
+
+html.light label {
+  color: #041e42 !important;
+  font-weight: 600;
+}
+
+/* 11. BORDERS & DIVIDERS */
+html.light main section:not(:first-of-type) .border-white\/5,
+html.light main section:not(:first-of-type) .border-white\/10,
+html.light main section:not(:first-of-type) .border-white\/20,
+html.light main section:not(:first-of-type) .border-slate-800,
+html.light main section:not(:first-of-type) .border-slate-700,
+html.light hr {
+  border-color: rgba(4, 30, 66, 0.18) !important;
+}
+
+/* 12. ICONS */
+html.light main section:not(:first-of-type) svg:not(.accent-icon) {
+  color: #041e42;
+  transition: color 250ms ease;
+}
+
+html.light main section:not(:first-of-type) a:hover svg,
+html.light main section:not(:first-of-type) button:hover svg {
+  color: #0073a8;
+}
+
+html.light .accent-icon {
+  color: #ffb300 !important;
+}
+
+/* 13. CHATBOT WIDGET IN LIGHT MODE */
+html.light [role="dialog"].bg-slate-900,
+html.light div.chatbot-container {
+  background-color: #ffffff !important;
+  border: 1px solid rgba(4, 30, 66, 0.18) !important;
+  box-shadow: 0 20px 50px rgba(4, 30, 66, 0.25) !important;
+}
+
+html.light .chatbot-header {
+  background-color: #041e42 !important;
+  color: #ffffff !important;
+}
+
+html.light .chatbot-header * {
+  color: #ffffff !important;
+}
+
+/* Base styles and keyframe animations */
 .gold-text {
   color: #ff7700;
 }
@@ -25,7 +451,7 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* Glass panel with diagonal reflection sweep on hover */
+/* Glass panel */
 .glass-panel {
   background: rgba(18, 18, 18, 0.85);
   backdrop-filter: blur(12px);
@@ -37,35 +463,6 @@
   transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
               box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1),
               border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.glass-panel::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -150%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 119, 0, 0.12),
-    transparent
-  );
-  transform: skewX(-25deg);
-  transition: left 0.75s ease-in-out;
-  pointer-events: none;
-}
-
-.glass-panel:hover::before {
-  left: 150%;
-}
-
-.glass-panel:hover {
-  transform: translateY(-6px) scale(1.015);
-  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.8),
-              0 0 25px 0 rgba(255, 119, 0, 0.25);
-  border-color: rgba(255, 119, 0, 0.5);
 }
 
 .stat-card {
@@ -80,44 +477,6 @@
               border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.stat-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -150%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 119, 0, 0.08),
-    transparent
-  );
-  transform: skewX(-25deg);
-  transition: left 0.75s ease-in-out;
-  pointer-events: none;
-}
-
-.stat-card:hover::before {
-  left: 150%;
-}
-
-.stat-card:hover {
-  transform: translateY(-4px) scale(1.01);
-  box-shadow: 0 16px 32px -10px rgba(0, 0, 0, 0.8),
-              0 0 18px 0 rgba(255, 119, 0, 0.2);
-  border-color: rgba(255, 119, 0, 0.4);
-}
-
-/* Form input focus effects */
-input:focus, textarea:focus, select:focus {
-  outline: none;
-  border-color: rgba(255, 119, 0, 0.7) !important;
-  box-shadow: 0 0 0 3px rgba(255, 119, 0, 0.2) !important;
-  transition: all 0.2s ease;
-}
-
-/* Keyframes for shimmer */
 @keyframes shimmer {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
@@ -127,7 +486,6 @@ input:focus, textarea:focus, select:focus {
   animation: shimmer 3s infinite;
 }
 
-/* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after {
     animation-duration: 0.01ms !important;
@@ -136,4 +494,3 @@ input:focus, textarea:focus, select:focus {
     scroll-behavior: auto !important;
   }
 }
-

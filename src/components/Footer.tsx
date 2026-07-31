@@ -72,7 +72,7 @@ export const Footer: React.FC<FooterProps> = ({ navigate }) => {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-300 hover:text-white hover:bg-gradient-to-tr hover:from-[#f09433] hover:via-[#dc2743] hover:to-[#bc1888] hover:border-transparent transition-all shadow-sm relative group overflow-hidden"
-                  title="Wal Group on Instagram (@thewalgroup)"
+                  title="Wal Group on Instagram (@thewalgroups)"
                   aria-label="Instagram"
                 >
                   {/* Subtle glass reflection sweep */}

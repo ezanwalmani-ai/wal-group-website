@@ -9,6 +9,7 @@ import { CursorRipple } from './components/CursorRipple';
 import { FloatingQuickActionMenu } from './components/FloatingQuickActionMenu';
 import { BookingProvider, useBooking } from './context/BookingContext';
 import { BehaviorProvider, useBehavior } from './context/BehaviorContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { BookDemoModal } from './components/BookDemoModal';
 import { AdminDashboardModal } from './components/AdminDashboardModal';
 import { JsonLdHead } from './components/JsonLdHead';
@@ -248,11 +249,13 @@ function AppContent() {
 
 export default function App() {
   return (
-    <BehaviorProvider>
-      <BookingProvider>
-        <AppContent />
-      </BookingProvider>
-    </BehaviorProvider>
+    <ThemeProvider>
+      <BehaviorProvider>
+        <BookingProvider>
+          <AppContent />
+        </BookingProvider>
+      </BehaviorProvider>
+    </ThemeProvider>
   );
 }
 

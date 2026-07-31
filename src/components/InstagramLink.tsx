@@ -7,8 +7,8 @@ interface InstagramLinkProps {
   className?: string;
 }
 
-export const INSTAGRAM_URL = 'https://www.instagram.com/thewalgroup?igsh=MW10OXZqM2N4YXhvbQ==';
-export const INSTAGRAM_HANDLE = '@thewalgroup';
+export const INSTAGRAM_URL = 'https://www.instagram.com/thewalgroups/';
+export const INSTAGRAM_HANDLE = '@thewalgroups';
 
 export const InstagramLink: React.FC<InstagramLinkProps> = ({
   variant = 'card',

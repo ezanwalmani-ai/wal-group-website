@@ -4,6 +4,7 @@ import { Logo } from './Logo';
 import { AnimatedIcon } from './AnimatedIcon';
 import { soundFx } from '../utils/audio';
 import { useBooking } from '../context/BookingContext';
+import { useTheme } from '../context/ThemeContext';
 import { 
   ChevronDown, 
   Menu, 
@@ -19,7 +20,9 @@ import {
   Bot,
   Volume2,
   VolumeX,
-  Sparkles
+  Sparkles,
+  Sun,
+  Moon
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -29,6 +32,7 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ currentPath, navigate }) => {
   const { openBookDemo } = useBooking();
+  const { theme, toggleTheme } = useTheme();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isMuted, setIsMuted] = useState(soundFx.getMuted());
@@ -355,8 +359,25 @@ export const Header: React.FC<HeaderProps> = ({ currentPath, navigate }) => {
             </button>
           </div>
 
-          {/* Action CTA Button - Talk To Us & Audio Toggle */}
-          <div className="hidden sm:flex items-center gap-3">
+          {/* Action CTA Button - Talk To Us, Theme Switcher & Audio Toggle */}
+          <div className="hidden sm:flex items-center gap-2.5">
+            {/* Theme Switcher Toggle (Light / Dark) */}
+            <button
+              onClick={() => {
+                soundFx.playClick();
+                toggleTheme();
+              }}
+              title={theme === 'dark' ? "Switch to Light Theme" : "Switch to Dark Theme"}
+              aria-label="Toggle theme mode"
+              className="p-2 rounded-xl bg-white/5 border border-white/10 text-slate-400 hover:text-[#ff6600] hover:border-[#ff6600]/40 transition-all cursor-pointer flex items-center justify-center group"
+            >
+              {theme === 'dark' ? (
+                <Sun className="w-4 h-4 text-[#ffb700] group-hover:rotate-45 transition-transform" />
+              ) : (
+                <Moon className="w-4 h-4 text-indigo-400 group-hover:-rotate-12 transition-transform" />
+              )}
+            </button>
+
             {/* Subtle Audio Micro-sound Toggle */}
             <button
               onClick={toggleSound}
@@ -469,6 +490,29 @@ export const Header: React.FC<HeaderProps> = ({ currentPath, navigate }) => {
                 >
                   Support / Raise Ticket
                 </button>
+                <div className="pt-2 border-t border-white/10 flex items-center justify-between px-3">
+                  <span className="text-xs font-semibold text-slate-300">Theme Mode:</span>
+                  <button
+                    onClick={() => {
+                      soundFx.playClick();
+                      toggleTheme();
+                    }}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-bold text-slate-200 hover:text-[#ff6600] transition-all"
+                  >
+                    {theme === 'dark' ? (
+                      <>
+                        <Sun className="w-3.5 h-3.5 text-[#ffb700]" />
+                        <span>Light Mode</span>
+                      </>
+                    ) : (
+                      <>
+                        <Moon className="w-3.5 h-3.5 text-indigo-400" />
+                        <span>Dark Mode</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
                 <button
                   onClick={() => {
                     soundFx.playClick();
@@ -484,7 +528,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPath, navigate }) => {
                 {/* Mobile Social & Contact Badges */}
                 <div className="pt-3 border-t border-white/10 mt-3 space-y-2 text-xs">
                   <a
-                    href="https://www.instagram.com/thewalgroup?igsh=MW10OXZqM2N4YXhvbQ=="
+                    href="https://www.instagram.com/thewalgroups/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 p-2 rounded-lg bg-gradient-to-r from-white/[0.04] to-white/[0.01] border border-white/10 text-slate-300 hover:text-white hover:border-[#ff7700]/50 transition-all group"
@@ -494,7 +538,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPath, navigate }) => {
                         <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
                       </svg>
                     </div>
-                    <span>Instagram: <span className="text-white font-bold group-hover:text-[#ff7700] transition-colors">@thewalgroup</span></span>
+                    <span>Instagram: <span className="text-white font-bold group-hover:text-[#ff7700] transition-colors">@thewalgroups</span></span>
                   </a>
                 </div>
               </div>

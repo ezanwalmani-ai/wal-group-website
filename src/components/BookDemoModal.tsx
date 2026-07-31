@@ -972,13 +972,13 @@ export const BookDemoModal: React.FC<BookDemoModalProps> = ({ isOpen, onClose, n
                 </button>
 
                 <a
-                  href="https://www.instagram.com/thewalgroup?igsh=MW10OXZqM2N4YXhvbQ=="
+                  href="https://www.instagram.com/thewalgroups/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md hover:scale-105 transition-all"
                 >
                   <Instagram className="w-4 h-4 stroke-[2.5]" />
-                  <span>Follow @thewalgroup</span>
+                  <span>Follow @thewalgroups</span>
                 </a>
               </div>
 
