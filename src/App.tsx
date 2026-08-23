@@ -10,6 +10,7 @@ import { FloatingQuickActionMenu } from './components/FloatingQuickActionMenu';
 import { BookingProvider, useBooking } from './context/BookingContext';
 import { BehaviorProvider, useBehavior } from './context/BehaviorContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { BookDemoModal } from './components/BookDemoModal';
 import { AdminDashboardModal } from './components/AdminDashboardModal';
 import { JsonLdHead } from './components/JsonLdHead';
@@ -38,6 +39,11 @@ const RaiseTicketPage = lazy(() => import('./pages/RaiseTicketPage').then(m => (
 const TermsPage = lazy(() => import('./pages/TermsPage').then(m => ({ default: m.TermsPage })));
 const PrivacyPage = lazy(() => import('./pages/PrivacyPage').then(m => ({ default: m.PrivacyPage })));
 
+// Admin Pages
+const AdminLoginPage = lazy(() => import('./pages/admin/AdminLoginPage').then(m => ({ default: m.AdminLoginPage })));
+const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage').then(m => ({ default: m.AdminDashboardPage })));
+
+
 const PageFallback = () => (
   <div className="min-h-[60vh] flex items-center justify-center p-8">
     <div className="flex flex-col items-center gap-3">
@@ -51,10 +57,15 @@ function AppContent() {
   const [currentPath, setCurrentPath] = useState(window.location.pathname || '/');
   const { isBookDemoOpen, closeBookDemo, isAdminOpen, closeAdmin } = useBooking();
   const { trackPageView } = useBehavior();
+  const { user, loading: authLoading } = useAuth();
+
+  const isAdminRoute = currentPath.startsWith('/admin');
 
   useEffect(() => {
-    trackPageView(currentPath);
-  }, [currentPath, trackPageView]);
+    if (!isAdminRoute) {
+      trackPageView(currentPath);
+    }
+  }, [currentPath, trackPageView, isAdminRoute]);
 
   useEffect(() => {
     const handlePopState = () => {
@@ -64,85 +75,115 @@ function AppContent() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  const navigate = (path: string) => {
+  const navigate = useCallback((path: string) => {
     if (window.location.pathname !== path) {
       window.history.pushState({}, '', path);
       setCurrentPath(path);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  };
+  }, []);
+
+  // Admin route protection & auto-redirects
+  useEffect(() => {
+    if (authLoading) return;
+
+    if (currentPath === '/admin' && user) {
+      navigate('/admin/dashboard');
+    } else if (currentPath.startsWith('/admin/') && !user) {
+      navigate('/admin');
+    }
+  }, [currentPath, user, authLoading, navigate]);
 
   // Dynamic meta title update per route
   useEffect(() => {
     let title = 'Wal Group - Operational Backbone & Backend Outsourcing';
-    switch (currentPath) {
-      case '/':
-        title = 'Wal Group | We Run the Backend So You Can Run the Business';
-        break;
-      case '/about':
-        title = 'About Us | Wal Group - Relationships First, Business Follows';
-        break;
-      case '/services':
-        title = 'Services Overview | Wal Group Logistics & BPO Solutions';
-        break;
-      case '/website-design-development':
-        title = 'Website Design & Development Services | Wal Group';
-        break;
-      case '/dsp-dispatch-support':
-        title = '24x7 Amazon DSP Dispatch Support Services | Wal Group';
-        break;
-      case '/dsp-accounting-payroll':
-        title = 'Amazon DSP Accounting & Payroll Services | Wal Group';
-        break;
-      case '/dsp-hr-recruitment':
-        title = 'Amazon DSP HR & AI Recruitment Services | Wal Group';
-        break;
-      case '/afp-dispatch-support':
-        title = 'Amazon AFP Freight Dispatch Support | Wal Group';
-        break;
-      case '/afp-accounting-tms':
-        title = 'AFP Accounting & TMS Management | Wal Group';
-        break;
-      case '/dedicated-lane-services':
-        title = 'Dedicated Lane Services & 12-Step POD | Wal Group';
-        break;
-      case '/hr-bpo-services':
-      case '/bpo-services':
-        title = 'HR BPO Outsourcing Services | Wal Group';
-        break;
-      case '/virtual-assistants':
-        title = 'Dedicated Remote Virtual Assistants | Wal Group';
-        break;
-      case '/digital-marketing':
-        title = 'Digital Marketing Operations | Wal Group';
-        break;
-      case '/gig-projects':
-        title = 'Gig Projects for DSPs & Freight Fleets | Wal Group';
-        break;
-      case '/success-stories':
-        title = 'Client Success Stories & Turnarounds | Wal Group';
-        break;
-      case '/careers':
-        title = 'Careers | Join Wal Group Remote Team';
-        break;
-      case '/contact':
-        title = 'Contact Us | Wal Group Operations';
-        break;
-      case '/raise-ticket':
-        title = 'Support Center - Raise a Ticket | Wal Group';
-        break;
-      case '/terms-and-conditions':
-        title = 'Terms & Conditions | Wal Group';
-        break;
-      case '/privacy-policy':
-        title = 'Privacy Policy | Wal Group';
-        break;
-      default:
-        title = 'Wal Group | Backend Operations & Outsourcing';
-        break;
+    if (currentPath === '/admin' || currentPath.startsWith('/admin')) {
+      title = 'Wal Group | Executive Administration Panel';
+    } else {
+      switch (currentPath) {
+        case '/':
+          title = 'Wal Group | We Run the Backend So You Can Run the Business';
+          break;
+        case '/about':
+          title = 'About Us | Wal Group - Relationships First, Business Follows';
+          break;
+        case '/services':
+          title = 'Services Overview | Wal Group Logistics & BPO Solutions';
+          break;
+        case '/website-design-development':
+          title = 'Website Design & Development Services | Wal Group';
+          break;
+        case '/dsp-dispatch-support':
+          title = '24x7 Amazon DSP Dispatch Support Services | Wal Group';
+          break;
+        case '/dsp-accounting-payroll':
+          title = 'Amazon DSP Accounting & Payroll Services | Wal Group';
+          break;
+        case '/dsp-hr-recruitment':
+          title = 'Amazon DSP HR & AI Recruitment Services | Wal Group';
+          break;
+        case '/afp-dispatch-support':
+          title = 'Amazon AFP Freight Dispatch Support | Wal Group';
+          break;
+        case '/afp-accounting-tms':
+          title = 'AFP Accounting & TMS Management | Wal Group';
+          break;
+        case '/dedicated-lane-services':
+          title = 'Dedicated Lane Services & 12-Step POD | Wal Group';
+          break;
+        case '/hr-bpo-services':
+        case '/bpo-services':
+          title = 'HR BPO Outsourcing Services | Wal Group';
+          break;
+        case '/virtual-assistants':
+          title = 'Dedicated Remote Virtual Assistants | Wal Group';
+          break;
+        case '/digital-marketing':
+          title = 'Digital Marketing Operations | Wal Group';
+          break;
+        case '/gig-projects':
+          title = 'Gig Projects for DSPs & Freight Fleets | Wal Group';
+          break;
+        case '/success-stories':
+          title = 'Client Success Stories & Turnarounds | Wal Group';
+          break;
+        case '/careers':
+          title = 'Careers | Join Wal Group Remote Team';
+          break;
+        case '/contact':
+          title = 'Contact Us | Wal Group Operations';
+          break;
+        case '/raise-ticket':
+          title = 'Support Center - Raise a Ticket | Wal Group';
+          break;
+        case '/terms-and-conditions':
+          title = 'Terms & Conditions | Wal Group';
+          break;
+        case '/privacy-policy':
+          title = 'Privacy Policy | Wal Group';
+          break;
+        default:
+          title = 'Wal Group | Backend Operations & Outsourcing';
+          break;
+      }
     }
     document.title = title;
   }, [currentPath]);
+
+  // Dedicated Admin Route View
+  if (isAdminRoute) {
+    return (
+      <div className="min-h-screen bg-[#070b14] text-slate-100 font-sans selection:bg-[#ff7700] selection:text-black">
+        <Suspense fallback={<PageFallback />}>
+          {currentPath === '/admin' ? (
+            <AdminLoginPage navigate={navigate} />
+          ) : (
+            <AdminDashboardPage currentPath={currentPath} navigate={navigate} />
+          )}
+        </Suspense>
+      </div>
+    );
+  }
 
   const renderPage = () => {
     switch (currentPath) {
@@ -252,10 +293,13 @@ export default function App() {
     <ThemeProvider>
       <BehaviorProvider>
         <BookingProvider>
-          <AppContent />
+          <AuthProvider>
+            <AppContent />
+          </AuthProvider>
         </BookingProvider>
       </BehaviorProvider>
     </ThemeProvider>
   );
 }
+
 

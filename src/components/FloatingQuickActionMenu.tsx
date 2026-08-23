@@ -14,9 +14,12 @@ import {
   ArrowRight,
   ChevronLeft,
   ExternalLink,
-  PhoneCall
+  PhoneCall,
+  Loader2,
+  AlertCircle
 } from 'lucide-react';
 import { soundFx } from '../utils/audio';
+import { saveLeadToSupabase, saveAiLogToSupabase } from '../lib/supabase';
 
 interface FloatingQuickActionMenuProps {
   navigate: (path: string) => void;
@@ -52,6 +55,8 @@ export const FloatingQuickActionMenu: React.FC<FloatingQuickActionMenuProps> = (
   const [leadPhone, setLeadPhone] = useState('');
   const [leadFleet, setLeadFleet] = useState('');
   const [showLeadForm, setShowLeadForm] = useState(false);
+  const [isSubmittingLead, setIsSubmittingLead] = useState(false);
+  const [leadSubmitError, setLeadSubmitError] = useState('');
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const streamingIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -186,6 +191,15 @@ export const FloatingQuickActionMenu: React.FC<FloatingQuickActionMenuProps> = (
         if (data.shouldSuggestBooking && !leadCaptured) {
           setShowLeadForm(true);
         }
+
+        // Save AI log directly to Supabase
+        saveAiLogToSupabase({
+          session_id: sessionId,
+          provider: data.provider || 'Wal Group AI',
+          model: data.model || 'standard',
+          user_message: text,
+          ai_response: data.response
+        }).catch((err) => console.warn('Supabase client AI log notice:', err));
       } else {
         throw new Error('Fallback required');
       }
@@ -195,36 +209,75 @@ export const FloatingQuickActionMenu: React.FC<FloatingQuickActionMenuProps> = (
         const fallback = `We can certainly assist you with that! Wal Group provides end-to-end backend operations, 24/7 Amazon DSP & AFP dispatch, payroll reconciliation, BPO Virtual Assistants, and custom web development. To recommend the exact solution, approximately how many drivers, vehicles, or team members are you currently managing?`;
         streamResponse(fallback, true);
         setShowLeadForm(true);
+
+        saveAiLogToSupabase({
+          session_id: sessionId,
+          provider: 'RuleEngine',
+          model: 'fallback',
+          user_message: text,
+          ai_response: fallback
+        }).catch((err) => console.warn('Supabase fallback AI log notice:', err));
       }, 500);
     }
   };
 
   const handleLeadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmittingLead) return;
     if (!leadEmail && !leadPhone) return;
 
+    setLeadSubmitError('');
+    setIsSubmittingLead(true);
+
     try {
-      await fetch('/api/leads', {
+      const activeService = behavior.servicesViewed.length > 0 ? behavior.servicesViewed.join(', ') : 'Logistics & Fleet Operations';
+      const leadName = leadEmail ? leadEmail.split('@')[0] : 'Inbound Chat Lead';
+
+      // 1. Direct insert to Supabase leads table
+      const res = await saveLeadToSupabase({
+        id: `LEAD-CHAT-${Date.now()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`,
+        name: leadName,
+        email: leadEmail || 'chat-inquiry@walgroup.com',
+        phone: leadPhone || null,
+        service: activeService,
+        source: 'AI Assistant Chat Widget',
+        status: 'New',
+        challenges: `AI Chat Session ${sessionId}`,
+        fleetSize: leadFleet || null
+      });
+
+      if (!res.success) {
+        console.warn('Supabase lead insert notice:', res.error);
+        setLeadSubmitError(res.error || 'Failed to record details. Please try again.');
+        setIsSubmittingLead(false);
+        return;
+      }
+
+      // 2. Also dispatch to backend API for email alert notification
+      fetch('/api/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: leadEmail,
           phone: leadPhone,
           fleetSize: leadFleet,
-          industry: behavior.servicesViewed.length > 0 ? behavior.servicesViewed[0] : 'Logistics / Fleet',
+          industry: activeService,
           challenges: `AI Assistant Chat Session ${sessionId}`
         })
-      });
-    } catch {
-      // ignore
+      }).catch(() => {});
+
+      setLeadCaptured(true);
+      setShowLeadForm(false);
+      soundFx.playClick();
+
+      const confirmationText = `Thank you! I've received your details (${leadEmail || leadPhone}). Our leadership team at thewalgroupinfo@gmail.com has been notified. Would you like to pick a time for your executive Discovery Call?`;
+      streamResponse(confirmationText, true);
+    } catch (err: any) {
+      console.error('Lead submit error:', err);
+      setLeadSubmitError(err?.message || 'Failed to submit contact info.');
+    } finally {
+      setIsSubmittingLead(false);
     }
-
-    setLeadCaptured(true);
-    setShowLeadForm(false);
-    soundFx.playClick();
-
-    const confirmationText = `Thank you! I've received your details (${leadEmail || leadPhone}). Our leadership team at thewalgroupinfo@gmail.com has been notified. Would you like to pick a time for your executive Discovery Call?`;
-    streamResponse(confirmationText, true);
   };
 
   const suggestedTopics = [
@@ -466,36 +519,53 @@ export const FloatingQuickActionMenu: React.FC<FloatingQuickActionMenuProps> = (
                         <Sparkles className="w-2.5 h-2.5" />
                         <span>Instant Proposal & Consultation</span>
                       </p>
+                      {leadSubmitError && (
+                        <div className="p-1.5 bg-red-900/60 border border-red-500/50 rounded-lg text-[9px] text-red-200 flex items-center gap-1">
+                          <AlertCircle className="w-2.5 h-2.5 text-red-400 shrink-0" />
+                          <span className="truncate">{leadSubmitError}</span>
+                        </div>
+                      )}
                       <div className="space-y-1">
                         <input
                           type="email"
+                          disabled={isSubmittingLead}
                           placeholder="Work Email..."
                           value={leadEmail}
                           onChange={(e) => setLeadEmail(e.target.value)}
-                          className="w-full bg-black/60 border border-white/15 rounded-lg px-2 py-1 text-[10.5px] text-white placeholder-slate-500 focus:outline-none focus:border-[#ff7700]"
+                          className="w-full bg-black/60 border border-white/15 rounded-lg px-2 py-1 text-[10.5px] text-white placeholder-slate-500 focus:outline-none focus:border-[#ff7700] disabled:opacity-50"
                         />
                         <div className="grid grid-cols-2 gap-1">
                           <input
                             type="tel"
+                            disabled={isSubmittingLead}
                             placeholder="Phone..."
                             value={leadPhone}
                             onChange={(e) => setLeadPhone(e.target.value)}
-                            className="w-full bg-black/60 border border-white/15 rounded-lg px-2 py-1 text-[10.5px] text-white placeholder-slate-500 focus:outline-none focus:border-[#ff7700]"
+                            className="w-full bg-black/60 border border-white/15 rounded-lg px-2 py-1 text-[10.5px] text-white placeholder-slate-500 focus:outline-none focus:border-[#ff7700] disabled:opacity-50"
                           />
                           <input
                             type="text"
+                            disabled={isSubmittingLead}
                             placeholder="Fleet / Team Size..."
                             value={leadFleet}
                             onChange={(e) => setLeadFleet(e.target.value)}
-                            className="w-full bg-black/60 border border-white/15 rounded-lg px-2 py-1 text-[10.5px] text-white placeholder-slate-500 focus:outline-none focus:border-[#ff7700]"
+                            className="w-full bg-black/60 border border-white/15 rounded-lg px-2 py-1 text-[10.5px] text-white placeholder-slate-500 focus:outline-none focus:border-[#ff7700] disabled:opacity-50"
                           />
                         </div>
                       </div>
                       <button
                         type="submit"
-                        className="w-full bg-white/10 hover:bg-[#ff7700] hover:text-slate-950 border border-white/20 text-white font-semibold py-1 rounded-lg text-[10px] transition-all cursor-pointer"
+                        disabled={isSubmittingLead || (!leadEmail && !leadPhone)}
+                        className="w-full bg-white/10 hover:bg-[#ff7700] hover:text-slate-950 border border-white/20 text-white font-semibold py-1 rounded-lg text-[10px] transition-all cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50"
                       >
-                        Submit Contact Info
+                        {isSubmittingLead ? (
+                          <>
+                            <Loader2 className="w-2.5 h-2.5 animate-spin text-[#ff7700]" />
+                            <span>Recording Lead...</span>
+                          </>
+                        ) : (
+                          <span>Submit Contact Info</span>
+                        )}
                       </button>
                     </motion.form>
                   )}

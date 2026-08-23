@@ -9,7 +9,8 @@ import {
   Phone, 
   Ticket, 
   ArrowUpRight,
-  Instagram
+  Instagram,
+  Lock
 } from 'lucide-react';
 
 interface FooterProps {
@@ -152,6 +153,12 @@ export const Footer: React.FC<FooterProps> = ({ navigate }) => {
               </li>
               <li>
                 <button onClick={() => handleNavClick('/privacy-policy')} className="text-slate-400 hover:text-slate-200 transition-colors">Privacy Policy</button>
+              </li>
+              <li>
+                <button onClick={() => handleNavClick('/admin')} className="text-slate-500 hover:text-slate-300 transition-colors flex items-center gap-1 text-[11px]">
+                  <Lock className="w-3 h-3 text-slate-500" />
+                  <span>Admin Portal</span>
+                </button>
               </li>
             </ul>
           </div>

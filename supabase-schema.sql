@@ -86,18 +86,46 @@ CREATE TABLE IF NOT EXISTS public.job_applications (
   applied_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 5. STORAGE BUCKET FOR RESUMES
+-- Ensure all columns exist even if the table was created earlier with fewer fields
+ALTER TABLE public.job_applications ADD COLUMN IF NOT EXISTS location TEXT;
+ALTER TABLE public.job_applications ADD COLUMN IF NOT EXISTS linkedin_url TEXT;
+ALTER TABLE public.job_applications ADD COLUMN IF NOT EXISTS experience_years NUMERIC;
+ALTER TABLE public.job_applications ADD COLUMN IF NOT EXISTS current_company TEXT;
+ALTER TABLE public.job_applications ADD COLUMN IF NOT EXISTS notice_period TEXT;
+ALTER TABLE public.job_applications ADD COLUMN IF NOT EXISTS expected_salary TEXT;
+ALTER TABLE public.job_applications ADD COLUMN IF NOT EXISTS resume_file_name TEXT;
+ALTER TABLE public.job_applications ADD COLUMN IF NOT EXISTS resume_url TEXT;
+ALTER TABLE public.job_applications ADD COLUMN IF NOT EXISTS cover_letter TEXT;
+ALTER TABLE public.job_applications ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'New';
+ALTER TABLE public.job_applications ADD COLUMN IF NOT EXISTS notes TEXT;
+ALTER TABLE public.job_applications ADD COLUMN IF NOT EXISTS applied_at TIMESTAMPTZ DEFAULT NOW();
+
+-- 5. AI CONVERSATION LOGS TABLE
+CREATE TABLE IF NOT EXISTS public.ai_logs (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  session_id TEXT NOT NULL,
+  provider TEXT NOT NULL,
+  model TEXT,
+  user_message TEXT NOT NULL,
+  ai_response TEXT NOT NULL,
+  lead_email TEXT,
+  lead_phone TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 6. STORAGE BUCKET FOR RESUMES
 INSERT INTO storage.buckets (id, name, public) 
 VALUES ('resumes', 'resumes', true)
 ON CONFLICT (id) DO NOTHING;
 
--- 6. ENABLE ROW LEVEL SECURITY (RLS)
+-- 7. ENABLE ROW LEVEL SECURITY (RLS)
 ALTER TABLE public.bookings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.leads ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.contact_submissions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.job_applications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.ai_logs ENABLE ROW LEVEL SECURITY;
 
--- 7. RLS POLICIES (ALLOW PUBLIC INSERTS & ADMIN ALL OPERATIONS)
+-- 8. RLS POLICIES (ALLOW PUBLIC INSERTS & ADMIN ALL OPERATIONS)
 -- Bookings Policies
 CREATE POLICY "Allow public inserts to bookings" ON public.bookings FOR INSERT WITH CHECK (true);
 CREATE POLICY "Allow read bookings for authenticated & anon" ON public.bookings FOR SELECT USING (true);
@@ -122,6 +150,12 @@ CREATE POLICY "Allow read job_applications" ON public.job_applications FOR SELEC
 CREATE POLICY "Allow update job_applications" ON public.job_applications FOR UPDATE USING (true);
 CREATE POLICY "Allow delete job_applications" ON public.job_applications FOR DELETE USING (true);
 
+-- AI Logs Policies
+CREATE POLICY "Allow public inserts to ai_logs" ON public.ai_logs FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow read ai_logs" ON public.ai_logs FOR SELECT USING (true);
+CREATE POLICY "Allow update ai_logs" ON public.ai_logs FOR UPDATE USING (true);
+CREATE POLICY "Allow delete ai_logs" ON public.ai_logs FOR DELETE USING (true);
+
 -- Storage Objects Policies for Resumes Bucket
 CREATE POLICY "Allow public uploads to resumes bucket" 
 ON storage.objects FOR INSERT 
@@ -138,3 +172,5 @@ CREATE INDEX IF NOT EXISTS idx_leads_created_at ON public.leads(created_at DESC)
 CREATE INDEX IF NOT EXISTS idx_leads_status ON public.leads(status);
 CREATE INDEX IF NOT EXISTS idx_contacts_created_at ON public.contact_submissions(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_job_apps_applied_at ON public.job_applications(applied_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ai_logs_created_at ON public.ai_logs(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ai_logs_session_id ON public.ai_logs(session_id);

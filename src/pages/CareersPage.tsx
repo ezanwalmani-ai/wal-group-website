@@ -23,14 +23,17 @@ export const CareersPage: React.FC<Props> = ({ navigate }) => {
   const [coverLetter, setCoverLetter] = useState('');
   const [uploading, setUploading] = useState(false);
   const [fileError, setFileError] = useState('');
+  const [submitError, setSubmitError] = useState('');
 
   const [submittedApp, setSubmittedApp] = useState<JobApplication | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (uploading) return;
     if (!fullName || !email || !phone || !position || !expectedSalary) return;
 
     setFileError('');
+    setSubmitError('');
     setUploading(true);
 
     let resumeUrl = '';
@@ -48,7 +51,7 @@ export const CareersPage: React.FC<Props> = ({ navigate }) => {
     }
 
     const appId = `WM-APP-${Math.floor(100000 + Math.random() * 900000)}`;
-    const nowISO = new Date().toLocaleString();
+    const nowISO = new Date().toISOString();
 
     const app: JobApplication = {
       id: appId,
@@ -68,29 +71,41 @@ export const CareersPage: React.FC<Props> = ({ navigate }) => {
       status: 'New'
     };
 
-    // Save to local storage
-    const existing = JSON.parse(localStorage.getItem('wal_groups_careers') || localStorage.getItem('walmani_careers') || '[]');
-    existing.unshift(app);
-    localStorage.setItem('wal_groups_careers', JSON.stringify(existing));
-
-    // Save directly to Supabase
-    await saveJobApplicationToSupabase({
-      ...app,
-      resumeUrl
-    }).catch((err) => console.error('Supabase career app save error:', err));
-
-    // Trigger backend server route for email notifications
-    fetch('/api/careers', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+    try {
+      // 2. Save directly to Supabase job_applications table
+      const res = await saveJobApplicationToSupabase({
         ...app,
         resumeUrl
-      })
-    }).catch((err) => console.error('Server email trigger error:', err));
+      });
 
-    setUploading(false);
-    setSubmittedApp(app);
+      if (!res.success) {
+        setSubmitError(res.error || 'Failed to submit job application to database. Please check your connection and try again.');
+        setUploading(false);
+        return;
+      }
+
+      // Save to local storage for quick user review
+      const existing = JSON.parse(localStorage.getItem('wal_groups_careers') || localStorage.getItem('walmani_careers') || '[]');
+      existing.unshift(app);
+      localStorage.setItem('wal_groups_careers', JSON.stringify(existing));
+
+      // Trigger backend server route for email notifications
+      fetch('/api/careers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...app,
+          resumeUrl
+        })
+      }).catch((err) => console.error('Server email trigger error:', err));
+
+      setSubmittedApp(app);
+    } catch (err: any) {
+      console.error('Supabase career app save error:', err);
+      setSubmitError(err?.message || 'An unexpected error occurred while saving your application.');
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
@@ -178,6 +193,12 @@ export const CareersPage: React.FC<Props> = ({ navigate }) => {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
+                {submitError && (
+                  <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 flex items-center gap-2.5 font-medium">
+                    <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
+                    <span>{submitError}</span>
+                  </div>
+                )}
                 
                 {/* Section 1 */}
                 <div className="space-y-4">

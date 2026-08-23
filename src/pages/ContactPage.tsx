@@ -7,8 +7,8 @@ import { InteractiveOfficeLocations } from '../components/InteractiveOfficeLocat
 import { SectionDivider } from '../components/SectionDivider';
 import { EmailLink } from '../components/EmailLink';
 import { InstagramLink } from '../components/InstagramLink';
-import { MapPin, Mail, Phone, Send, CheckCircle2, Calendar, ShieldCheck, Sparkles, Loader2 } from 'lucide-react';
-import { saveContactSubmissionToSupabase } from '../lib/supabase';
+import { MapPin, Mail, Phone, Send, CheckCircle2, Calendar, ShieldCheck, Sparkles, Loader2, AlertCircle } from 'lucide-react';
+import { saveContactSubmissionToSupabase, saveLeadToSupabase } from '../lib/supabase';
 
 interface Props {
   navigate: (path: string) => void;
@@ -24,6 +24,7 @@ export const ContactPage: React.FC<Props> = ({ navigate }) => {
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   // Intelligent Routing Logic
   const getRoutedEmail = (subj: string): 'thewalgroupinfo@gmail.com' | 'thewalgroups@gmail.com' => {
@@ -45,13 +46,15 @@ export const ContactPage: React.FC<Props> = ({ navigate }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
     if (!fullName || !email || !phone || !companyName || !message) return;
 
+    setSubmitError('');
     setIsSubmitting(true);
 
     try {
-      // Save directly to Supabase
-      await saveContactSubmissionToSupabase({
+      // 1. Save directly to Supabase contact_submissions table
+      const res = await saveContactSubmissionToSupabase({
         fullName,
         email,
         phone,
@@ -61,7 +64,25 @@ export const ContactPage: React.FC<Props> = ({ navigate }) => {
         targetEmail
       });
 
-      // Dispatch to backend API to trigger email notifications
+      if (!res.success) {
+        setSubmitError(res.error || 'Failed to submit message to the database. Please try again.');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // 2. Also register lead in leads table for CRM tracking
+      saveLeadToSupabase({
+        name: fullName,
+        email,
+        phone,
+        company: companyName,
+        service: subject,
+        source: 'Contact Page Direct Message',
+        challenges: message,
+        status: 'New'
+      }).catch((leadErr) => console.warn('CRM lead tracking note:', leadErr));
+
+      // 3. Dispatch to backend API to trigger email notifications
       fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -75,24 +96,12 @@ export const ContactPage: React.FC<Props> = ({ navigate }) => {
         })
       }).catch((err) => console.error('Error triggering email API:', err));
 
-      // Also record as business lead for admin tracking
-      fetch('/api/leads', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: fullName,
-          email,
-          phone,
-          company: companyName,
-          challenges: message,
-          servicesOfInterest: [subject]
-        })
-      }).catch(() => {});
-    } catch (err) {
+      setSubmitted(true);
+    } catch (err: any) {
       console.error('Error submitting contact form:', err);
+      setSubmitError(err?.message || 'An unexpected error occurred. Please try again.');
     } finally {
       setIsSubmitting(false);
-      setSubmitted(true);
     }
   };
 
@@ -180,6 +189,12 @@ export const ContactPage: React.FC<Props> = ({ navigate }) => {
                   </motion.div>
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-4">
+                    {submitError && (
+                      <div className="p-3.5 bg-red-950/50 border border-red-500/40 rounded-xl text-xs text-red-300 flex items-center gap-2.5 font-medium">
+                        <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
+                        <span>{submitError}</span>
+                      </div>
+                    )}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-xs font-bold text-slate-300 mb-1">Full Name <span className="text-[#ff6600]">*</span></label>

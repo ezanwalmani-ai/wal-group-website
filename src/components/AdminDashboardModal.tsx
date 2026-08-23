@@ -41,6 +41,8 @@ import { WorkspaceHub } from './WorkspaceHub';
 import { 
   fetchContactsFromSupabase, 
   fetchJobApplicationsFromSupabase,
+  fetchLeadsFromSupabase,
+  fetchAiLogsFromSupabase,
   updateBookingInSupabase,
   deleteBookingFromSupabase,
   updateLeadInSupabase,
@@ -484,6 +486,26 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({ isOpen
   const fetchLeads = async () => {
     setLoading(true);
     try {
+      const sbRes = await fetchLeadsFromSupabase();
+      if (sbRes.success && sbRes.data && sbRes.data.length > 0) {
+        const mapped: LeadRecord[] = sbRes.data.map((row: any) => ({
+          id: row.id,
+          name: row.name || row.email?.split('@')[0] || 'Inbound Lead',
+          company: row.company || 'Direct Client',
+          email: row.email,
+          phone: row.phone || 'N/A',
+          country: row.country,
+          industry: row.industry || 'Logistics & Fleet Operations',
+          status: (row.status as any) || 'New',
+          score: 'Hot',
+          scoreReason: 'Direct CRM Inquiry',
+          notes: row.notes,
+          createdAt: row.created_at || new Date().toISOString()
+        }));
+        setLeads(mapped);
+        return;
+      }
+
       const url = new URL('/api/leads', window.location.origin);
       if (statusFilter !== 'All') url.searchParams.append('status', statusFilter);
       if (searchTerm) url.searchParams.append('search', searchTerm);
@@ -531,6 +553,45 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({ isOpen
   const fetchTranscripts = async () => {
     setLoading(true);
     try {
+      const sbLogs = await fetchAiLogsFromSupabase();
+      if (sbLogs.success && sbLogs.data && sbLogs.data.length > 0) {
+        // Group by session_id
+        const sessionMap: Record<string, ChatTranscriptSession> = {};
+        for (const log of sbLogs.data) {
+          const sId = log.session_id || 'default-session';
+          if (!sessionMap[sId]) {
+            sessionMap[sId] = {
+              sessionId: sId,
+              createdAt: log.created_at || new Date().toISOString(),
+              updatedAt: log.created_at || new Date().toISOString(),
+              pageVisited: 'Website / AI Consultant',
+              userBehaviorSummary: log.lead_email ? `Lead captured: ${log.lead_email}` : 'Active AI Chat Session',
+              messages: [],
+              leadDetails: {
+                email: log.lead_email || null,
+                phone: log.lead_phone || null
+              }
+            };
+          }
+          if (log.user_message) {
+            sessionMap[sId].messages.push({
+              sender: 'user',
+              text: log.user_message,
+              timestamp: log.created_at || new Date().toISOString()
+            });
+          }
+          if (log.ai_response) {
+            sessionMap[sId].messages.push({
+              sender: 'ai',
+              text: log.ai_response,
+              timestamp: log.created_at || new Date().toISOString()
+            });
+          }
+        }
+        setTranscripts(Object.values(sessionMap));
+        return;
+      }
+
       const res = await fetch('/api/ai-transcripts');
       const data = await res.json();
       if (data.success) {
@@ -1797,19 +1858,31 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({ isOpen
                         <h3 className="text-lg font-bold text-white">{selectedJobApp.full_name}</h3>
                         <div className="text-xs text-slate-400 mt-0.5">{selectedJobApp.position} &bull; Ref: {selectedJobApp.id}</div>
                       </div>
-                      {selectedJobApp.resume_url ? (
-                        <a
-                          href={selectedJobApp.resume_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-extrabold text-xs flex items-center gap-1.5 shadow-lg hover:brightness-110 transition-all shrink-0 cursor-pointer"
-                        >
-                          <Paperclip className="w-4 h-4" />
-                          <span>View Resume ({selectedJobApp.resume_file_name || 'Resume.pdf'})</span>
-                        </a>
-                      ) : (
-                        <span className="text-xs text-slate-500 italic">No resume attachment</span>
-                      )}
+                      {(() => {
+                        let resumeLink = selectedJobApp.resume_url;
+                        if (!resumeLink && selectedJobApp.cover_letter) {
+                          const urlMatch = selectedJobApp.cover_letter.match(/https?:\/\/[^\s\]\)]+\/storage\/v1\/object\/public\/resumes\/[^\s\]\)]+/);
+                          if (urlMatch) resumeLink = urlMatch[0];
+                        }
+                        if (!resumeLink && selectedJobApp.notes) {
+                          const urlMatch = selectedJobApp.notes.match(/https?:\/\/[^\s\]\)]+\/storage\/v1\/object\/public\/resumes\/[^\s\]\)]+/);
+                          if (urlMatch) resumeLink = urlMatch[0];
+                        }
+
+                        return resumeLink ? (
+                          <a
+                            href={resumeLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-extrabold text-xs flex items-center gap-1.5 shadow-lg hover:brightness-110 transition-all shrink-0 cursor-pointer"
+                          >
+                            <Paperclip className="w-4 h-4" />
+                            <span>View Resume ({selectedJobApp.resume_file_name || 'Resume.pdf'})</span>
+                          </a>
+                        ) : (
+                          <span className="text-xs text-slate-500 italic">No resume attachment</span>
+                        );
+                      })()}
                     </div>
 
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs bg-black/40 p-3.5 rounded-xl border border-white/5">

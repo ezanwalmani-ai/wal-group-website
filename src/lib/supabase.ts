@@ -82,6 +82,9 @@ export interface LeadPayload {
   phone?: string;
   country?: string;
   industry?: string;
+  title?: string;
+  service?: string;
+  source?: string;
   fleetSize?: string;
   teamSize?: string;
   challenges?: string;
@@ -177,7 +180,7 @@ export async function uploadResumeToSupabaseStorage(file: File): Promise<{ succe
 /**
  * Save contact submission directly to Supabase
  */
-export async function saveContactSubmissionToSupabase(payload: ContactSubmissionPayload) {
+export async function saveContactSubmissionToSupabase(payload: ContactSubmissionPayload): Promise<{ success: boolean; data?: any; error?: string }> {
   try {
     const insertObj = {
       full_name: payload.fullName,
@@ -194,7 +197,7 @@ export async function saveContactSubmissionToSupabase(payload: ContactSubmission
       .insert([insertObj])
       .select();
 
-    if (error && error.code === '42501') {
+    if (error && (error.code === '42501' || error.message?.includes('security policy') || error.message?.includes('permission denied'))) {
       // Permission denied on select due to RLS, try pure insert without select
       const res = await supabase.from('contact_submissions').insert([insertObj]);
       error = res.error;
@@ -202,13 +205,13 @@ export async function saveContactSubmissionToSupabase(payload: ContactSubmission
     }
 
     if (error) {
-      console.warn('[Supabase Warning] Failed to insert contact submission. Ensure SQL tables & RLS policies are run in Supabase SQL Editor:', error.message || error);
-      return { success: false, error };
+      console.warn('[Supabase Warning] Failed to insert contact submission:', error.message || error);
+      return { success: false, error: error.message || 'Failed to submit contact message to database.' };
     }
     return { success: true, data };
-  } catch (err) {
+  } catch (err: any) {
     console.error('[Supabase Exception] Contact submission save error:', err);
-    return { success: false, error: err };
+    return { success: false, error: err?.message || 'Failed to submit contact message.' };
   }
 }
 
@@ -271,26 +274,40 @@ export async function saveBookingToSupabase(payload: BookingPayload) {
 /**
  * Save lead record directly to Supabase
  */
-export async function saveLeadToSupabase(payload: LeadPayload) {
+export async function saveLeadToSupabase(payload: LeadPayload): Promise<{ success: boolean; data?: any; error?: string }> {
   try {
+    const notesParts: string[] = [];
+    if (payload.title) notesParts.push(`Title: ${payload.title}`);
+    if (payload.service) notesParts.push(`Service: ${payload.service}`);
+    if (payload.servicesOfInterest && payload.servicesOfInterest.length > 0) notesParts.push(`Services: ${payload.servicesOfInterest.join(', ')}`);
+    if (payload.fleetSize) notesParts.push(`Fleet: ${payload.fleetSize}`);
+    if (payload.teamSize) notesParts.push(`Team Size: ${payload.teamSize}`);
+    if (payload.country) notesParts.push(`Country: ${payload.country}`);
+    if (payload.challenges) notesParts.push(`Challenges: ${payload.challenges}`);
+    if (payload.score) notesParts.push(`Score: ${payload.score}`);
+    if (payload.scoreReason) notesParts.push(`Reason: ${payload.scoreReason}`);
+    if (payload.sessionId) notesParts.push(`Session: ${payload.sessionId}`);
+    if (payload.notes) notesParts.push(payload.notes);
+
+    const fullNotes = notesParts.length > 0 ? notesParts.join(' | ') : null;
+
+    const leadId = payload.id || `LEAD-${Date.now()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+    const leadName = payload.name || (payload.email ? payload.email.split('@')[0] : 'Inbound Lead');
+    const leadIndustry = payload.industry || payload.service || (payload.servicesOfInterest && payload.servicesOfInterest.length > 0 ? payload.servicesOfInterest.join(', ') : 'Logistics & Fleet Operations');
+    const leadSource = payload.source || 'Website Lead Form';
+
+    // Strict schema matching public.leads table (id, name, company, email, phone, country, industry, source, status, notes)
     const insertObj = {
-      id: payload.id,
-      name: payload.name,
-      company: payload.company,
-      email: payload.email,
-      phone: payload.phone,
-      country: payload.country,
-      industry: payload.industry,
-      fleet_size: payload.fleetSize,
-      team_size: payload.teamSize,
-      challenges: payload.challenges,
-      services_of_interest: payload.servicesOfInterest,
-      score: payload.score || 'Warm',
-      score_reason: payload.scoreReason,
-      session_id: payload.sessionId,
+      id: leadId,
+      name: leadName,
+      company: payload.company || null,
+      email: payload.email || '',
+      phone: payload.phone || null,
+      country: payload.country || null,
+      industry: leadIndustry,
+      source: leadSource,
       status: payload.status || 'New',
-      notes: payload.notes,
-      routed_to: payload.routedTo || 'thewalgroupinfo@gmail.com'
+      notes: fullNotes
     };
 
     let { data, error } = await supabase
@@ -298,20 +315,20 @@ export async function saveLeadToSupabase(payload: LeadPayload) {
       .insert([insertObj])
       .select();
 
-    if (error && (error.code === '42501' || error.message?.includes('security policy'))) {
+    if (error && (error.code === '42501' || error.message?.includes('security policy') || error.message?.includes('permission denied'))) {
       const res = await supabase.from('leads').insert([insertObj]);
       error = res.error;
       data = null;
     }
 
     if (error) {
-      console.warn('[Supabase Warning] Failed to insert lead. Ensure SQL tables & RLS policies are run in Supabase SQL Editor:', error.message || error);
-      return { success: false, error };
+      console.warn('[Supabase Warning] Failed to insert lead:', error.message || error);
+      return { success: false, error: error.message || 'Failed to save lead record.' };
     }
     return { success: true, data };
-  } catch (err) {
+  } catch (err: any) {
     console.error('[Supabase Exception] Lead save error:', err);
-    return { success: false, error: err };
+    return { success: false, error: err?.message || 'Failed to save lead record.' };
   }
 }
 
@@ -359,46 +376,134 @@ export async function saveTicketToSupabase(payload: TicketPayload) {
 /**
  * Save job application directly to Supabase
  */
-export async function saveJobApplicationToSupabase(payload: JobApplicationPayload) {
+export async function saveJobApplicationToSupabase(payload: JobApplicationPayload): Promise<{ success: boolean; data?: any; error?: string }> {
   try {
-    const insertObj = {
-      id: payload.id,
+    let expYears: number | null = null;
+    if (typeof payload.experienceYears === 'number' && !isNaN(payload.experienceYears)) {
+      expYears = payload.experienceYears;
+    } else if (typeof payload.experienceYears === 'string') {
+      const parsed = parseFloat(payload.experienceYears);
+      expYears = isNaN(parsed) ? null : parsed;
+    }
+
+    // Always ensure a valid ISO timestamp for PostgreSQL TIMESTAMPTZ column
+    let validAppliedAt = new Date().toISOString();
+    if (payload.appliedAt) {
+      const parsedDate = new Date(payload.appliedAt);
+      if (!isNaN(parsedDate.getTime())) {
+        validAppliedAt = parsedDate.toISOString();
+      }
+    }
+
+    const appId = payload.id || `WM-APP-${Math.floor(100000 + Math.random() * 900000)}`;
+
+    let coverLetterWithAttachments = payload.coverLetter || '';
+    if (payload.resumeUrl && !coverLetterWithAttachments.includes(payload.resumeUrl)) {
+      coverLetterWithAttachments = `${coverLetterWithAttachments}\n\n[Resume Document (${payload.resumeFileName || 'Resume.pdf'})]: ${payload.resumeUrl}`.trim();
+    }
+
+    let insertObj: Record<string, any> = {
+      id: appId,
       full_name: payload.fullName,
       email: payload.email,
       phone: payload.phone,
-      location: payload.location,
-      linkedin_url: payload.linkedinUrl,
+      location: payload.location || null,
+      linkedin_url: payload.linkedinUrl || null,
       position: payload.position,
-      experience_years: payload.experienceYears,
-      current_company: payload.currentCompany,
-      notice_period: payload.noticePeriod,
-      expected_salary: payload.expectedSalary,
-      resume_file_name: payload.resumeFileName,
+      experience_years: expYears,
+      current_company: payload.currentCompany || null,
+      notice_period: payload.noticePeriod || null,
+      expected_salary: payload.expectedSalary || null,
+      resume_file_name: payload.resumeFileName || null,
       resume_url: payload.resumeUrl || null,
-      cover_letter: payload.coverLetter,
-      applied_at: payload.appliedAt || new Date().toISOString(),
+      cover_letter: coverLetterWithAttachments || null,
+      applied_at: validAppliedAt,
       status: payload.status || 'New'
     };
 
-    let { data, error } = await supabase
-      .from('job_applications')
-      .insert([insertObj])
-      .select();
+    console.log('[Supabase] Inserting into job_applications:', insertObj);
 
-    if (error && (error.code === '42501' || error.message?.includes('security policy'))) {
-      const res = await supabase.from('job_applications').insert([insertObj]);
-      error = res.error;
-      data = null;
+    let lastError: any = null;
+    let maxRetries = 6;
+
+    while (maxRetries > 0) {
+      maxRetries--;
+
+      let { data, error } = await supabase
+        .from('job_applications')
+        .insert([insertObj])
+        .select();
+
+      if (!error) {
+        return { success: true, data };
+      }
+
+      lastError = error;
+      console.warn(`[Supabase Warning] Insert attempt resulted in error [${error.code}]:`, error.message);
+
+      // 1. If error is PGRST204 (Column not found in schema cache)
+      if (error.code === 'PGRST204' || error.message?.includes('schema cache') || error.message?.includes('Could not find the')) {
+        const match = error.message.match(/'([^']+)' column/) || error.message.match(/Could not find the '([^']+)'/);
+        const missingCol = match ? match[1] : null;
+
+        if (missingCol && missingCol in insertObj) {
+          console.log(`[Supabase Adaptive] Removing missing column '${missingCol}' from payload and retrying...`);
+          // Preserve any removed critical info in cover_letter
+          const val = insertObj[missingCol];
+          if (val && missingCol !== 'cover_letter') {
+            insertObj.cover_letter = `${insertObj.cover_letter || ''}\n[${missingCol}]: ${val}`.trim();
+          }
+          delete insertObj[missingCol];
+          continue;
+        } else if (!missingCol) {
+          // If regex couldn't match, attempt removing common optional columns
+          if ('resume_url' in insertObj) {
+            delete insertObj.resume_url;
+            delete insertObj.resume_file_name;
+            continue;
+          }
+        }
+      }
+
+      // 2. If error is 22P02 (UUID syntax invalid on id column)
+      if (error.code === '22P02' && (error.message?.includes('uuid') || error.message?.includes('id'))) {
+        console.log('[Supabase Adaptive] Removing custom text ID for auto-generated UUID...');
+        delete insertObj.id;
+        continue;
+      }
+
+      // 3. If error is RLS select rejection (42501)
+      if (error.code === '42501' || error.message?.includes('security policy') || error.message?.includes('permission denied')) {
+        console.log('[Supabase Adaptive] Retrying insert without .select() for RLS compatibility...');
+        const res = await supabase.from('job_applications').insert([insertObj]);
+        if (!res.error) {
+          return { success: true };
+        }
+        lastError = res.error;
+      }
+
+      // 4. If error is 22007 (Timestamp format error)
+      if (error.code === '22007' && 'applied_at' in insertObj) {
+        console.log('[Supabase Adaptive] Removing applied_at timestamp for DB default...');
+        delete insertObj.applied_at;
+        continue;
+      }
+
+      break;
     }
 
-    if (error) {
-      console.warn('[Supabase Warning] Failed to insert job application:', error.message || error);
-      return { success: false, error };
+    if (lastError) {
+      console.error('[Supabase Error] Failed to insert job application after retries:', lastError);
+      return { 
+        success: false, 
+        error: `Supabase Error [${lastError.code || 'UNKNOWN'}]: ${lastError.message || lastError.details || 'Failed to submit application.'}` 
+      };
     }
-    return { success: true, data };
-  } catch (err) {
+
+    return { success: true };
+  } catch (err: any) {
     console.error('[Supabase Exception] Job application save error:', err);
-    return { success: false, error: err };
+    return { success: false, error: err?.message || 'Failed to submit application due to an unexpected error.' };
   }
 }
 
@@ -620,30 +725,222 @@ export interface AiLogPayload {
 /**
  * Save AI conversation logs directly to Supabase
  */
-export async function saveAiLogToSupabase(payload: AiLogPayload) {
+export async function saveAiLogToSupabase(payload: AiLogPayload): Promise<{ success: boolean; data?: any; error?: string }> {
   try {
-    const { data, error } = await supabase
+    const insertObj = {
+      session_id: payload.session_id,
+      provider: payload.provider || 'AI Assistant',
+      model: payload.model || null,
+      user_message: payload.user_message,
+      ai_response: payload.ai_response,
+      lead_email: payload.lead_email || null,
+      lead_phone: payload.lead_phone || null
+    };
+
+    let { data, error } = await supabase
       .from('ai_logs')
-      .insert([payload])
+      .insert([insertObj])
       .select();
 
-    if (error && (error.code === '42501' || error.message?.includes('security policy'))) {
-      const res = await supabase.from('ai_logs').insert([payload]);
-      return { success: !res.error, error: res.error };
+    if (error && (error.code === '42501' || error.message?.includes('security policy') || error.message?.includes('permission denied'))) {
+      const res = await supabase.from('ai_logs').insert([insertObj]);
+      error = res.error;
+      data = null;
     }
 
     if (error) {
       if (error.message?.includes('Could not find the table') || error.code === 'PGRST204') {
-        console.info('[Supabase Info] ai_logs table not present in Supabase database. Persistent chat transcripts saved in local data store.');
+        console.warn('[Supabase Warning] Table "ai_logs" does not exist in Supabase database yet. Please run the SQL schema in Supabase SQL Editor:', error.message);
       } else {
-        console.warn('[Supabase Info] AI log table insert notice:', error.message || error);
+        console.warn('[Supabase Warning] Failed to insert AI log:', error.message || error);
       }
-      return { success: false, error };
+      return { success: false, error: error.message || 'Failed to save AI log record.' };
     }
     return { success: true, data };
   } catch (err: any) {
-    console.info('[Supabase Info] AI log save skipped:', err?.message || err);
-    return { success: false, error: err };
+    console.error('[Supabase Exception] AI log save error:', err);
+    return { success: false, error: err?.message || 'Failed to save AI log.' };
   }
 }
+
+/**
+ * Fetch all AI conversation logs from Supabase
+ */
+export async function fetchAiLogsFromSupabase() {
+  try {
+    const { data, error } = await supabase
+      .from('ai_logs')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.warn('[Supabase Fetch AI Logs Warning]', error.message);
+      return { success: false, data: [] };
+    }
+    return { success: true, data: data || [] };
+  } catch (err) {
+    return { success: false, data: [] };
+  }
+}
+
+/**
+ * Fetch all tickets from Supabase
+ */
+export async function fetchTicketsFromSupabase() {
+  try {
+    const { data, error } = await supabase
+      .from('tickets')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.warn('[Supabase Fetch Tickets Warning]', error.message);
+      return { success: false, data: [], error: error.message };
+    }
+    return { success: true, data: data || [] };
+  } catch (err: any) {
+    return { success: false, data: [], error: err?.message || 'Error fetching tickets' };
+  }
+}
+
+/**
+ * Update ticket status, priority, or messages in Supabase
+ */
+export async function updateTicketInSupabase(id: string, updates: Partial<{ status: string; priority: string; department: string; messages: any[] }>) {
+  try {
+    const { data, error } = await supabase
+      .from('tickets')
+      .update(updates)
+      .eq('id', id)
+      .select();
+
+    if (error) return { success: false, error: error.message };
+    return { success: true, data };
+  } catch (err: any) {
+    return { success: false, error: err?.message || 'Failed to update ticket' };
+  }
+}
+
+/**
+ * Delete ticket from Supabase
+ */
+export async function deleteTicketFromSupabase(id: string) {
+  try {
+    const { error } = await supabase.from('tickets').delete().eq('id', id);
+    if (error) return { success: false, error: error.message };
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err?.message || 'Failed to delete ticket' };
+  }
+}
+
+export interface DashboardMetricSummary {
+  table: string;
+  label: string;
+  count: number;
+  loading: boolean;
+  error?: string;
+}
+
+export interface DashboardMetricsResult {
+  contacts: DashboardMetricSummary;
+  leads: DashboardMetricSummary;
+  jobs: DashboardMetricSummary;
+  bookings: DashboardMetricSummary;
+  tickets: DashboardMetricSummary;
+  aiLogs: DashboardMetricSummary;
+}
+
+/**
+ * Live aggregate counts across all 6 Supabase tables with explicit per-table error reporting
+ */
+export async function fetchDashboardMetrics(): Promise<DashboardMetricsResult> {
+  const result: DashboardMetricsResult = {
+    contacts: { table: 'contact_submissions', label: 'Total Contacts', count: 0, loading: false },
+    leads: { table: 'leads', label: 'Total Leads', count: 0, loading: false },
+    jobs: { table: 'job_applications', label: 'Total Job Applications', count: 0, loading: false },
+    bookings: { table: 'bookings', label: 'Total Bookings', count: 0, loading: false },
+    tickets: { table: 'tickets', label: 'Total Tickets', count: 0, loading: false },
+    aiLogs: { table: 'ai_logs', label: 'Total AI Logs', count: 0, loading: false }
+  };
+
+  const [
+    contactsRes,
+    leadsRes,
+    jobsRes,
+    bookingsRes,
+    ticketsRes,
+    aiLogsRes
+  ] = await Promise.allSettled([
+    supabase.from('contact_submissions').select('*', { count: 'exact', head: true }),
+    supabase.from('leads').select('*', { count: 'exact', head: true }),
+    supabase.from('job_applications').select('*', { count: 'exact', head: true }),
+    supabase.from('bookings').select('*', { count: 'exact', head: true }),
+    supabase.from('tickets').select('*', { count: 'exact', head: true }),
+    supabase.from('ai_logs').select('*', { count: 'exact', head: true })
+  ]);
+
+  if (contactsRes.status === 'fulfilled') {
+    if (contactsRes.value.error) {
+      result.contacts.error = contactsRes.value.error.message;
+    } else {
+      result.contacts.count = contactsRes.value.count ?? 0;
+    }
+  } else {
+    result.contacts.error = contactsRes.reason?.message || 'Failed to query contact_submissions';
+  }
+
+  if (leadsRes.status === 'fulfilled') {
+    if (leadsRes.value.error) {
+      result.leads.error = leadsRes.value.error.message;
+    } else {
+      result.leads.count = leadsRes.value.count ?? 0;
+    }
+  } else {
+    result.leads.error = leadsRes.reason?.message || 'Failed to query leads';
+  }
+
+  if (jobsRes.status === 'fulfilled') {
+    if (jobsRes.value.error) {
+      result.jobs.error = jobsRes.value.error.message;
+    } else {
+      result.jobs.count = jobsRes.value.count ?? 0;
+    }
+  } else {
+    result.jobs.error = jobsRes.reason?.message || 'Failed to query job_applications';
+  }
+
+  if (bookingsRes.status === 'fulfilled') {
+    if (bookingsRes.value.error) {
+      result.bookings.error = bookingsRes.value.error.message;
+    } else {
+      result.bookings.count = bookingsRes.value.count ?? 0;
+    }
+  } else {
+    result.bookings.error = bookingsRes.reason?.message || 'Failed to query bookings';
+  }
+
+  if (ticketsRes.status === 'fulfilled') {
+    if (ticketsRes.value.error) {
+      result.tickets.error = ticketsRes.value.error.message;
+    } else {
+      result.tickets.count = ticketsRes.value.count ?? 0;
+    }
+  } else {
+    result.tickets.error = ticketsRes.reason?.message || 'Failed to query tickets';
+  }
+
+  if (aiLogsRes.status === 'fulfilled') {
+    if (aiLogsRes.value.error) {
+      result.aiLogs.error = aiLogsRes.value.error.message;
+    } else {
+      result.aiLogs.count = aiLogsRes.value.count ?? 0;
+    }
+  } else {
+    result.aiLogs.error = aiLogsRes.reason?.message || 'Failed to query ai_logs';
+  }
+
+  return result;
+}
+
 
