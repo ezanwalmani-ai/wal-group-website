@@ -142,23 +142,11 @@ export const Footer: React.FC<FooterProps> = ({ navigate }) => {
               <li><button onClick={() => handleNavClick('/success-stories')} className="text-slate-300 hover:text-white transition-colors">Success Stories</button></li>
               <li><button onClick={() => handleNavClick('/careers')} className="text-slate-300 hover:text-white transition-colors">Careers</button></li>
               <li><button onClick={() => handleNavClick('/contact')} className="text-slate-300 hover:text-white transition-colors">Contact</button></li>
-              <li>
-                <button onClick={() => handleNavClick('/raise-ticket')} className="text-[#ff7700] hover:text-[#ff9933] font-semibold transition-colors flex items-center gap-1">
-                  <Ticket className="w-3.5 h-3.5" />
-                  <span>Raise a Ticket</span>
-                </button>
-              </li>
               <li className="pt-2 border-t border-white/10">
                 <button onClick={() => handleNavClick('/terms-and-conditions')} className="text-slate-400 hover:text-slate-200 transition-colors">Terms &amp; Conditions</button>
               </li>
               <li>
                 <button onClick={() => handleNavClick('/privacy-policy')} className="text-slate-400 hover:text-slate-200 transition-colors">Privacy Policy</button>
-              </li>
-              <li>
-                <button onClick={() => handleNavClick('/admin')} className="text-slate-500 hover:text-slate-300 transition-colors flex items-center gap-1 text-[11px]">
-                  <Lock className="w-3 h-3 text-slate-500" />
-                  <span>Admin Portal</span>
-                </button>
               </li>
             </ul>
           </div>
@@ -213,8 +201,16 @@ export const Footer: React.FC<FooterProps> = ({ navigate }) => {
           transition={{ duration: 0.8 }}
           className="pt-8 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-400 gap-4"
         >
-          <div>
-            &copy; {new Date().getFullYear()} Wal Group. All rights reserved.
+          <div className="flex items-center gap-3">
+            <span>&copy; {new Date().getFullYear()} Wal Group. All rights reserved.</span>
+            <button
+              onClick={() => handleNavClick('/admin')}
+              className="text-slate-600 hover:text-slate-400 transition-colors p-1 rounded hover:bg-white/5 opacity-60 hover:opacity-100"
+              title="Staff Access"
+              aria-label="Staff Access"
+            >
+              <Lock className="w-3 h-3" />
+            </button>
           </div>
           <div className="flex items-center gap-6 text-slate-400">
             <span>Bengaluru, KA • Serving DSPs across US &amp; Global Operations</span>

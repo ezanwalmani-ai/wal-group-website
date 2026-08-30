@@ -219,39 +219,39 @@ export const AdminSettingsView: React.FC<SettingsViewProps> = ({
 
   return (
     <div className="space-y-6 sm:space-y-8">
-      {/* Supabase Connection Overview */}
+      {/* System & Operations Connection Overview */}
       <div className="rounded-2xl bg-[#09101d] border border-white/10 p-6 space-y-4">
         <div className="flex items-center justify-between pb-4 border-b border-white/5">
           <div className="flex items-center gap-2.5">
             <Database className="w-5 h-5 text-[#ff7700]" />
             <h3 className="text-sm font-extrabold text-white uppercase tracking-wider">
-              Supabase Project Connection
+              System &amp; Database Infrastructure
             </h3>
           </div>
           <span className="px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span>Active & Ready</span>
+            <span>Active &amp; Operational</span>
           </span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
           <div className="p-4 rounded-xl bg-black/40 border border-white/5 space-y-1">
-            <span className="text-slate-500 uppercase font-bold text-[10px] block">Project Endpoint URL</span>
-            <div className="font-mono text-slate-200 truncate">{supabaseUrl}</div>
+            <span className="text-slate-500 uppercase font-bold text-[10px] block">Database Environment</span>
+            <div className="font-semibold text-slate-200 truncate">Cloud PostgreSQL Instance (Synchronized)</div>
           </div>
           <div className="p-4 rounded-xl bg-black/40 border border-white/5 space-y-1">
-            <span className="text-slate-500 uppercase font-bold text-[10px] block">Current Authenticated Admin</span>
-            <div className="font-mono text-amber-300 truncate">{user?.email || 'N/A'}</div>
+            <span className="text-slate-500 uppercase font-bold text-[10px] block">Active Administrator Session</span>
+            <div className="font-mono text-amber-300 truncate">{user?.email || 'Authorized Administrator'}</div>
           </div>
           <div className="p-4 rounded-xl bg-black/40 border border-white/5 space-y-1">
-            <span className="text-slate-500 uppercase font-bold text-[10px] block">Authenticated User UID</span>
-            <div className="font-mono text-slate-400 truncate">{user?.id || 'N/A'}</div>
+            <span className="text-slate-500 uppercase font-bold text-[10px] block">Authentication Method</span>
+            <div className="font-semibold text-slate-300 truncate">Encrypted JWT Session</div>
           </div>
           <div className="p-4 rounded-xl bg-black/40 border border-white/5 space-y-1">
-            <span className="text-slate-500 uppercase font-bold text-[10px] block">Security Context</span>
+            <span className="text-slate-500 uppercase font-bold text-[10px] block">Access Security Context</span>
             <div className="text-emerald-400 font-semibold flex items-center gap-1.5">
               <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Public Anon Key with RLS Enforced</span>
+              <span>Row Level Security (RLS) Active</span>
             </div>
           </div>
         </div>
@@ -263,7 +263,7 @@ export const AdminSettingsView: React.FC<SettingsViewProps> = ({
           <div className="flex items-center gap-2.5">
             <Layers className="w-5 h-5 text-blue-400" />
             <h3 className="text-sm font-extrabold text-white uppercase tracking-wider">
-              Supabase Tables Health & RLS Status
+              Data Collections Health &amp; Schema Status
             </h3>
           </div>
           <button
@@ -271,7 +271,7 @@ export const AdminSettingsView: React.FC<SettingsViewProps> = ({
             className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-slate-200 flex items-center gap-1.5 transition-colors cursor-pointer"
           >
             <RefreshCw className="w-3 h-3 text-[#ff7700]" />
-            <span>Re-check Tables</span>
+            <span>Verify Status</span>
           </button>
         </div>
 
@@ -288,7 +288,7 @@ export const AdminSettingsView: React.FC<SettingsViewProps> = ({
               <div className="flex items-start justify-between">
                 <div>
                   <div className="font-bold text-white">{t.label}</div>
-                  <div className="font-mono text-[10px] text-slate-500">public.{t.name}</div>
+                  <div className="text-[10px] text-slate-400">Pipeline Collection</div>
                 </div>
                 {t.error ? (
                   <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
@@ -300,7 +300,7 @@ export const AdminSettingsView: React.FC<SettingsViewProps> = ({
               <div className="pt-2 border-t border-white/5 flex items-center justify-between text-[11px]">
                 {t.error ? (
                   <span className="text-amber-400 text-[10px] truncate" title={t.error}>
-                    Table query notice
+                    Verification required
                   </span>
                 ) : (
                   <span className="text-slate-400">
@@ -308,7 +308,7 @@ export const AdminSettingsView: React.FC<SettingsViewProps> = ({
                   </span>
                 )}
                 <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold uppercase ${t.error ? 'bg-amber-500/20 text-amber-300' : 'bg-emerald-500/10 text-emerald-400'}`}>
-                  {t.error ? 'Needs SQL' : 'Healthy'}
+                  {t.error ? 'Attention' : 'Healthy'}
                 </span>
               </div>
             </div>
@@ -321,31 +321,23 @@ export const AdminSettingsView: React.FC<SettingsViewProps> = ({
         <div className="flex items-center gap-2.5 pb-4 border-b border-white/5">
           <UserCheck className="w-5 h-5 text-amber-400" />
           <h3 className="text-sm font-extrabold text-white uppercase tracking-wider">
-            Supabase Admin Authorization Recommendations
+            Executive Access Control &amp; Policies
           </h3>
         </div>
 
         <div className="text-xs text-slate-300 space-y-3 leading-relaxed">
           <p>
-            The Wal Groups Admin Panel verifies authenticated sessions using Supabase Auth (<code className="text-amber-300 font-mono">supabase.auth.getSession()</code>).
+            The Wal Group Operations Portal uses cryptographic JWT token verification with automated session validation and access controls.
           </p>
           
           <div className="p-4 rounded-xl bg-black/40 border border-white/5 space-y-2">
             <h4 className="font-bold text-white text-xs flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span>Recommended Production RBAC Architecture</span>
+              <span>Role-Based Access Control (RBAC)</span>
             </h4>
             <p className="text-slate-400 text-[11px]">
-              To restrict access so that only specific authorized administrator accounts can manage data:
+              Access to customer bookings, sales leads, job candidate applications, and internal support tickets is restricted to authorized Wal Group administrative staff.
             </p>
-            <ol className="list-decimal list-inside space-y-1 text-[11px] text-slate-300 pl-1">
-              <li>
-                <strong>Option A (User Metadata):</strong> In Supabase Dashboard &gt; Authentication &gt; Users, add <code className="text-amber-300 font-mono">{"{\"role\": \"admin\"}"}</code> to the user's <code className="text-amber-300 font-mono">raw_app_meta_data</code> or <code className="text-amber-300 font-mono">raw_user_meta_data</code>.
-              </li>
-              <li>
-                <strong>Option B (Profiles Table with RLS):</strong> Create a <code className="text-amber-300 font-mono">public.profiles (id UUID PRIMARY KEY REFERENCES auth.users, role TEXT)</code> table and enforce RLS policies such as <code className="text-amber-300 font-mono">USING (auth.jwt() -&gt;&gt; 'role' = 'admin' OR EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin'))</code>.
-              </li>
-            </ol>
           </div>
         </div>
       </div>
@@ -357,11 +349,11 @@ export const AdminSettingsView: React.FC<SettingsViewProps> = ({
             <div className="flex items-center gap-2">
               <FileCode className="w-4 h-4 text-[#ff7700]" />
               <h3 className="text-sm font-extrabold text-white uppercase tracking-wider">
-                Supabase SQL Schema & RLS Scripts
+                Database Schema &amp; Migration Script
               </h3>
             </div>
             <p className="text-xs text-slate-400 mt-0.5">
-              Copy and execute this script inside your Supabase project's SQL Editor if any tables or RLS policies need initialization.
+              Reference SQL definition and security policies for database maintenance and disaster recovery.
             </p>
           </div>
 

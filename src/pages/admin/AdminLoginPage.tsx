@@ -90,7 +90,7 @@ export const AdminLoginPage: React.FC<Props> = ({ navigate }) => {
             Executive Admin Portal
           </h1>
           <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-xs mx-auto">
-            Supabase Authenticated Control Center for Leads, Bookings, Resumes & Support
+            Executive Control Center for Leads, Bookings, Applications &amp; Support
           </p>
         </div>
 
@@ -100,12 +100,12 @@ export const AdminLoginPage: React.FC<Props> = ({ navigate }) => {
             <div className="flex items-center gap-2">
               <ShieldCheck className="w-5 h-5 text-[#ff7700]" />
               <span className="text-xs font-bold uppercase tracking-wider text-slate-300">
-                Supabase Auth Protected
+                Authorized Personnel Only
               </span>
             </div>
-            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-semibold">
+            <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-semibold">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Direct Postgres Link</span>
+              <span>Secure Authentication</span>
             </div>
           </div>
 
@@ -120,7 +120,7 @@ export const AdminLoginPage: React.FC<Props> = ({ navigate }) => {
               <div>
                 <p className="font-semibold">{errorMessage}</p>
                 <p className="text-[11px] text-red-400/80 mt-0.5">
-                  Verify the email and password in your Supabase project's Authentication &gt; Users table.
+                  Please verify your credentials or contact the IT administration team.
                 </p>
               </div>
             </motion.div>
@@ -199,15 +199,15 @@ export const AdminLoginPage: React.FC<Props> = ({ navigate }) => {
             </button>
           </form>
 
-          {/* Supabase Information / Quick Setup Tip */}
+          {/* Secure Access Notice */}
           <div className="mt-6 pt-5 border-t border-white/5 space-y-3">
             <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 text-[11px] text-slate-400 leading-relaxed">
               <div className="flex items-center gap-1.5 font-semibold text-slate-300 mb-1">
-                <Database className="w-3.5 h-3.5 text-[#ff7700]" />
-                <span>Supabase Auth Project Connected</span>
+                <KeyRound className="w-3.5 h-3.5 text-[#ff7700]" />
+                <span>Enterprise Identity & Access</span>
               </div>
               <p>
-                Sign in with any user registered in your Supabase Auth project (<code className="text-amber-300 font-mono text-[10px]">yzkjivknyalgfnpklxgr</code>). If you haven't created an admin user yet, create one in the Supabase Dashboard under <strong>Authentication &gt; Users &gt; Add User</strong>.
+                Sign in with your authorized administrator account. Access is monitored and logged for security and operational compliance.
               </p>
             </div>
           </div>

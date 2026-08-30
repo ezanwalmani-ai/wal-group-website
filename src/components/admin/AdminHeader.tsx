@@ -80,10 +80,10 @@ export const AdminHeader: React.FC<HeaderProps> = ({
 
       {/* Right Section: Database Status, Actions & Sign Out */}
       <div className="flex items-center gap-2 sm:gap-3">
-        {/* Supabase Status indicator */}
+        {/* Status indicator */}
         <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold">
-          <Database className="w-3.5 h-3.5" />
-          <span>Supabase Connected</span>
+          <ShieldCheck className="w-3.5 h-3.5" />
+          <span>Live Sync Online</span>
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
         </div>
 

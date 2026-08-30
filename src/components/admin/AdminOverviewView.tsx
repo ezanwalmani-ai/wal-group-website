@@ -134,13 +134,13 @@ export const AdminOverviewView: React.FC<OverviewProps> = ({
                 Executive Control Hub
               </span>
               <span className="text-xs text-slate-400">&bull;</span>
-              <span className="text-xs text-slate-400">Database: <code className="text-amber-300 font-mono">yzkjivknyalgfnpklxgr</code></span>
+              <span className="text-xs text-slate-400">Live Data Stream Active</span>
             </div>
             <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-              Operational Intelligence & Inbound Pipeline
+              Operational Intelligence &amp; Inbound Pipeline
             </h2>
             <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-2xl">
-              Live records synchronized with Supabase Postgres. Real-time updates for leads, client bookings, job candidate resumes, and support tickets.
+              Unified operational view for business leads, client discovery bookings, job applicant profiles, and client support tickets.
             </p>
           </div>
 
@@ -161,10 +161,10 @@ export const AdminOverviewView: React.FC<OverviewProps> = ({
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-extrabold text-slate-200 tracking-wider uppercase flex items-center gap-2">
             <Database className="w-4 h-4 text-[#ff7700]" />
-            <span>Database Metrics Overview</span>
+            <span>Operations &amp; Pipeline Overview</span>
           </h3>
           <span className="text-xs text-slate-500 font-medium">
-            Queried via Supabase JS Client
+            Real-Time Synchronization
           </span>
         </div>
 
@@ -196,7 +196,7 @@ export const AdminOverviewView: React.FC<OverviewProps> = ({
                   </div>
 
                   <div className="flex items-center gap-1 text-[11px] font-semibold text-slate-400 group-hover:text-white transition-colors">
-                    <span>View Table</span>
+                    <span>View Section</span>
                     <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform text-slate-500 group-hover:text-[#ff7700]" />
                   </div>
                 </div>
@@ -214,7 +214,7 @@ export const AdminOverviewView: React.FC<OverviewProps> = ({
                     <div className="py-1">
                       <div className="flex items-center gap-1.5 text-xs text-amber-400 font-semibold">
                         <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-                        <span className="truncate">Table check required</span>
+                        <span className="truncate">Data connection notice</span>
                       </div>
                       <span className="text-[10px] text-slate-500 line-clamp-1" title={card.error}>
                         {card.error}
@@ -233,7 +233,7 @@ export const AdminOverviewView: React.FC<OverviewProps> = ({
 
                   <div className="text-[11px] text-slate-500 pt-1 flex items-center justify-between">
                     <span>{card.description}</span>
-                    <span className="font-mono text-[10px] text-slate-600">public.{card.table}</span>
+                    <span className="font-semibold text-[10px] text-slate-500 uppercase">Live Record</span>
                   </div>
                 </div>
               </motion.div>
@@ -252,7 +252,7 @@ export const AdminOverviewView: React.FC<OverviewProps> = ({
             </h3>
           </div>
           <span className="text-xs text-slate-400 font-medium">
-            Chronological Supabase logs
+            Chronological Activity Stream
           </span>
         </div>
 

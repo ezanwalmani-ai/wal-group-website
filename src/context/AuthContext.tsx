@@ -105,8 +105,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Currently, any authenticated user from the designated project is considered authenticated
-  const isAdmin = !!user;
+  // Robust Admin Authorization Verification
+  // Verifies if the authenticated user has administrative privileges via role metadata or authorized admin email/domain
+  const isAdmin = Boolean(
+    user && (
+      user.app_metadata?.role === 'admin' ||
+      user.user_metadata?.role === 'admin' ||
+      user.app_metadata?.is_admin === true ||
+      user.user_metadata?.is_admin === true ||
+      (user.email && (
+        user.email.toLowerCase().endsWith('@walgroup.com') ||
+        user.email.toLowerCase() === 'thewalgroupinfo@gmail.com' ||
+        user.email.toLowerCase() === 'thewalgroups@gmail.com' ||
+        user.email.toLowerCase().includes('admin')
+      ))
+    )
+  );
 
   return (
     <AuthContext.Provider

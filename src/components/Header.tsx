@@ -488,7 +488,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPath, navigate }) => {
                     currentPath === '/raise-ticket' ? 'bg-white/10 text-[#ff6600]' : 'text-slate-200 hover:bg-white/5'
                   }`}
                 >
-                  Support / Raise Ticket
+                  Client Support Portal
                 </button>
                 <div className="pt-2 border-t border-white/10 flex items-center justify-between px-3">
                   <span className="text-xs font-semibold text-slate-300">Theme Mode:</span>
