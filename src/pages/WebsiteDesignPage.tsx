@@ -31,13 +31,16 @@ export const WebsiteDesignPage: React.FC<Props> = ({ navigate }) => {
           </div>
           <div className="lg:col-span-5">
             <AnimatedImage 
-              src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1000&q=80" 
+              src="https://images.unsplash.com/photo-1460925895917-afdab827c52f" 
               alt="Website Mockups across Laptop and Mobile" 
               containerClassName="rounded-2xl overflow-hidden shadow-2xl border border-slate-700"
               className="w-full h-auto object-cover"
+              width={800}
+              height={550}
               entranceAnimation="slideLeft"
               hoverEffect="tilt"
               floating={true}
+              priority={true}
             />
           </div>
         </div>

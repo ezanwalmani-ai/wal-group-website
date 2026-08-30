@@ -113,19 +113,31 @@ export const InteractiveOfficeLocations: React.FC = () => {
           
           {/* Office Photo with Overlay Glass (5 cols) */}
           <div className="lg:col-span-5 relative rounded-3xl overflow-hidden border border-white/10 shadow-2xl group min-h-[320px] bg-[#0a0a10]">
-            <img
-              src={getOptimizedUnsplashUrl(office.photo, 800, 75)}
-              srcSet={getUnsplashSrcSet(office.photo, [480, 800, 1200])}
-              sizes="(max-width: 1024px) 100vw, 500px"
-              width={800}
-              height={600}
-              alt={office.name}
-              loading="lazy"
-              decoding="async"
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 absolute inset-0"
-            />
+            <picture className="w-full h-full block">
+              <source
+                type="image/avif"
+                srcSet={getUnsplashSrcSet(office.photo, [480, 800, 1200], 75, 'avif')}
+                sizes="(max-width: 1024px) 100vw, 500px"
+              />
+              <source
+                type="image/webp"
+                srcSet={getUnsplashSrcSet(office.photo, [480, 800, 1200], 75, 'webp')}
+                sizes="(max-width: 1024px) 100vw, 500px"
+              />
+              <img
+                src={getOptimizedUnsplashUrl(office.photo, 800, 75)}
+                srcSet={getUnsplashSrcSet(office.photo, [480, 800, 1200])}
+                sizes="(max-width: 1024px) 100vw, 500px"
+                width={800}
+                height={600}
+                alt={office.name}
+                loading="lazy"
+                decoding="async"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 absolute inset-0"
+              />
+            </picture>
 
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent pointer-events-none" />
 
             {/* Photo Bottom Tag */}
             <div className="absolute bottom-6 left-6 right-6 p-4 rounded-2xl bg-black/60 backdrop-blur-md border border-white/15 space-y-1">

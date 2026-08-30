@@ -151,17 +151,29 @@ export const InsideWalGroups: React.FC = () => {
               >
                 {/* Image Box */}
                 <div className="relative h-56 overflow-hidden bg-[#0a0a10]">
-                  <img
-                    src={getOptimizedUnsplashUrl(item.image, 600, 75)}
-                    srcSet={getUnsplashSrcSet(item.image, [360, 600, 800])}
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 380px"
-                    width={600}
-                    height={224}
-                    alt={item.title}
-                    loading="lazy"
-                    decoding="async"
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 brightness-90 group-hover:brightness-100"
-                  />
+                  <picture className="w-full h-full block">
+                    <source
+                      type="image/avif"
+                      srcSet={getUnsplashSrcSet(item.image, [360, 600, 800], 75, 'avif')}
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 380px"
+                    />
+                    <source
+                      type="image/webp"
+                      srcSet={getUnsplashSrcSet(item.image, [360, 600, 800], 75, 'webp')}
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 380px"
+                    />
+                    <img
+                      src={getOptimizedUnsplashUrl(item.image, 600, 75)}
+                      srcSet={getUnsplashSrcSet(item.image, [360, 600, 800])}
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 380px"
+                      width={600}
+                      height={224}
+                      alt={item.title}
+                      loading="lazy"
+                      decoding="async"
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 brightness-90 group-hover:brightness-100"
+                    />
+                  </picture>
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0c0c10] via-transparent to-black/30 pointer-events-none" />
 
                   {/* Top Badge */}

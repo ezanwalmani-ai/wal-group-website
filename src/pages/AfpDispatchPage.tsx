@@ -31,13 +31,16 @@ export const AfpDispatchPage: React.FC<Props> = ({ navigate }) => {
           </div>
           <div className="lg:col-span-5">
             <AnimatedImage 
-              src="https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1000&q=80" 
+              src="https://images.unsplash.com/photo-1601584115197-04ecc0da31d7" 
               alt="Amazon Freight Relay Dashboard and Fleet Logistics" 
               containerClassName="rounded-2xl overflow-hidden shadow-2xl border border-slate-700"
               className="w-full h-auto object-cover"
+              width={800}
+              height={550}
               entranceAnimation="scaleUp"
               hoverEffect="zoom"
               floating={true}
+              priority={true}
             />
           </div>
         </div>

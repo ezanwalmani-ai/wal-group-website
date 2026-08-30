@@ -52,10 +52,13 @@ export const HomePage: React.FC<HomePageProps> = ({ navigate }) => {
         {/* Background image overlay showing logistics command center / dispatch control room */}
         <div className="absolute inset-0 z-0">
           <AnimatedImage 
-            src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=2000&q=80" 
+            src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d" 
             alt="Logistics Operations Control Room" 
             containerClassName="w-full h-full opacity-15"
             className="w-full h-full object-cover object-center"
+            width={1920}
+            height={1080}
+            sizes="100vw"
             entranceAnimation="fadeIn"
             hoverEffect="none"
             priority={true}
@@ -826,10 +829,13 @@ export const HomePage: React.FC<HomePageProps> = ({ navigate }) => {
             {/* Right Visual Image with gentle hover zoom & animated entrance */}
             <div className="lg:col-span-6">
               <AnimatedImage
-                src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80"
+                src="https://images.unsplash.com/photo-1522071820081-009f0129c71c"
                 alt="Wal Group Operations Team Collaborating"
                 containerClassName="relative rounded-2xl overflow-hidden shadow-2xl border border-white/10"
                 className="w-full h-full object-cover opacity-85"
+                width={1200}
+                height={800}
+                sizes="(max-width: 1024px) 100vw, 600px"
                 entranceAnimation="scaleUp"
                 hoverEffect="zoom"
                 overlay={

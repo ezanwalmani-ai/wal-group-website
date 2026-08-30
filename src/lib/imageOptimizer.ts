@@ -5,28 +5,29 @@
  */
 
 /**
+ * Strips existing query parameters from an Unsplash URL to allow clean parameterization.
+ */
+export function cleanUnsplashUrl(url: string): string {
+  if (!url) return '';
+  return url.split('?')[0];
+}
+
+/**
  * Optimizes an Unsplash URL by applying width, quality, and modern format parameters.
  */
 export function getOptimizedUnsplashUrl(
   url: string,
   width: number,
-  quality = 75
+  quality = 75,
+  format?: 'webp' | 'avif' | 'auto'
 ): string {
-  if (!url || !url.includes('images.unsplash.com')) {
+  if (!url) return '';
+  if (!url.includes('images.unsplash.com')) {
     return url;
   }
-  try {
-    const urlObj = new URL(url);
-    urlObj.searchParams.set('auto', 'format');
-    urlObj.searchParams.set('fit', 'crop');
-    urlObj.searchParams.set('w', width.toString());
-    urlObj.searchParams.set('q', quality.toString());
-    return urlObj.toString();
-  } catch {
-    // Fallback if malformed
-    const baseUrl = url.split('?')[0];
-    return `${baseUrl}?auto=format&fit=crop&w=${width}&q=${quality}`;
-  }
+  const baseUrl = cleanUnsplashUrl(url);
+  const fmtParam = format && format !== 'auto' ? `&fm=${format}` : '&auto=format';
+  return `${baseUrl}?fit=crop&w=${width}&q=${quality}${fmtParam}`;
 }
 
 /**
@@ -34,14 +35,15 @@ export function getOptimizedUnsplashUrl(
  */
 export function getUnsplashSrcSet(
   url: string,
-  widths = [400, 800, 1200, 1600],
-  quality = 75
+  widths = [360, 600, 800, 1200, 1600],
+  quality = 75,
+  format?: 'webp' | 'avif' | 'auto'
 ): string {
   if (!url || !url.includes('images.unsplash.com')) {
     return '';
   }
   return widths
-    .map((w) => `${getOptimizedUnsplashUrl(url, w, quality)} ${w}w`)
+    .map((w) => `${getOptimizedUnsplashUrl(url, w, quality, format)} ${w}w`)
     .join(', ');
 }
 
@@ -71,3 +73,4 @@ export function getServiceCardImages(name: string, alt: string): ServiceCardImag
     height: 600,
   };
 }
+
