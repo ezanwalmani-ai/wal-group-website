@@ -230,26 +230,52 @@ export const HomePage: React.FC<HomePageProps> = ({ navigate }) => {
             <motion.div 
               whileHover={{ y: -6 }}
               transition={{ duration: 0.3 }}
-              className="glass-panel p-7 hover:border-[#ff7700]/50 transition-all flex flex-col justify-between group shadow-lg cursor-pointer"
+              onClick={() => navigate('/website-design-development')}
+              className="relative p-7 bg-[#0b101b]/85 border border-white/10 hover:border-[#ff7700]/60 transition-all flex flex-col justify-between group shadow-lg cursor-pointer overflow-hidden rounded-2xl backdrop-blur-md"
             >
-              <div className="space-y-4">
+              {/* Background wrapper with absolute inset-0 z-0, smooth opacity transition, and mix-blend-multiply dark overlay mask */}
+              <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none rounded-2xl transition-opacity duration-400 ease-in-out">
+                <picture>
+                  <source srcSet="/images/services/web-design-dev-400.avif 400w, /images/services/web-design-dev-800.avif 800w" type="image/avif" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px" />
+                  <source srcSet="/images/services/web-design-dev-400.webp 400w, /images/services/web-design-dev-800.webp 800w" type="image/webp" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px" />
+                  <img 
+                    src="/images/services/web-design-dev.jpg" 
+                    alt="Website Design & Development Background"
+                    aria-hidden="true"
+                    referrerPolicy="no-referrer"
+                    loading="lazy"
+                    decoding="async"
+                    width={800}
+                    height={600}
+                    className="w-full h-full object-cover object-center opacity-25 group-hover:opacity-35 group-hover:scale-105 transition-all duration-500 ease-out"
+                  />
+                </picture>
+                <div className="absolute inset-0 bg-gradient-to-b from-[#080d17]/55 via-[#05080f]/65 to-[#020408]/80 mix-blend-multiply transition-colors duration-500" />
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(255,119,0,0.12),transparent_70%)] pointer-events-none" />
+                <div className="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-[#020408]/90 via-[#03060c]/50 to-transparent pointer-events-none" />
+              </div>
+
+              <div className="relative z-10 space-y-4">
                 <AnimatedIcon animation="rotate" className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 text-[#ff7700] group-hover:border-[#ff7700]/50 transition-all">
                   <Monitor className="w-6 h-6" />
                 </AnimatedIcon>
                 <h3 className="text-xl font-bold text-white group-hover:text-[#ff7700] transition-colors">Website Design &amp; Development</h3>
-                <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
                   We build modern, responsive websites that help your business stand out online. From simple business sites to complex portals, we deliver exceptional digital experiences.
                 </p>
                 <div className="pt-2">
-                  <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Technologies</span>
-                  <div className="text-xs text-slate-400 font-medium">
+                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Technologies</span>
+                  <div className="text-xs text-slate-300 font-medium">
                     WordPress | Shopify | HTML &amp; CSS | Responsive Design | SEO Optimization | UI/UX
                   </div>
                 </div>
               </div>
               <button
-                onClick={() => navigate('/website-design-development')}
-                className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between text-xs font-bold text-[#ff7700] group-hover:text-[#ff9933]"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate('/website-design-development');
+                }}
+                className="relative z-10 mt-6 pt-4 border-t border-white/10 flex items-center justify-between text-xs font-bold text-[#ff7700] group-hover:text-[#ff9933]"
               >
                 <span>Learn More About Web Dev</span>
                 <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
@@ -260,24 +286,50 @@ export const HomePage: React.FC<HomePageProps> = ({ navigate }) => {
             <motion.div 
               whileHover={{ y: -6 }}
               transition={{ duration: 0.3 }}
-              className="glass-panel p-7 hover:border-[#ff7700]/50 transition-all flex flex-col justify-between group shadow-lg cursor-pointer"
+              onClick={() => navigate('/dsp-dispatch-support')}
+              className="relative p-7 bg-[#0b101b]/85 border border-white/10 hover:border-[#ff7700]/60 transition-all flex flex-col justify-between group shadow-lg cursor-pointer overflow-hidden rounded-2xl backdrop-blur-md"
             >
-              <div className="space-y-4">
+              {/* Background wrapper with absolute inset-0 z-0, smooth opacity transition, and mix-blend-multiply dark overlay mask */}
+              <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none rounded-2xl transition-opacity duration-400 ease-in-out">
+                <picture>
+                  <source srcSet="/images/services/dsp-dispatch-400.avif 400w, /images/services/dsp-dispatch-800.avif 800w" type="image/avif" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px" />
+                  <source srcSet="/images/services/dsp-dispatch-400.webp 400w, /images/services/dsp-dispatch-800.webp 800w" type="image/webp" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px" />
+                  <img 
+                    src="/images/services/dsp-dispatch.jpg" 
+                    alt="DSP Dispatch Support Background"
+                    aria-hidden="true"
+                    referrerPolicy="no-referrer"
+                    loading="lazy"
+                    decoding="async"
+                    width={800}
+                    height={600}
+                    className="w-full h-full object-cover object-center opacity-25 group-hover:opacity-35 group-hover:scale-105 transition-all duration-500 ease-out"
+                  />
+                </picture>
+                <div className="absolute inset-0 bg-gradient-to-b from-[#080d17]/55 via-[#05080f]/65 to-[#020408]/80 mix-blend-multiply transition-colors duration-500" />
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(255,119,0,0.12),transparent_70%)] pointer-events-none" />
+                <div className="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-[#020408]/90 via-[#03060c]/50 to-transparent pointer-events-none" />
+              </div>
+
+              <div className="relative z-10 space-y-4">
                 <AnimatedIcon animation="rotate" className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 text-[#ff7700] group-hover:border-[#ff7700]/50 transition-all">
                   <Headphones className="w-6 h-6" />
                 </AnimatedIcon>
                 <h3 className="text-xl font-bold text-white group-hover:text-[#ff7700] transition-colors">DSP Dispatch Support Services</h3>
-                <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
                   End-to-end dispatch operations with Amazon Cortex and Netradyne expertise. Our team provides 24×7×365 coverage ensuring no load is left behind and every violation is handled proactively.
                 </p>
-                <div className="space-y-1 text-xs text-slate-300 font-medium pt-2">
+                <div className="space-y-1 text-xs text-slate-200 font-medium pt-2">
                   <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-[#ff7700]" /> Netradyne Power Users &amp; Real-Time Alerts</div>
                   <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-[#ff7700]" /> DVIC Checks &amp; Driver Scorecard Tracking</div>
                 </div>
               </div>
               <button
-                onClick={() => navigate('/dsp-dispatch-support')}
-                className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between text-xs font-bold text-[#ff7700] group-hover:text-[#ff9933]"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate('/dsp-dispatch-support');
+                }}
+                className="relative z-10 mt-6 pt-4 border-t border-white/10 flex items-center justify-between text-xs font-bold text-[#ff7700] group-hover:text-[#ff9933]"
               >
                 <span>Learn More About DSP Dispatch</span>
                 <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
@@ -288,24 +340,50 @@ export const HomePage: React.FC<HomePageProps> = ({ navigate }) => {
             <motion.div 
               whileHover={{ y: -6 }}
               transition={{ duration: 0.3 }}
-              className="glass-panel p-7 hover:border-[#ff7700]/50 transition-all flex flex-col justify-between group shadow-lg cursor-pointer"
+              onClick={() => navigate('/dsp-accounting-payroll')}
+              className="relative p-7 bg-[#0b101b]/85 border border-white/10 hover:border-[#ff7700]/60 transition-all flex flex-col justify-between group shadow-lg cursor-pointer overflow-hidden rounded-2xl backdrop-blur-md"
             >
-              <div className="space-y-4">
+              {/* Background wrapper with absolute inset-0 z-0, smooth opacity transition, and mix-blend-multiply dark overlay mask */}
+              <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none rounded-2xl transition-opacity duration-400 ease-in-out">
+                <picture>
+                  <source srcSet="/images/services/dsp-accounting-400.avif 400w, /images/services/dsp-accounting-800.avif 800w" type="image/avif" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px" />
+                  <source srcSet="/images/services/dsp-accounting-400.webp 400w, /images/services/dsp-accounting-800.webp 800w" type="image/webp" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px" />
+                  <img 
+                    src="/images/services/dsp-accounting.jpg" 
+                    alt="DSP Accounting & Payroll Background"
+                    aria-hidden="true"
+                    referrerPolicy="no-referrer"
+                    loading="lazy"
+                    decoding="async"
+                    width={800}
+                    height={600}
+                    className="w-full h-full object-cover object-center opacity-25 group-hover:opacity-35 group-hover:scale-105 transition-all duration-500 ease-out"
+                  />
+                </picture>
+                <div className="absolute inset-0 bg-gradient-to-b from-[#080d17]/55 via-[#05080f]/65 to-[#020408]/80 mix-blend-multiply transition-colors duration-500" />
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(255,119,0,0.12),transparent_70%)] pointer-events-none" />
+                <div className="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-[#020408]/90 via-[#03060c]/50 to-transparent pointer-events-none" />
+              </div>
+
+              <div className="relative z-10 space-y-4">
                 <AnimatedIcon animation="pulse" className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 text-[#ff7700] group-hover:border-[#ff7700]/50 transition-all">
                   <Calculator className="w-6 h-6" />
                 </AnimatedIcon>
                 <h3 className="text-xl font-bold text-white group-hover:text-[#ff7700] transition-colors">DSP Accounting &amp; Payroll Services</h3>
-                <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
                   Certified QBO and ADP/Paycom experts ensuring accurate bookkeeping and seamless weekly payroll runs. We eliminate errors and ensure drivers are paid correctly, every time.
                 </p>
-                <div className="space-y-1 text-xs text-slate-300 font-medium pt-2">
+                <div className="space-y-1 text-xs text-slate-200 font-medium pt-2">
                   <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-[#ff7700]" /> Certified QBO &amp; ADP Specialists</div>
                   <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-[#ff7700]" /> Amazon Invoice Validation &amp; Timecard Audits</div>
                 </div>
               </div>
               <button
-                onClick={() => navigate('/dsp-accounting-payroll')}
-                className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between text-xs font-bold text-[#ff7700] group-hover:text-[#ff9933]"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate('/dsp-accounting-payroll');
+                }}
+                className="relative z-10 mt-6 pt-4 border-t border-white/10 flex items-center justify-between text-xs font-bold text-[#ff7700] group-hover:text-[#ff9933]"
               >
                 <span>Learn More About Accounting</span>
                 <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
@@ -316,24 +394,50 @@ export const HomePage: React.FC<HomePageProps> = ({ navigate }) => {
             <motion.div 
               whileHover={{ y: -6 }}
               transition={{ duration: 0.3 }}
-              className="glass-panel p-7 hover:border-[#ff7700]/50 transition-all flex flex-col justify-between group shadow-lg cursor-pointer"
+              onClick={() => navigate('/dsp-hr-recruitment')}
+              className="relative p-7 bg-[#0b101b]/85 border border-white/10 hover:border-[#ff7700]/60 transition-all flex flex-col justify-between group shadow-lg cursor-pointer overflow-hidden rounded-2xl backdrop-blur-md"
             >
-              <div className="space-y-4">
+              {/* Background wrapper with absolute inset-0 z-0, smooth opacity transition, and mix-blend-multiply dark overlay mask */}
+              <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none rounded-2xl transition-opacity duration-400 ease-in-out">
+                <picture>
+                  <source srcSet="/images/services/dsp-hr-recruitment-400.avif 400w, /images/services/dsp-hr-recruitment-800.avif 800w" type="image/avif" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px" />
+                  <source srcSet="/images/services/dsp-hr-recruitment-400.webp 400w, /images/services/dsp-hr-recruitment-800.webp 800w" type="image/webp" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px" />
+                  <img 
+                    src="/images/services/dsp-hr-recruitment.jpg" 
+                    alt="DSP HR & Recruitment Background"
+                    aria-hidden="true"
+                    referrerPolicy="no-referrer"
+                    loading="lazy"
+                    decoding="async"
+                    width={800}
+                    height={600}
+                    className="w-full h-full object-cover object-center opacity-25 group-hover:opacity-35 group-hover:scale-105 transition-all duration-500 ease-out"
+                  />
+                </picture>
+                <div className="absolute inset-0 bg-gradient-to-b from-[#080d17]/55 via-[#05080f]/65 to-[#020408]/80 mix-blend-multiply transition-colors duration-500" />
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(255,119,0,0.12),transparent_70%)] pointer-events-none" />
+                <div className="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-[#020408]/90 via-[#03060c]/50 to-transparent pointer-events-none" />
+              </div>
+
+              <div className="relative z-10 space-y-4">
                 <AnimatedIcon animation="bounce" className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 text-[#ff7700] group-hover:border-[#ff7700]/50 transition-all">
                   <Users className="w-6 h-6" />
                 </AnimatedIcon>
                 <h3 className="text-xl font-bold text-white group-hover:text-[#ff7700] transition-colors">DSP HR &amp; Recruitment Services</h3>
-                <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
                   Certified SmartRecruiters experts using AI-powered automation to reduce cost per hire by 30–40%. We handle high-volume hiring with bilingual AI voicebots.
                 </p>
-                <div className="space-y-1 text-xs text-slate-300 font-medium pt-2">
+                <div className="space-y-1 text-xs text-slate-200 font-medium pt-2">
                   <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-[#ff7700]" /> Spanish/English AI Voicebots</div>
                   <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-[#ff7700]" /> Fountain to SmartRecruiters Migration</div>
                 </div>
               </div>
               <button
-                onClick={() => navigate('/dsp-hr-recruitment')}
-                className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between text-xs font-bold text-[#ff7700] group-hover:text-[#ff9933]"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate('/dsp-hr-recruitment');
+                }}
+                className="relative z-10 mt-6 pt-4 border-t border-white/10 flex items-center justify-between text-xs font-bold text-[#ff7700] group-hover:text-[#ff9933]"
               >
                 <span>Learn More About Recruitment</span>
                 <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
@@ -344,24 +448,50 @@ export const HomePage: React.FC<HomePageProps> = ({ navigate }) => {
             <motion.div 
               whileHover={{ y: -6 }}
               transition={{ duration: 0.3 }}
-              className="glass-panel p-7 hover:border-[#ff7700]/50 transition-all flex flex-col justify-between group shadow-lg cursor-pointer"
+              onClick={() => navigate('/afp-dispatch-support')}
+              className="relative p-7 bg-[#0b101b]/85 border border-white/10 hover:border-[#ff7700]/60 transition-all flex flex-col justify-between group shadow-lg cursor-pointer overflow-hidden rounded-2xl backdrop-blur-md"
             >
-              <div className="space-y-4">
+              {/* Background wrapper with absolute inset-0 z-0, smooth opacity transition, and mix-blend-multiply dark overlay mask */}
+              <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none rounded-2xl transition-opacity duration-400 ease-in-out">
+                <picture>
+                  <source srcSet="/images/services/afp-dispatch-400.avif 400w, /images/services/afp-dispatch-800.avif 800w" type="image/avif" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px" />
+                  <source srcSet="/images/services/afp-dispatch-400.webp 400w, /images/services/afp-dispatch-800.webp 800w" type="image/webp" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px" />
+                  <img 
+                    src="/images/services/afp-dispatch.jpg" 
+                    alt="AFP Dispatch Support Background"
+                    aria-hidden="true"
+                    referrerPolicy="no-referrer"
+                    loading="lazy"
+                    decoding="async"
+                    width={800}
+                    height={600}
+                    className="w-full h-full object-cover object-center opacity-25 group-hover:opacity-35 group-hover:scale-105 transition-all duration-500 ease-out"
+                  />
+                </picture>
+                <div className="absolute inset-0 bg-gradient-to-b from-[#080d17]/55 via-[#05080f]/65 to-[#020408]/80 mix-blend-multiply transition-colors duration-500" />
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(255,119,0,0.12),transparent_70%)] pointer-events-none" />
+                <div className="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-[#020408]/90 via-[#03060c]/50 to-transparent pointer-events-none" />
+              </div>
+
+              <div className="relative z-10 space-y-4">
                 <AnimatedIcon animation="rotate" className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 text-[#ff7700] group-hover:border-[#ff7700]/50 transition-all">
                   <Truck className="w-6 h-6" />
                 </AnimatedIcon>
                 <h3 className="text-xl font-bold text-white group-hover:text-[#ff7700] transition-colors">AFP Dispatch Support Services</h3>
-                <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
                   Complete end-to-end shift management for Amazon AFP operations with proactive resolution. We monitor every load, every hour, ensuring on-time performance.
                 </p>
-                <div className="space-y-1 text-xs text-slate-300 font-medium pt-2">
+                <div className="space-y-1 text-xs text-slate-200 font-medium pt-2">
                   <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-[#ff7700]" /> Amazon Relay Experts &amp; Load Booking</div>
                   <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-[#ff7700]" /> Real-time HOS Log Monitoring &amp; Route Gaps</div>
                 </div>
               </div>
               <button
-                onClick={() => navigate('/afp-dispatch-support')}
-                className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between text-xs font-bold text-[#ff7700] group-hover:text-[#ff9933]"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate('/afp-dispatch-support');
+                }}
+                className="relative z-10 mt-6 pt-4 border-t border-white/10 flex items-center justify-between text-xs font-bold text-[#ff7700] group-hover:text-[#ff9933]"
               >
                 <span>Learn More About AFP Dispatch</span>
                 <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
@@ -372,24 +502,50 @@ export const HomePage: React.FC<HomePageProps> = ({ navigate }) => {
             <motion.div 
               whileHover={{ y: -6 }}
               transition={{ duration: 0.3 }}
-              className="glass-panel p-7 hover:border-[#ff7700]/50 transition-all flex flex-col justify-between group shadow-lg cursor-pointer"
+              onClick={() => navigate('/afp-accounting-tms')}
+              className="relative p-7 bg-[#0b101b]/85 border border-white/10 hover:border-[#ff7700]/60 transition-all flex flex-col justify-between group shadow-lg cursor-pointer overflow-hidden rounded-2xl backdrop-blur-md"
             >
-              <div className="space-y-4">
+              {/* Background wrapper with absolute inset-0 z-0, smooth opacity transition, and mix-blend-multiply dark overlay mask */}
+              <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none rounded-2xl transition-opacity duration-400 ease-in-out">
+                <picture>
+                  <source srcSet="/images/services/afp-accounting-400.avif 400w, /images/services/afp-accounting-800.avif 800w" type="image/avif" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px" />
+                  <source srcSet="/images/services/afp-accounting-400.webp 400w, /images/services/afp-accounting-800.webp 800w" type="image/webp" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px" />
+                  <img 
+                    src="/images/services/afp-accounting.jpg" 
+                    alt="AFP Accounting & TMS Reconciliation Background"
+                    aria-hidden="true"
+                    referrerPolicy="no-referrer"
+                    loading="lazy"
+                    decoding="async"
+                    width={800}
+                    height={600}
+                    className="w-full h-full object-cover object-center opacity-25 group-hover:opacity-35 group-hover:scale-105 transition-all duration-500 ease-out"
+                  />
+                </picture>
+                <div className="absolute inset-0 bg-gradient-to-b from-[#080d17]/55 via-[#05080f]/65 to-[#020408]/80 mix-blend-multiply transition-colors duration-500" />
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(255,119,0,0.12),transparent_70%)] pointer-events-none" />
+                <div className="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-[#020408]/90 via-[#03060c]/50 to-transparent pointer-events-none" />
+              </div>
+
+              <div className="relative z-10 space-y-4">
                 <AnimatedIcon animation="scale" className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 text-[#ff7700] group-hover:border-[#ff7700]/50 transition-all">
                   <BarChart3 className="w-6 h-6" />
                 </AnimatedIcon>
                 <h3 className="text-xl font-bold text-white group-hover:text-[#ff7700] transition-colors">AFP Accounting &amp; TMS Management</h3>
-                <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
                   Certified QuickBooks team providing structured financial oversight and accurate IFTA filing. We track profitability per load and ensure tax compliance.
                 </p>
-                <div className="space-y-1 text-xs text-slate-300 font-medium pt-2">
+                <div className="space-y-1 text-xs text-slate-200 font-medium pt-2">
                   <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-[#ff7700]" /> Profitability Tracking per Load</div>
                   <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-[#ff7700]" /> IFTA Filing &amp; TMS (Alvys / AscendTMS)</div>
                 </div>
               </div>
               <button
-                onClick={() => navigate('/afp-accounting-tms')}
-                className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between text-xs font-bold text-[#ff7700] group-hover:text-[#ff9933]"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate('/afp-accounting-tms');
+                }}
+                className="relative z-10 mt-6 pt-4 border-t border-white/10 flex items-center justify-between text-xs font-bold text-[#ff7700] group-hover:text-[#ff9933]"
               >
                 <span>Learn More About AFP Accounting</span>
                 <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
@@ -400,24 +556,50 @@ export const HomePage: React.FC<HomePageProps> = ({ navigate }) => {
             <motion.div 
               whileHover={{ y: -6 }}
               transition={{ duration: 0.3 }}
-              className="glass-panel p-7 hover:border-[#ff7700]/50 transition-all flex flex-col justify-between group shadow-lg cursor-pointer md:col-span-2 lg:col-span-1"
+              onClick={() => navigate('/dedicated-lane-services')}
+              className="relative p-7 bg-[#0b101b]/85 border border-white/10 hover:border-[#ff7700]/60 transition-all flex flex-col justify-between group shadow-lg cursor-pointer md:col-span-2 lg:col-span-1 overflow-hidden rounded-2xl backdrop-blur-md"
             >
-              <div className="space-y-4">
+              {/* Background wrapper with absolute inset-0 z-0, smooth opacity transition, and mix-blend-multiply dark overlay mask */}
+              <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none rounded-2xl transition-opacity duration-400 ease-in-out">
+                <picture>
+                  <source srcSet="/images/services/dedicated-lanes-400.avif 400w, /images/services/dedicated-lanes-800.avif 800w" type="image/avif" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px" />
+                  <source srcSet="/images/services/dedicated-lanes-400.webp 400w, /images/services/dedicated-lanes-800.webp 800w" type="image/webp" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px" />
+                  <img 
+                    src="/images/services/dedicated-lanes.jpg" 
+                    alt="Dedicated Lane POD Lifecycle Background"
+                    aria-hidden="true"
+                    referrerPolicy="no-referrer"
+                    loading="lazy"
+                    decoding="async"
+                    width={800}
+                    height={600}
+                    className="w-full h-full object-cover object-center opacity-25 group-hover:opacity-35 group-hover:scale-105 transition-all duration-500 ease-out"
+                  />
+                </picture>
+                <div className="absolute inset-0 bg-gradient-to-b from-[#080d17]/55 via-[#05080f]/65 to-[#020408]/80 mix-blend-multiply transition-colors duration-500" />
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(255,119,0,0.12),transparent_70%)] pointer-events-none" />
+                <div className="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-[#020408]/90 via-[#03060c]/50 to-transparent pointer-events-none" />
+              </div>
+
+              <div className="relative z-10 space-y-4">
                 <AnimatedIcon animation="rotate" className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 text-[#ff7700] group-hover:border-[#ff7700]/50 transition-all">
                   <MapPin className="w-6 h-6" />
                 </AnimatedIcon>
                 <h3 className="text-xl font-bold text-white group-hover:text-[#ff7700] transition-colors">Dedicated Lane Services</h3>
-                <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
                   Comprehensive dispatch management through Proof of Delivery (All 12 Steps) with complete shift oversight. We manage the entire lifecycle of every load.
                 </p>
-                <div className="space-y-1 text-xs text-slate-300 font-medium pt-2">
+                <div className="space-y-1 text-xs text-slate-200 font-medium pt-2">
                   <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-[#ff7700]" /> Complete 12-Step POD Management</div>
                   <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-[#ff7700]" /> Real-time HOS Monitoring &amp; BOL Verification</div>
                 </div>
               </div>
               <button
-                onClick={() => navigate('/dedicated-lane-services')}
-                className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between text-xs font-bold text-[#ff7700] group-hover:text-[#ff9933]"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate('/dedicated-lane-services');
+                }}
+                className="relative z-10 mt-6 pt-4 border-t border-white/10 flex items-center justify-between text-xs font-bold text-[#ff7700] group-hover:text-[#ff9933]"
               >
                 <span>Learn More About Dedicated Lanes</span>
                 <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />

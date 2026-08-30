@@ -13,6 +13,7 @@ import {
   Bot 
 } from 'lucide-react';
 import { IndustrySlide } from '../types';
+import { getOptimizedUnsplashUrl, getUnsplashSrcSet } from '../lib/imageOptimizer';
 
 export const IndustriesSlider: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -25,7 +26,7 @@ export const IndustriesSlider: React.FC = () => {
       name: 'Healthcare & Life Sciences',
       label: 'Healthcare & Life Sciences',
       icon: 'activity',
-      imageUrl: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1600&q=80',
+      imageUrl: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1200&q=75',
       description: 'HIPAA-compliant digital marketing, medical practice growth, and patient acquisition pipelines.'
     },
     {
@@ -33,7 +34,7 @@ export const IndustriesSlider: React.FC = () => {
       name: 'BFSI',
       label: 'BFSI',
       icon: 'building',
-      imageUrl: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1600&q=80',
+      imageUrl: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=75',
       description: 'Trust-centric financial marketing, lead qualification, and brand authority campaigns.'
     },
     {
@@ -41,7 +42,7 @@ export const IndustriesSlider: React.FC = () => {
       name: 'Hospitality',
       label: 'Hospitality',
       icon: 'utensils',
-      imageUrl: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1600&q=80',
+      imageUrl: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=75',
       description: 'Luxury hotel & restaurant branding, booking conversion funnels, and experiential marketing.'
     },
     {
@@ -49,7 +50,7 @@ export const IndustriesSlider: React.FC = () => {
       name: 'Entertainment',
       label: 'Entertainment',
       icon: 'film',
-      imageUrl: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1600&q=80',
+      imageUrl: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1200&q=75',
       description: 'High-impact multimedia promotion, event marketing, and social audience scaling.'
     },
     {
@@ -57,7 +58,7 @@ export const IndustriesSlider: React.FC = () => {
       name: 'Technology & Software',
       label: 'Technology & Software',
       icon: 'cpu',
-      imageUrl: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=1600&q=80',
+      imageUrl: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=1200&q=75',
       description: 'B2B SaaS demand generation, developer advocacy, and product-led content strategy.'
     },
     {
@@ -65,7 +66,7 @@ export const IndustriesSlider: React.FC = () => {
       name: 'Manufacturing & Distribution',
       label: 'Manufacturing & Distribution',
       icon: 'factory',
-      imageUrl: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1600&q=80',
+      imageUrl: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1200&q=75',
       description: 'Industrial supplier visibility, B2B procurement funnels, and global distribution marketing.'
     },
     {
@@ -73,7 +74,7 @@ export const IndustriesSlider: React.FC = () => {
       name: 'Ecommerce & Retail',
       label: 'Ecommerce & Retail',
       icon: 'cart',
-      imageUrl: 'https://images.unsplash.com/photo-1556740758-90de374c12ad?auto=format&fit=crop&w=1600&q=80',
+      imageUrl: 'https://images.unsplash.com/photo-1556740758-90de374c12ad?auto=format&fit=crop&w=1200&q=75',
       description: 'Omnichannel growth, cart recovery automations, and ROAS-optimized ad management.'
     },
     {
@@ -81,18 +82,17 @@ export const IndustriesSlider: React.FC = () => {
       name: 'AI Startups',
       label: 'AI Startups',
       icon: 'bot',
-      imageUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1600&q=80',
+      imageUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=75',
       description: 'Cutting-edge AI launch marketing, community building, and technical thought leadership.'
     }
   ];
 
-  // Preload all industry slide images for zero loading delays or blank flashes
+  // Just-in-time preload only the immediate next slide to save bandwidth
   useEffect(() => {
-    industries.forEach((ind) => {
-      const img = new Image();
-      img.src = ind.imageUrl;
-    });
-  }, []);
+    const nextIdx = (currentIndex + 1) % industries.length;
+    const img = new Image();
+    img.src = getOptimizedUnsplashUrl(industries[nextIdx].imageUrl, 1000, 75);
+  }, [currentIndex, industries]);
 
   useEffect(() => {
     if (isPaused) return;
@@ -150,19 +150,25 @@ export const IndustriesSlider: React.FC = () => {
 
   return (
     <div 
-      className="relative w-full rounded-2xl overflow-hidden shadow-2xl bg-slate-950 border border-white/10 group"
+      className="relative w-full rounded-2xl overflow-hidden shadow-2xl bg-[#080d17] border border-white/10 group"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
       {/* Background Image Container with Gradient Overlay */}
-      <div className="relative h-[380px] sm:h-[450px] w-full overflow-hidden">
+      <div className="relative h-[380px] sm:h-[450px] w-full overflow-hidden bg-[#080d17]">
         <AnimatePresence mode="wait">
           <motion.img 
             key={currentSlide.id}
-            src={currentSlide.imageUrl} 
-            alt={currentSlide.name} 
+            src={getOptimizedUnsplashUrl(currentSlide.imageUrl, 1000, 75)}
+            srcSet={getUnsplashSrcSet(currentSlide.imageUrl, [480, 800, 1200])}
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 1200px"
+            width={1200}
+            height={450}
+            alt={currentSlide.name}
+            loading="lazy"
+            decoding="async"
             initial={{ opacity: 0, scale: 1.06 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.98 }}

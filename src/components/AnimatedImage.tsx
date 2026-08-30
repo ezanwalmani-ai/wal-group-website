@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
+import { getUnsplashSrcSet, getOptimizedUnsplashUrl } from '../lib/imageOptimizer';
 
 export interface AnimatedImageProps {
   src: string;
+  srcSet?: string;
+  sizes?: string;
+  width?: number;
+  height?: number;
   alt: string;
   className?: string;
   containerClassName?: string;
@@ -15,6 +20,10 @@ export interface AnimatedImageProps {
 
 export const AnimatedImage: React.FC<AnimatedImageProps> = ({
   src,
+  srcSet,
+  sizes,
+  width,
+  height,
   alt,
   className = '',
   containerClassName = '',
@@ -25,6 +34,17 @@ export const AnimatedImage: React.FC<AnimatedImageProps> = ({
   overlay,
 }) => {
   const [isLoaded, setIsLoaded] = useState(false);
+
+  // Auto-generate responsive srcset for Unsplash images if not explicitly provided
+  const computedSrc = src.includes('images.unsplash.com') && !src.includes('w=')
+    ? getOptimizedUnsplashUrl(src, priority ? 1600 : 800)
+    : src;
+
+  const computedSrcSet = srcSet || (src.includes('images.unsplash.com')
+    ? getUnsplashSrcSet(src, [480, 800, 1200, 1600])
+    : undefined);
+
+  const computedSizes = sizes || (computedSrcSet ? '(max-width: 640px) 100vw, (max-width: 1024px) 75vw, 1200px' : undefined);
 
   // Define entrance variants based on prop
   const getEntranceVariants = () => {
@@ -96,23 +116,27 @@ export const AnimatedImage: React.FC<AnimatedImageProps> = ({
             }
           : undefined
       }
-      className={`relative overflow-hidden group ${containerClassName}`}
+      className={`relative overflow-hidden group bg-[#080d17] ${containerClassName}`}
     >
-      {/* Skeleton Loading Pulse */}
+      {/* Subtle Dark Placeholder to prevent layout shift */}
       {!isLoaded && (
-        <div className="absolute inset-0 bg-slate-800/80 animate-pulse flex items-center justify-center z-10">
-          <div className="w-8 h-8 border-2 border-[#ff6600]/40 border-t-[#ff6600] rounded-full animate-spin" />
-        </div>
+        <div className="absolute inset-0 bg-[#080d17]/80 backdrop-blur-xs transition-opacity duration-300 pointer-events-none" />
       )}
 
-      {/* Main Animated Image */}
+      {/* Main Animated Image with Responsive srcSet and high-efficiency loading */}
       <motion.img
-        src={src}
+        src={computedSrc}
+        srcSet={computedSrcSet}
+        sizes={computedSizes}
+        width={width}
+        height={height}
         alt={alt}
         loading={priority ? 'eager' : 'lazy'}
+        decoding="async"
+        fetchPriority={priority ? 'high' : 'auto'}
         onLoad={() => setIsLoaded(true)}
         animate={{ opacity: isLoaded ? 1 : 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.4, ease: 'easeOut' }}
         whileHover={
           hoverEffect === 'zoom'
             ? { scale: 1.07, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } }

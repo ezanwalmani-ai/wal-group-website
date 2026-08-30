@@ -9,6 +9,7 @@ import {
   Globe, 
   ShieldCheck 
 } from 'lucide-react';
+import { getOptimizedUnsplashUrl, getUnsplashSrcSet } from '../lib/imageOptimizer';
 
 interface OfficeLocation {
   id: string;
@@ -111,9 +112,13 @@ export const InteractiveOfficeLocations: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
           
           {/* Office Photo with Overlay Glass (5 cols) */}
-          <div className="lg:col-span-5 relative rounded-3xl overflow-hidden border border-white/10 shadow-2xl group min-h-[320px]">
+          <div className="lg:col-span-5 relative rounded-3xl overflow-hidden border border-white/10 shadow-2xl group min-h-[320px] bg-[#0a0a10]">
             <img
-              src={office.photo}
+              src={getOptimizedUnsplashUrl(office.photo, 800, 75)}
+              srcSet={getUnsplashSrcSet(office.photo, [480, 800, 1200])}
+              sizes="(max-width: 1024px) 100vw, 500px"
+              width={800}
+              height={600}
               alt={office.name}
               loading="lazy"
               decoding="async"
