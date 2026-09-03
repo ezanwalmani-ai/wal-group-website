@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { Mail, ArrowUpRight } from 'lucide-react';
 import { soundFx } from '../utils/audio';
+import { useBehavior } from '../context/BehaviorContext';
 
 export type EmailAddress = 'thewalgroupinfo@gmail.com' | 'thewalgroups@gmail.com' | 'thewalgroup@gmail.com' | string;
 
@@ -12,6 +13,8 @@ interface EmailLinkProps {
   className?: string;
   subject?: string;
   body?: string;
+  source?: string;
+  onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
 }
 
 export const EMAIL_DETAILS: Record<string, {
@@ -79,7 +82,11 @@ export const EmailLink: React.FC<EmailLinkProps> = ({
   className = '',
   subject,
   body,
+  source = 'contact_element',
+  onClick,
 }) => {
+  const { trackContactClick } = useBehavior();
+
   const info = EMAIL_DETAILS[email] || {
     email,
     label: 'Email Us',
@@ -96,8 +103,16 @@ export const EmailLink: React.FC<EmailLinkProps> = ({
 
   const mailToUrl = `mailto:${displayEmail}?subject=${encodeURIComponent(finalSubject)}&body=${encodeURIComponent(finalBody)}`;
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     soundFx.playClick();
+    trackContactClick('email', {
+      source,
+      target: displayEmail,
+      label: displayLabel
+    });
+    if (onClick) {
+      onClick(e);
+    }
   };
 
   const handleHover = () => {

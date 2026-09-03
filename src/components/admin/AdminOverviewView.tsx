@@ -16,10 +16,14 @@ import {
   RefreshCw,
   Sparkles,
   Shield,
-  Layers
+  Layers,
+  MessageCircle,
+  Activity,
+  RotateCcw
 } from 'lucide-react';
 import { AdminTab } from './AdminSidebar';
 import { DashboardMetricsResult } from '../../lib/supabase';
+import { useBehavior } from '../../context/BehaviorContext';
 
 interface OverviewProps {
   metrics: DashboardMetricsResult | null;
@@ -46,6 +50,26 @@ export const AdminOverviewView: React.FC<OverviewProps> = ({
   recentActivities,
   onRefresh
 }) => {
+  const { behavior, resetContactPreferences } = useBehavior();
+  const contactPrefs = behavior.contactPreferences || {
+    whatsappClicks: 0,
+    emailClicks: 0,
+    phoneClicks: 0,
+    linkedinClicks: 0,
+    instagramClicks: 0,
+    totalContactClicks: 0,
+    preferredMethod: 'none',
+    detailsHistory: []
+  };
+
+  const totalPreferenceClicks = contactPrefs.whatsappClicks + contactPrefs.emailClicks;
+  const whatsappPct = totalPreferenceClicks > 0 
+    ? Math.round((contactPrefs.whatsappClicks / totalPreferenceClicks) * 100) 
+    : 50;
+  const emailPct = totalPreferenceClicks > 0 
+    ? Math.round((contactPrefs.emailClicks / totalPreferenceClicks) * 100) 
+    : 50;
+
   const cards = [
     {
       id: 'contacts' as AdminTab,
@@ -240,6 +264,141 @@ export const AdminOverviewView: React.FC<OverviewProps> = ({
             );
           })}
         </div>
+      </div>
+
+      {/* Visitor Contact Preference Monitoring (BehaviorProvider Engine) */}
+      <div className="rounded-2xl bg-[#09101d] border border-white/10 p-5 sm:p-6 relative overflow-hidden">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-white/5 gap-3 mb-5">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-[#ff7700]/15 border border-[#ff7700]/30 flex items-center justify-center text-[#ff7700]">
+              <Activity className="w-4 h-4 animate-pulse" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-extrabold text-white uppercase tracking-wider">
+                  Visitor Contact Channel Preferences
+                </h3>
+                <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase bg-white/10 text-slate-300">
+                  BehaviorProvider Active
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-400">
+                Real-time tracking of visitor link clicks across Footer &amp; direct channels (WhatsApp vs. Email)
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            {contactPrefs.totalContactClicks > 0 && (
+              <button
+                onClick={resetContactPreferences}
+                className="px-2.5 py-1 text-[11px] rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white border border-white/10 transition-colors flex items-center gap-1.5"
+                title="Reset local contact preference metrics"
+              >
+                <RotateCcw className="w-3 h-3" />
+                <span>Reset Telemetry</span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
+          {/* WhatsApp Card */}
+          <div className="p-4 rounded-xl bg-[#25D366]/5 border border-[#25D366]/20 relative overflow-hidden">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] uppercase font-bold tracking-wider text-[#25D366] flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-[#25D366] animate-pulse" />
+                WhatsApp Direct Desk
+              </span>
+              <span className="text-[10px] font-mono text-slate-400">+91 6363698148</span>
+            </div>
+            <div className="flex items-baseline gap-2">
+              <span className="text-3xl font-black text-white">{contactPrefs.whatsappClicks}</span>
+              <span className="text-xs text-slate-400">clicks tracked</span>
+            </div>
+            <div className="mt-2 text-[11px] text-slate-400">
+              {contactPrefs.whatsappClicks > contactPrefs.emailClicks ? (
+                <span className="text-[#25D366] font-semibold">★ Current Leading Channel</span>
+              ) : (
+                <span>Instant dispatch chat routing</span>
+              )}
+            </div>
+          </div>
+
+          {/* Email Card */}
+          <div className="p-4 rounded-xl bg-[#ff7700]/5 border border-[#ff7700]/20 relative overflow-hidden">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] uppercase font-bold tracking-wider text-[#ff7700] flex items-center gap-1.5">
+                <Mail className="w-3 h-3" />
+                Email Desk Inbound
+              </span>
+              <span className="text-[10px] font-mono text-slate-400">thewalgroups@gmail.com</span>
+            </div>
+            <div className="flex items-baseline gap-2">
+              <span className="text-3xl font-black text-white">{contactPrefs.emailClicks}</span>
+              <span className="text-xs text-slate-400">clicks tracked</span>
+            </div>
+            <div className="mt-2 text-[11px] text-slate-400">
+              {contactPrefs.emailClicks > contactPrefs.whatsappClicks ? (
+                <span className="text-[#ff7700] font-semibold">★ Current Leading Channel</span>
+              ) : (
+                <span>Formal business enquiries</span>
+              )}
+            </div>
+          </div>
+
+          {/* Overall Preference State */}
+          <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 flex flex-col justify-between">
+            <div>
+              <div className="text-[10px] uppercase font-bold tracking-wider text-slate-400 mb-2">
+                User Preference Status
+              </div>
+              <div className="text-lg font-bold text-white flex items-center gap-2">
+                {contactPrefs.preferredMethod === 'whatsapp' ? (
+                  <span className="text-[#25D366] flex items-center gap-1.5">
+                    <span>🟢 WhatsApp Preferred</span>
+                  </span>
+                ) : contactPrefs.preferredMethod === 'email' ? (
+                  <span className="text-[#ff7700] flex items-center gap-1.5">
+                    <span>🟠 Email Preferred</span>
+                  </span>
+                ) : contactPrefs.totalContactClicks > 0 ? (
+                  <span className="text-cyan-400 capitalize">{contactPrefs.preferredMethod} Preferred</span>
+                ) : (
+                  <span className="text-slate-400 font-normal text-sm">Awaiting First Interaction</span>
+                )}
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-white/5 text-[11px] text-slate-400 flex items-center justify-between">
+              <span>Total Channel Events:</span>
+              <span className="font-bold text-white font-mono">{contactPrefs.totalContactClicks}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Ratio bar if there are clicks */}
+        {totalPreferenceClicks > 0 && (
+          <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-2">
+            <div className="flex justify-between text-xs font-semibold">
+              <span className="text-[#25D366]">WhatsApp ({whatsappPct}%)</span>
+              <span className="text-slate-400 text-[11px]">Channel Ratio</span>
+              <span className="text-[#ff7700]">Email ({emailPct}%)</span>
+            </div>
+            <div className="w-full h-2.5 rounded-full bg-white/10 overflow-hidden flex">
+              <div 
+                className="h-full bg-[#25D366] transition-all duration-500" 
+                style={{ width: `${whatsappPct}%` }} 
+                title={`WhatsApp: ${whatsappPct}%`}
+              />
+              <div 
+                className="h-full bg-[#ff7700] transition-all duration-500" 
+                style={{ width: `${emailPct}%` }} 
+                title={`Email: ${emailPct}%`}
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Recent Activity Section */}

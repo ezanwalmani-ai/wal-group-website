@@ -3,6 +3,9 @@ import { motion } from 'motion/react';
 import { Logo } from './Logo';
 import { EMAIL_DETAILS, EmailLink } from './EmailLink';
 import { InstagramLink, INSTAGRAM_URL } from './InstagramLink';
+import { SocialConnectButtons } from './SocialConnectButtons';
+import { WhatsAppLink } from './WhatsAppLink';
+import { useBehavior } from '../context/BehaviorContext';
 import { 
   MapPin, 
   Mail, 
@@ -10,7 +13,9 @@ import {
   Ticket, 
   ArrowUpRight,
   Instagram,
-  Lock
+  Lock,
+  MessageCircle,
+  Activity
 } from 'lucide-react';
 
 interface FooterProps {
@@ -18,6 +23,8 @@ interface FooterProps {
 }
 
 export const Footer: React.FC<FooterProps> = ({ navigate }) => {
+  const { trackContactClick, trackCtaClick, behavior } = useBehavior();
+
   const handleNavClick = (path: string) => {
     navigate(path);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -47,40 +54,7 @@ export const Footer: React.FC<FooterProps> = ({ navigate }) => {
             {/* Social Media Links */}
             <div className="pt-2">
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 block mb-3">Connect With Us</span>
-              <div className="flex items-center gap-3">
-                {/* LinkedIn */}
-                <motion.a
-                  whileHover={{ y: -3, scale: 1.08 }}
-                  whileTap={{ scale: 0.95 }}
-                  href="https://www.linkedin.com/company/wal-groups/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-300 hover:text-black hover:bg-[#ff7700] hover:border-[#ff7700] transition-all shadow-sm"
-                  title="Wal Group on LinkedIn"
-                  aria-label="LinkedIn"
-                >
-                  <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                    <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
-                  </svg>
-                </motion.a>
-
-                {/* Instagram */}
-                <motion.a
-                  whileHover={{ y: -3, scale: 1.08, shadow: "0 0 20px rgba(255, 119, 0, 0.4)" }}
-                  whileTap={{ scale: 0.95 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                  href={INSTAGRAM_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-300 hover:text-white hover:bg-gradient-to-tr hover:from-[#f09433] hover:via-[#dc2743] hover:to-[#bc1888] hover:border-transparent transition-all shadow-sm relative group overflow-hidden"
-                  title="Wal Group on Instagram (@thewalgroups)"
-                  aria-label="Instagram"
-                >
-                  {/* Subtle glass reflection sweep */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out pointer-events-none" />
-                  <Instagram className="w-5 h-5 stroke-[2]" />
-                </motion.a>
-              </div>
+              <SocialConnectButtons source="footer_social_icons" />
             </div>
           </div>
 
@@ -164,7 +138,11 @@ export const Footer: React.FC<FooterProps> = ({ navigate }) => {
 
               <div className="flex items-center gap-2.5">
                 <Phone className="w-4 h-4 text-[#ff7700] shrink-0" />
-                <a href="tel:6363698148" className="hover:text-[#ff7700] transition-colors font-medium">
+                <a 
+                  href="tel:6363698148" 
+                  onClick={() => trackContactClick('phone', { source: 'footer_contact_info', target: '+91 6363698148', label: 'Office Phone' })}
+                  className="hover:text-[#ff7700] transition-colors font-medium"
+                >
                   +91 6363698148
                 </a>
               </div>
@@ -172,16 +150,45 @@ export const Footer: React.FC<FooterProps> = ({ navigate }) => {
 
             {/* Official Email Routing & Social Links */}
             <div className="pt-1 space-y-2">
-              <EmailLink email="thewalgroupinfo@gmail.com" variant="inline" />
-              <EmailLink email="thewalgroups@gmail.com" variant="inline" />
-              <InstagramLink variant="inline" />
+              <EmailLink email="thewalgroupinfo@gmail.com" variant="inline" source="footer_contact_column" />
+              <EmailLink email="thewalgroups@gmail.com" variant="inline" source="footer_contact_column" />
+              <WhatsAppLink variant="inline" source="footer_contact_column" />
+              <InstagramLink variant="inline" source="footer_contact_column" />
             </div>
+
+            {/* Live Contact Preference Monitor (BehaviorProvider State) */}
+            {behavior.contactPreferences && (behavior.contactPreferences.totalContactClicks > 0) && (
+              <motion.div 
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-2.5 p-2.5 rounded-xl bg-white/[0.03] border border-[#ff7700]/20 flex flex-col gap-1.5 text-[11px]"
+              >
+                <div className="flex items-center justify-between text-slate-300 font-semibold">
+                  <span className="flex items-center gap-1.5 text-[#ff7700]">
+                    <Activity className="w-3.5 h-3.5 animate-pulse" />
+                    <span>Contact Preference:</span>
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white/10 text-white">
+                    {behavior.contactPreferences.preferredMethod === 'whatsapp' ? '🟢 WhatsApp Preferred' :
+                     behavior.contactPreferences.preferredMethod === 'email' ? '🟠 Email Preferred' :
+                     `${behavior.contactPreferences.preferredMethod} Preferred`}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-[10px] text-slate-400 font-mono">
+                  <span>WhatsApp: {behavior.contactPreferences.whatsappClicks} clicks</span>
+                  <span>Email: {behavior.contactPreferences.emailClicks} clicks</span>
+                </div>
+              </motion.div>
+            )}
 
             <div className="pt-2">
               <motion.button
                 whileHover={{ scale: 1.02, translateY: -2 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={() => handleNavClick('/raise-ticket')}
+                onClick={() => {
+                  trackCtaClick('Footer Submit Support Ticket');
+                  handleNavClick('/raise-ticket');
+                }}
                 className="w-full bg-white/5 hover:bg-white/10 text-[#ff7700] border border-[#ff7700]/30 hover:border-[#ff7700]/60 font-semibold text-xs py-2.5 px-3 rounded-lg transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(255,119,0,0.1)]"
               >
                 <Ticket className="w-4 h-4 text-[#ff7700]" />

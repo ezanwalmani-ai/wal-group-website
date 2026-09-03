@@ -1,10 +1,14 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Instagram, ExternalLink } from 'lucide-react';
+import { useBehavior } from '../context/BehaviorContext';
+import { soundFx } from '../utils/audio';
 
 interface InstagramLinkProps {
   variant?: 'card' | 'inline' | 'compact';
   className?: string;
+  source?: string;
+  onClick?: () => void;
 }
 
 export const INSTAGRAM_URL = 'https://www.instagram.com/thewalgroups/';
@@ -13,7 +17,23 @@ export const INSTAGRAM_HANDLE = '@thewalgroups';
 export const InstagramLink: React.FC<InstagramLinkProps> = ({
   variant = 'card',
   className = '',
+  source = 'footer_contact_column',
+  onClick,
 }) => {
+  const { trackContactClick } = useBehavior();
+
+  const handleClick = () => {
+    soundFx.playClick();
+    trackContactClick('instagram', {
+      source,
+      target: INSTAGRAM_URL,
+      label: 'Instagram Official Profile'
+    });
+    if (onClick) {
+      onClick();
+    }
+  };
+
   if (variant === 'inline' || variant === 'compact') {
     return (
       <motion.a
@@ -21,6 +41,7 @@ export const InstagramLink: React.FC<InstagramLinkProps> = ({
         whileTap={{ scale: 0.97 }}
         transition={{ type: 'spring', stiffness: 400, damping: 25 }}
         href={INSTAGRAM_URL}
+        onClick={handleClick}
         target="_blank"
         rel="noopener noreferrer"
         className={`flex items-center justify-between gap-3 p-2.5 rounded-xl bg-white/[0.03] border border-white/10 hover:border-[#ff7700]/50 hover:bg-[#ff7700]/10 transition-all group relative overflow-hidden ${className}`}
@@ -49,6 +70,7 @@ export const InstagramLink: React.FC<InstagramLinkProps> = ({
       whileTap={{ scale: 0.98 }}
       transition={{ type: 'spring', stiffness: 350, damping: 22 }}
       href={INSTAGRAM_URL}
+      onClick={handleClick}
       target="_blank"
       rel="noopener noreferrer"
       className={`glass-panel p-4 rounded-2xl border border-white/10 hover:border-[#ff7700]/50 hover:shadow-[0_0_25px_rgba(255,119,0,0.25)] transition-all group relative overflow-hidden block ${className}`}

@@ -968,6 +968,26 @@ app.get('/api/bookings/export-csv', (_req, res) => {
   return res.send(csvContent);
 });
 
+// Gemini & AI Assistant Status API Endpoint
+app.get('/api/ai/status', (_req, res) => {
+  const isGeminiConfigured = Boolean(process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY.trim() !== '');
+  const isOpenAiConfigured = Boolean(process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY.trim() !== '');
+  return res.json({
+    success: true,
+    gemini: {
+      configured: isGeminiConfigured,
+      defaultModel: 'gemini-3.7-flash',
+      provider: 'Google Gemini'
+    },
+    openai: {
+      configured: isOpenAiConfigured,
+      defaultModel: 'gpt-4o-mini',
+      provider: 'OpenAI'
+    },
+    supabaseConnected: true
+  });
+});
+
 // OpenAI Status API Endpoint
 app.get('/api/openai/status', (_req, res) => {
   const isConfigured = Boolean(process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY.trim() !== '');
@@ -1055,7 +1075,7 @@ app.post('/api/openai-chat', async (req, res) => {
   }
 });
 
-// 2. AI Business Consultant Chat API
+// 2. Wal AI Business Assistant Chat API (Powered by Google Gemini 3.7 Flash)
 app.post('/api/ai-chat', async (req, res) => {
   const { message, sessionId, behavior, history } = req.body;
 
@@ -1094,59 +1114,83 @@ app.post('/api/ai-chat', async (req, res) => {
   const phoneMatch = userText.match(/(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/);
   if (phoneMatch) extracted.phone = phoneMatch[0];
 
-  const fleetMatch = userText.match(/(\d+)\s*(vans|trucks|fleets|routes|vehicles|drivers|dispatchers)/i);
+  const fleetMatch = userText.match(/(\d+)\s*(vans|trucks|fleets|routes|vehicles|drivers|dispatchers|reps|agents|members)/i);
   if (fleetMatch) extracted.fleetSize = `${fleetMatch[1]} ${fleetMatch[2]}`;
 
-  const companyMatch = userText.match(/(?:at|for|company|firm|dsp)\s+([A-Z][A-Za-z0-9\s]{2,25})/);
+  const companyMatch = userText.match(/(?:at|for|company|firm|dsp|llc|inc)\s+([A-Z][A-Za-z0-9\s]{2,25})/);
   if (companyMatch && !extracted.company) extracted.company = companyMatch[1].trim();
 
-  const nameMatch = userText.match(/(?:my name is|i am|i'm)\s+([A-Z][a-z]+\s+[A-Z][a-z]+)/i);
+  const nameMatch = userText.match(/(?:my name is|i am|i'm|this is)\s+([A-Z][a-z]+\s+[A-Z][a-z]+)/i);
   if (nameMatch && !extracted.name) extracted.name = nameMatch[1].trim();
 
   session.leadDetails = extracted;
 
   // System Prompt Knowledge Base & Intent Strategy
-  const systemPrompt = `You are the AI Business Consultant and Senior Sales Representative for Wal Group (official company name: Wal Group). You act as an expert 24/7 business consultant, strategic advisor, and SDR for prospective clients.
+  const systemPrompt = `You are the Wal AI Business Assistant, the 24/7 AI Sales Executive and Senior Operations Consultant for The Wal Group (official company name: The Wal Group / Wal Group).
 
-COMPANY OVERVIEW:
-- Official Name: Wal Group (EXCLUSIVELY "Wal Group", NEVER "Walmani" or "Walmani Group").
-- Headquarters: Bengaluru, Karnataka, India (55, 100 Feet Road, Indiranagar, Bengaluru 560038).
-- Operations Model: 24/7 Global Remote Operations & Dedicated Operational Backbones.
-- Official Email Addresses:
-  • Primary Support & Business Enquiries: thewalgroupinfo@gmail.com
+YOUR ROLE & MISSION:
+- You are an elite, consultative, friendly, knowledgeable 24/7 AI Sales Executive and Operations Consultant.
+- Help website visitors understand The Wal Group's services, identify operational bottlenecks, recommend matching outsourced solutions, qualify leads, and guide prospective clients to booking a 30-minute Discovery Call or getting in touch.
+- ALWAYS respond naturally, dynamically, and specifically to whatever question the user asks. DO NOT give generic or repetitive responses. Address their specific query with deep expertise.
+
+COMPANY OVERVIEW & ACCREDITATION:
+- Company Name: The Wal Group (or Wal Group; NEVER "Walmani").
+- Headquarters: 55, 100 Feet Road, Indiranagar, Bengaluru, Karnataka 560038, India.
+- Global Remote Operations: Providing 24/7 dedicated operational backbones across North America, UK, Europe, and India.
+- Official Contact Emails:
+  • Primary Business & Sales Enquiries: thewalgroupinfo@gmail.com
   • General Communications: thewalgroups@gmail.com
+- Official Phone & WhatsApp: +91 6363698148
+- Website: https://thewalgroup.in/
 
-APPROVED KNOWLEDGE BASE & SERVICES:
-1. Amazon DSP Support & Dispatch: 24/7 Cortex, Geotab, Netradyne, eMaint dispatching, driver scheduling, route delay management, roadside assistance, Amazon Super Fantastic scorecard strategy.
-2. Amazon Freight Partner (AFP) Support: Relay portal dispatch, 12-step POD management, TMS tracking, 24/7 HOS (Hours of Service) compliance monitoring, dedicated lane optimization.
-3. Dispatch Operations: 24/7 fleet tracking, load assignments, real-time driver communication, route optimization.
-4. Driver Management & AI Recruitment: AI driver recruiting, candidate screening, background checks, onboarding, driver retention programs, performance tracking.
-5. Fleet Support: Vehicle maintenance logging, damage tracking, fuel card reconciliation, DOT compliance.
-6. Payroll Processing & Accounting: 14-day Amazon pay statement reconciliation (line-by-line audits for damages, fuel, route adjustments), ADP / Gusto / QuickBooks integration, bonus calculations.
-7. Customer Support & BPO Services: 24/7 multi-channel support (email, phone, live chat, ticketing), SLA adherence, back-office operational teams.
-8. Dedicated Virtual Assistants: Executive VAs, administrative support, inbox & calendar management, data entry, CRM management.
-9. Custom Website Development: Enterprise React / Vite / Node web applications, responsive UI, high performance, conversion optimization.
-10. Digital Marketing: SEO strategy, branding, lead generation campaigns, social media marketing, PPC advertising.
-11. Administrative Support & Back-office Operations: Order processing, inventory tracking, vendor management, report generation.
+COMPREHENSIVE KNOWLEDGE BASE & SERVICES:
+1. Amazon DSP Support & Dispatch:
+   - 24/7 live dispatch coverage using official portals (Amazon Cortex, Geotab, Netradyne, eMaint).
+   - Driver scheduling, live route delay tracking, roadside assistance coordination, and package rescue routing.
+   - Amazon Super Fantastic scorecard strategy (safety score optimization, seatbelt/distraction event remediation).
+2. Amazon Freight Partner (AFP) Support:
+   - Amazon Relay portal dispatch, load assignment, 12-step Proof of Delivery (POD) management.
+   - TMS fleet tracking, 24/7 Hours of Service (HOS) DOT compliance monitoring, and dedicated lane optimization.
+3. Dedicated Lane Services:
+   - Scheduled freight, high-utilization round trips, on-time delivery guarantees, capacity planning.
+4. Dispatch Operations (General & Freight):
+   - 24/7 fleet tracking, load booking, real-time driver communication, detention management, route optimization.
+5. Driver Management & AI Recruitment:
+   - AI-assisted driver recruiting pipelines, candidate screening, background checks, license verification, onboarding, and driver retention programs.
+6. Fleet Support & Compliance:
+   - Preventative maintenance scheduling, damage logs, fuel card reconciliation, DOT compliance audit prep.
+7. Accounting & Payroll Processing:
+   - 14-day Amazon pay statement line-by-line reconciliation (auditing van damages, fuel card deductions, route adjustments, disputed claims).
+   - Integration with ADP, Gusto, and QuickBooks; automated driver bonus and tier-based incentive calculations.
+8. Customer Support & BPO Solutions:
+   - 24/7 multi-channel inbound/outbound support (Email, Live Chat, Phone, Zendesk/Freshdesk Ticketing).
+   - Dedicated offshore operations teams with rigorous SLAs.
+9. Dedicated Virtual Assistants (VAs):
+   - Executive VAs, email & calendar management, CRM updates, data entry, invoice processing, and vendor communications.
+10. Website Design & Custom Web Engineering:
+    - High-performance enterprise web platforms built with modern React, Vite, Node, Tailwind CSS.
+    - Conversion-optimized UI/UX, SEO ready, mobile-first responsive architecture.
+11. Digital Marketing:
+    - Targeted B2B SEO strategy, paid acquisition (Google Ads/Meta/LinkedIn), B2B lead generation, brand positioning.
+12. Gig & Special Projects:
+    - Custom short-term operational sprints, seasonal scaling, and dedicated project managers.
 
-INTENT DETECTION & CONVERSATION RULES:
-Before responding, determine WHY the visitor is asking:
-- LOGISTICS INTENT ("I need dispatchers", "drivers", "fleet", "routes"): Acknowledge fleet challenges -> Recommend Dispatch Operations & Driver Management -> Ask: "How many drivers or vehicles are in your current fleet?"
-- WEB / MARKETING INTENT ("I need a website", "marketing", "SEO"): Acknowledge digital goals -> Recommend Website Development -> Ask: "What type of website or platform are you looking to build?"
-- BPO / VIRTUAL ASSISTANT INTENT ("need VAs", "customer support", "data entry"): Acknowledge operational scaling -> Recommend BPO / Dedicated VAs -> Ask: "What industry are you in, and what level of support do you require?"
-- PAYROLL / ACCOUNTING INTENT ("pay statement", "accounting", "scorecard reconciliation"): Recommend DSP/AFP Payroll Reconciliation -> Ask: "Are you looking for 14-day Amazon pay statement reconciliation or general payroll software integration?"
+KEY VALUE PROPOSITIONS & OUTSOURCING BENEFITS:
+- 35% to 50% operational cost savings compared to in-house US/UK operations.
+- 24/7/365 continuous coverage (no shift gaps or holiday disruptions).
+- Domain experts trained on official Amazon logistics tools (Cortex, Relay, Geotab).
+- Immediate scaling without local hiring headaches or equipment overhead.
 
-CONVERSATION SEQUENCE & MEMORY:
-1. UNDERSTAND -> 2. CLARIFY -> 3. EDUCATE -> 4. RECOMMEND -> 5. QUALIFY -> 6. CAPTURE LEAD -> 7. OFFER DISCOVERY CALL.
-- ALWAYS answer the user's question first.
-- Then ask ONE relevant follow-up question to keep the conversation flowing naturally.
-- Maintain context (remember previous answers, driver counts, company names).
-- Collect lead details conversationally over multiple turns—never dump a long form.
-- Recommend a complimentary 30-minute Discovery Call when a visitor shows genuine qualified interest.
-- Never invent prices or services not in the knowledge base. If unsure, offer to connect them with executive support at thewalgroupinfo@gmail.com.
+SALES CONVERSATION GUIDELINES:
+1. Active Listening: Direct, concise, consultative, and helpful. Always address what the user asked FIRST.
+2. Format: Use clean paragraphs and bullet points where helpful. Keep answers crisp (2-4 concise paragraphs or clean bullet points).
+3. Consultative Qualification: Naturally ask ONE relevant question per turn to understand their fleet size or specific business goals.
+4. Pricing Inquiries: Explain that pricing is customized and volume-based depending on fleet size/team scope (saving 35-50%), and offer a tailored quote during a 30-minute Discovery Call.
+5. Next Steps: When the user shows buying interest, offer to book a Discovery Call or collect their email/phone for a personalized proposal.
+6. Tone: Professional, enthusiastic, executive-ready, knowledgeable.
 
-BEHAVIORAL CONTEXT:
-The visitor is currently viewing page: "${behavior?.lastPageVisited || '/'}". Pages visited: ${(behavior?.pagesVisited || []).join(', ') || 'Home'}.`;
+BEHAVIOR CONTEXT:
+The user is currently viewing: "${behavior?.lastPageVisited || '/'}". Pages viewed: ${(behavior?.pagesVisited || []).join(', ') || 'Home'}.`;
 
   let responseText = '';
   let shouldSuggestBooking = false;
@@ -1154,14 +1198,110 @@ The visitor is currently viewing page: "${behavior?.lastPageVisited || '/'}". Pa
   let activeModel = '';
 
   const { preferredProvider } = req.body || {};
-  const openai = getOpenAI();
   const ai = getGenAI();
+  const openai = getOpenAI();
+
+  // Helper to execute Gemini chat using modern @google/genai SDK
+  const runGemini = async () => {
+    if (!ai) return false;
+    try {
+      // Build strictly sanitized contents array for Gemini API:
+      // Must alternate 'user' -> 'model' -> 'user' and start with 'user'
+      const sanitizedContents: { role: 'user' | 'model'; parts: { text: string }[] }[] = [];
+      const rawHistory = Array.isArray(history) ? history.slice(-10) : [];
+
+      for (const item of rawHistory) {
+        if (!item || !item.text || typeof item.text !== 'string') continue;
+        const text = item.text.trim();
+        if (!text) continue;
+        const role = item.sender === 'user' ? 'user' : 'model';
+
+        // Skip leading model messages (Gemini contents[0] must be user)
+        if (sanitizedContents.length === 0 && role !== 'user') {
+          continue;
+        }
+
+        // Avoid consecutive duplicate roles by concatenating
+        if (sanitizedContents.length > 0 && sanitizedContents[sanitizedContents.length - 1].role === role) {
+          sanitizedContents[sanitizedContents.length - 1].parts[0].text += `\n${text}`;
+        } else {
+          sanitizedContents.push({ role, parts: [{ text }] });
+        }
+      }
+
+      // Add current user prompt
+      if (sanitizedContents.length > 0 && sanitizedContents[sanitizedContents.length - 1].role === 'user') {
+        sanitizedContents[sanitizedContents.length - 1].parts[0].text += `\n${userText}`;
+      } else {
+        sanitizedContents.push({ role: 'user', parts: [{ text: userText }] });
+      }
+
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('Gemini API timeout')), 25000)
+      );
+
+      const responsePromise = ai.models.generateContent({
+        model: 'gemini-3.7-flash',
+        contents: sanitizedContents,
+        config: {
+          systemInstruction: { parts: [{ text: systemPrompt }] },
+          temperature: 0.7,
+          maxOutputTokens: 1000
+        }
+      });
+
+      const response = await Promise.race([responsePromise, timeoutPromise]);
+
+      if (response && response.text) {
+        responseText = response.text;
+        activeProvider = 'Gemini';
+        activeModel = 'gemini-3.7-flash';
+        return true;
+      }
+    } catch (err: any) {
+      console.warn('[AI Assistant] Gemini API issue:', err?.message || err);
+      // Try fallback to gemini-3.6-flash
+      try {
+        if (ai) {
+          const fallbackRes = await ai.models.generateContent({
+            model: 'gemini-3.6-flash',
+            contents: [{ role: 'user', parts: [{ text: `${systemPrompt}\n\nUser Question: ${userText}` }] }]
+          });
+          if (fallbackRes && fallbackRes.text) {
+            responseText = fallbackRes.text;
+            activeProvider = 'Gemini';
+            activeModel = 'gemini-3.6-flash';
+            return true;
+          }
+        }
+      } catch (fallbackErr: any) {
+        console.warn('[AI Assistant] Gemini 3.6 fallback issue, trying 3.1-flash-lite:', fallbackErr?.message || fallbackErr);
+        try {
+          if (ai) {
+            const liteRes = await ai.models.generateContent({
+              model: 'gemini-3.1-flash-lite',
+              contents: [{ role: 'user', parts: [{ text: `${systemPrompt}\n\nUser Question: ${userText}` }] }]
+            });
+            if (liteRes && liteRes.text) {
+              responseText = liteRes.text;
+              activeProvider = 'Gemini';
+              activeModel = 'gemini-3.1-flash-lite';
+              return true;
+            }
+          }
+        } catch (liteErr: any) {
+          console.warn('[AI Assistant] Gemini lite fallback issue:', liteErr?.message || liteErr);
+        }
+      }
+    }
+    return false;
+  };
 
   // Helper to execute OpenAI chat
   const runOpenAI = async () => {
     if (!openai) return false;
     try {
-      const chatHistory = (history || []).map((h: { sender: string; text: string }) => ({
+      const chatHistory = (history || []).slice(-10).map((h: { sender: string; text: string }) => ({
         role: h.sender === 'user' ? ('user' as const) : ('assistant' as const),
         content: h.text
       }));
@@ -1174,7 +1314,7 @@ The visitor is currently viewing page: "${behavior?.lastPageVisited || '/'}". Pa
           { role: 'user', content: userText }
         ],
         temperature: 0.7,
-        max_tokens: 700
+        max_tokens: 800
       });
 
       if (completion.choices[0]?.message?.content) {
@@ -1184,100 +1324,77 @@ The visitor is currently viewing page: "${behavior?.lastPageVisited || '/'}". Pa
         return true;
       }
     } catch (openAiErr: any) {
-      if (openAiErr?.status === 401 || openAiErr?.message?.includes('401') || openAiErr?.message?.includes('Incorrect API key')) {
-        console.warn('[AI Assistant] Provided OPENAI_API_KEY is unauthorized or invalid (401). Falling back seamlessly to Gemini AI / Rule Engine.');
-      } else {
-        console.warn('[AI Assistant] OpenAI API attempt issue:', openAiErr?.message || openAiErr);
-      }
+      console.warn('[AI Assistant] OpenAI API issue:', openAiErr?.message || openAiErr);
     }
     return false;
   };
 
-  // Helper to execute Gemini chat
-  const runGemini = async () => {
-    if (!ai) return false;
-    try {
-      const chatHistory = (history || []).map((h: { sender: string; text: string }) => ({
-        role: h.sender === 'user' ? 'user' : 'model',
-        parts: [{ text: h.text }]
-      }));
-
-      const timeoutPromise = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error('AI response request timeout (3.5s limit reached)')), 3500)
-      );
-
-      const response = await Promise.race([
-        ai.models.generateContent({
-          model: 'gemini-3.6-flash',
-          contents: [
-            { role: 'user', parts: [{ text: systemPrompt }] },
-            ...chatHistory,
-            { role: 'user', parts: [{ text: userText }] }
-          ]
-        }),
-        timeoutPromise
-      ]);
-
-      if (response && response.text) {
-        responseText = response.text;
-        activeProvider = 'Gemini';
-        activeModel = 'gemini-3.6-flash';
-        return true;
-      }
-    } catch (err: any) {
-      console.warn('[AI Assistant] Gemini API temporary issue or limit reached:', err?.message || err);
-    }
-    return false;
-  };
-
-  // Execution flow based on user preference or key availability
+  // Execution flow: Prefer Gemini first as the primary engine for Google AI Studio
   if (preferredProvider === 'openai') {
     if (!(await runOpenAI())) {
       await runGemini();
     }
-  } else if (preferredProvider === 'gemini') {
+  } else {
+    // Default: Gemini first, then OpenAI fallback
     if (!(await runGemini())) {
       await runOpenAI();
     }
-  } else {
-    // Auto mode: Prioritize OpenAI if key configured, else Gemini
-    if (process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY.trim() !== '') {
-      if (!(await runOpenAI())) {
-        await runGemini();
-      }
-    } else {
-      if (!(await runGemini())) {
-        await runOpenAI();
-      }
-    }
   }
 
-
-  // Rule-based Fallback if AI not available or errored
+  // Dynamic Rule-based Intelligent Domain Fallback if AI keys not available or failed
   if (!responseText) {
     const lower = userText.toLowerCase();
 
-    if (lower.includes('dsp') || lower.includes('dispatch') || lower.includes('driver')) {
-      responseText = `Wal Group provides 24/7 Amazon DSP dispatch coverage using official portals like Cortex, Geotab, and Netradyne. Our team actively monitors safety scores, manages route delays, and coordinates roadside assistance so you maintain an Amazon Super Fantastic rating. Would you like to schedule a 30-minute discovery call with our DSP operations lead?`;
+    if (lower.includes('dsp') || lower.includes('cortex') || lower.includes('netradyne') || lower.includes('geotab') || lower.includes('emaint')) {
+      responseText = `The Wal Group provides 24/7 dedicated Amazon DSP dispatch operations. Our team manages live routing on Amazon Cortex, tracks vehicle telematics via Geotab & Netradyne, oversees safety event coaching, coordinates on-road rescues, and resolves roadside emergencies.
+
+We maintain a strict focus on Amazon Super Fantastic scorecards to protect your margins. How many routes or vans do you currently operate in your DSP station?`;
       shouldSuggestBooking = true;
-    } else if (lower.includes('accounting') || lower.includes('payroll') || lower.includes('reconciliation')) {
-      responseText = `Our Amazon DSP & AFP accounting team reconciles your 14-day Amazon pay statements line-by-line, including van damages, fuel cards, and route adjustments. We also integrate with ADP, Gusto, and QuickBooks for seamless driver payroll. Would you like us to audit your recent scorecard reconciliation?`;
+    } else if (lower.includes('afp') || lower.includes('relay') || lower.includes('freight') || lower.includes('lane') || lower.includes('tms')) {
+      responseText = `For Amazon Freight Partners (AFP) and freight carriers, we provide 24/7 Amazon Relay dispatching, 12-step POD verification, TMS fleet tracking, and 24/7 DOT Hours of Service (HOS) compliance.
+
+Our dispatchers optimize your round trips and dedicated lanes for maximum asset utilization. Are you operating box trucks, day cabs, or sleeper teams?`;
       shouldSuggestBooking = true;
-    } else if (lower.includes('website') || lower.includes('marketing') || lower.includes('dev')) {
-      responseText = `Wal Group builds high-performance, enterprise-grade web platforms designed specifically for logistics fleets, BPO clients, and growing brands. We also run end-to-end digital marketing and CRM lead automation. Would you like to view our past website design case studies or book a quick strategy session?`;
+    } else if (lower.includes('accounting') || lower.includes('payroll') || lower.includes('reconciliation') || lower.includes('audit') || lower.includes('pay statement')) {
+      responseText = `Our specialized logistics accounting team conducts line-by-line audits of your 14-day Amazon pay statements. We reconcile fuel card expenses, van damage deductions, disputed claims, and route adjustments to recover lost revenue.
+
+We also integrate seamlessly with ADP, Gusto, and QuickBooks for timely driver payroll processing. Would you like a complimentary audit of your recent pay statement?`;
       shouldSuggestBooking = true;
-    } else if (lower.includes('book') || lower.includes('demo') || lower.includes('call') || lower.includes('meeting')) {
-      responseText = `I'd be happy to arrange a Discovery Call for you with our executive team. You can click "Book Discovery Call" right here or let me know your preferred date and business email!`;
+    } else if (lower.includes('driver') || lower.includes('recruit') || lower.includes('hire') || lower.includes('hiring') || lower.includes('onboard') || lower.includes('hr')) {
+      responseText = `We operate an AI-driven driver recruitment pipeline that screens commercial candidates, verifies motor vehicle records, runs background checks, and manages driver onboarding into Amazon platforms.
+
+This keeps your roster fully staffed and eliminates expensive last-minute call-outs. What market or station are you currently hiring drivers in?`;
       shouldSuggestBooking = true;
-    } else if (lower.includes('price') || lower.includes('cost') || lower.includes('rate')) {
-      responseText = `Our pricing is customized to your exact fleet size, hours of dispatch coverage, or backend scope to guarantee a high return on investment. On average, our clients save 35–50% compared to local in-house overhead. Would you like a customized proposal on a Discovery Call?`;
+    } else if (lower.includes('website') || lower.includes('web') || lower.includes('software') || lower.includes('app') || lower.includes('marketing') || lower.includes('seo') || lower.includes('dev')) {
+      responseText = `The Wal Group's digital engineering division builds enterprise-grade web applications, responsive customer portals, and conversion-optimized websites using React, Node.js, and modern cloud stacks. We also execute targeted B2B SEO and lead generation campaigns.
+
+What type of web project or digital marketing initiative are you looking to launch?`;
       shouldSuggestBooking = true;
+    } else if (lower.includes('va') || lower.includes('virtual assistant') || lower.includes('bpo') || lower.includes('back-office') || lower.includes('support') || lower.includes('data entry')) {
+      responseText = `Our Dedicated Virtual Assistants and 24/7 BPO teams handle inbox management, CRM maintenance, order processing, customer support ticketing (Zendesk/Freshdesk), and data entry with guaranteed SLAs.
+
+You receive dedicated, rigorously trained specialists starting at 35–50% cost savings compared to domestic hiring. What core tasks would you like your VA to take over?`;
+      shouldSuggestBooking = true;
+    } else if (lower.includes('price') || lower.includes('cost') || lower.includes('rate') || lower.includes('quote') || lower.includes('fee') || lower.includes('package')) {
+      responseText = `Our pricing is customized to your exact operational requirements (fleet size, hours of dispatch coverage, or virtual team size), typically delivering 35% to 50% net cost savings compared to in-house US/UK staffing.
+
+We can prepare a transparent, itemized proposal for your team during a 30-minute Discovery Call. Would you like to schedule a session with our operations director?`;
+      shouldSuggestBooking = true;
+    } else if (lower.includes('book') || lower.includes('demo') || lower.includes('call') || lower.includes('meeting') || lower.includes('schedule') || lower.includes('consult')) {
+      responseText = `I would be delighted to arrange a 30-minute Discovery Call for you with our executive leadership team. You can click the "Book Discovery Call" button right below or share your email and preferred date!`;
+      shouldSuggestBooking = true;
+    } else if (lower.includes('hi') || lower.includes('hello') || lower.includes('hey') || lower.includes('who are you')) {
+      responseText = `Hello! I am the Wal AI Business Assistant, representing The Wal Group. We provide 24/7 dedicated remote operations, Amazon DSP & AFP dispatching, payroll reconciliation, driver recruitment, virtual assistants, and custom software development.
+
+How can I help streamline your operations or assist your business today?`;
     } else {
-      responseText = `At Wal Group, we serve as the operational backbone for Amazon DSPs, Freight fleets, and growing businesses globally. We handle 24/7 dispatch, accounting & payroll, driver recruiting, virtual assistants, and web development. How can we support your business goals today?`;
+      responseText = `At The Wal Group, we serve as the complete 24/7 operational backbone for Amazon DSPs, freight carriers, and growing international enterprises. We cover dispatching, payroll auditing, driver recruitment, dedicated virtual assistants, and custom web development.
+
+Could you tell me a little about your business or current operational challenges so I can point you in the right direction?`;
     }
   }
 
-  if (userText.toLowerCase().includes('demo') || userText.toLowerCase().includes('book') || userText.toLowerCase().includes('schedule')) {
+  if (userText.toLowerCase().includes('demo') || userText.toLowerCase().includes('book') || userText.toLowerCase().includes('schedule') || userText.toLowerCase().includes('consultation') || userText.toLowerCase().includes('pricing') || userText.toLowerCase().includes('quote')) {
     shouldSuggestBooking = true;
   }
 
@@ -1306,11 +1423,13 @@ The visitor is currently viewing page: "${behavior?.lastPageVisited || '/'}". Pa
 
     const leadData: LeadRecord = {
       id: existingIndex >= 0 ? leads[existingIndex].id : leadId,
+      name: extracted.name || (extracted.email ? extracted.email.split('@')[0] : 'Inbound Chat Lead'),
+      company: extracted.company,
       email: extracted.email || (existingIndex >= 0 ? leads[existingIndex].email : undefined),
       phone: extracted.phone || (existingIndex >= 0 ? leads[existingIndex].phone : undefined),
       fleetSize: extracted.fleetSize || (existingIndex >= 0 ? leads[existingIndex].fleetSize : undefined),
       score,
-      scoreReason: `Engaged via AI Consultant | Last Page: ${behavior?.lastPageVisited || '/'}`,
+      scoreReason: `Engaged via AI Business Assistant | Last Page: ${behavior?.lastPageVisited || '/'}`,
       sessionId: currentSessionId,
       status: 'New',
       createdAt: existingIndex >= 0 ? leads[existingIndex].createdAt : new Date().toISOString(),
@@ -1324,15 +1443,29 @@ The visitor is currently viewing page: "${behavior?.lastPageVisited || '/'}". Pa
     }
     saveData(LEADS_FILE, leads);
 
+    // Save lead directly to Supabase
+    saveLeadToSupabase({
+      id: leadData.id,
+      name: leadData.name,
+      company: leadData.company,
+      email: leadData.email,
+      phone: leadData.phone,
+      fleetSize: leadData.fleetSize,
+      score: leadData.score,
+      scoreReason: leadData.scoreReason,
+      source: 'AI Business Assistant',
+      status: 'New',
+      notes: `Session: ${currentSessionId}`
+    }).catch((err) => console.warn('[Supabase AI Lead Save Warning]', err));
+
     console.log(`[QUALIFIED LEAD CAPTURED] ID: ${leadData.id} | Score: ${score} | Email: ${leadData.email}`);
-    console.log(`Notification sent to: thewalgroupinfo@gmail.com`);
   }
 
   // Log conversation to Supabase asynchronously
   saveAiLogToSupabase({
     session_id: currentSessionId,
-    provider: activeProvider || 'RuleEngine',
-    model: activeModel || 'standard',
+    provider: activeProvider || 'Wal AI Engine',
+    model: activeModel || 'gemini-3.7-flash',
     user_message: userText,
     ai_response: responseText,
     lead_email: extracted.email,
@@ -1342,8 +1475,8 @@ The visitor is currently viewing page: "${behavior?.lastPageVisited || '/'}". Pa
   return res.json({
     success: true,
     sessionId: currentSessionId,
-    provider: activeProvider || 'RuleEngine',
-    model: activeModel || 'standard',
+    provider: activeProvider || 'Wal AI Engine',
+    model: activeModel || 'gemini-3.7-flash',
     response: responseText,
     extractedLead: extracted,
     shouldSuggestBooking,

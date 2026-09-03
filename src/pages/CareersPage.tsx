@@ -1,7 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { JobApplication } from '../types';
 import { EmailLink } from '../components/EmailLink';
-import { Users, CheckCircle2, Upload, Send, ArrowLeft, Briefcase, FileText, Globe, Mail, Loader2, AlertCircle } from 'lucide-react';
+import { 
+  CheckCircle2, 
+  Upload, 
+  ArrowLeft, 
+  Briefcase, 
+  FileText, 
+  AlertCircle,
+  Loader2,
+  User,
+  X
+} from 'lucide-react';
 import { saveJobApplicationToSupabase, uploadResumeToSupabaseStorage } from '../lib/supabase';
 
 interface Props {
@@ -9,45 +19,77 @@ interface Props {
 }
 
 export const CareersPage: React.FC<Props> = ({ navigate }) => {
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [location, setLocation] = useState('');
-  const [linkedinUrl, setLinkedinUrl] = useState('');
-  const [position, setPosition] = useState('Dispatch Support Specialist');
-  const [experienceYears, setExperienceYears] = useState('3');
-  const [currentCompany, setCurrentCompany] = useState('');
-  const [noticePeriod, setNoticePeriod] = useState('Immediately available');
-  const [expectedSalary, setExpectedSalary] = useState('');
-  const [resumeFile, setResumeFile] = useState<File | null>(null);
-  const [coverLetter, setCoverLetter] = useState('');
   const [uploading, setUploading] = useState(false);
-  const [fileError, setFileError] = useState('');
   const [submitError, setSubmitError] = useState('');
-
   const [submittedApp, setSubmittedApp] = useState<JobApplication | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    phone: '',
+    location: '',
+    linkedinUrl: '',
+    position: 'Dispatch Support Specialist',
+    experienceYears: '3',
+    currentCompany: '',
+    noticePeriod: 'Immediately available',
+    expectedSalary: '',
+    coverLetter: ''
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      if (file.size > 10 * 1024 * 1024) {
+        setSubmitError('Resume file size must be less than 10MB.');
+        return;
+      }
+      setSelectedFile(file);
+      setSubmitError('');
+    }
+  };
+
+  const handleApplicationSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (uploading) return;
-    if (!fullName || !email || !phone || !position || !expectedSalary) return;
 
-    setFileError('');
+    if (!formData.fullName.trim() || !formData.email.trim() || !formData.phone.trim() || !formData.expectedSalary.trim()) {
+      setSubmitError('Please complete all required fields.');
+      return;
+    }
+
+    if (!selectedFile) {
+      setSubmitError('Please attach your resume file (PDF, DOC, DOCX up to 10MB).');
+      return;
+    }
+
     setSubmitError('');
     setUploading(true);
 
     let resumeUrl = '';
-    let resumeFileName = resumeFile ? resumeFile.name : 'Resume.pdf';
+    const resumeFileName = selectedFile.name;
 
-    // 1. Handle resume file upload if provided
-    if (resumeFile) {
-      const uploadRes = await uploadResumeToSupabaseStorage(resumeFile);
+    // 1. Handle resume file upload
+    try {
+      const uploadRes = await uploadResumeToSupabaseStorage(selectedFile);
       if (!uploadRes.success) {
-        setFileError(uploadRes.error || 'Failed to upload resume file.');
+        setSubmitError(uploadRes.error || 'Failed to upload resume file.');
         setUploading(false);
         return;
       }
       resumeUrl = uploadRes.url || '';
+    } catch (err: any) {
+      console.error('Resume upload error:', err);
+      setSubmitError('Failed to upload resume. Please try again.');
+      setUploading(false);
+      return;
     }
 
     const appId = `WM-APP-${Math.floor(100000 + Math.random() * 900000)}`;
@@ -55,18 +97,18 @@ export const CareersPage: React.FC<Props> = ({ navigate }) => {
 
     const app: JobApplication = {
       id: appId,
-      fullName,
-      email,
-      phone,
-      location,
-      linkedinUrl,
-      position,
-      experienceYears: parseInt(experienceYears) || 0,
-      currentCompany,
-      noticePeriod,
-      expectedSalary,
+      fullName: formData.fullName,
+      email: formData.email,
+      phone: formData.phone,
+      location: formData.location,
+      linkedinUrl: formData.linkedinUrl,
+      position: formData.position,
+      experienceYears: parseInt(formData.experienceYears) || 0,
+      currentCompany: formData.currentCompany,
+      noticePeriod: formData.noticePeriod,
+      expectedSalary: formData.expectedSalary,
       resumeFileName,
-      coverLetter,
+      coverLetter: formData.coverLetter,
       appliedAt: nowISO,
       status: 'New'
     };
@@ -109,173 +151,183 @@ export const CareersPage: React.FC<Props> = ({ navigate }) => {
   };
 
   return (
-    <div className="font-sans text-slate-800 bg-white">
+    <div className="font-sans text-slate-100 bg-[#0a0a0a]">
       {/* Hero */}
-      <section className="bg-[#0A2647] text-white py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto text-center space-y-4">
-          <span className="px-3.5 py-1.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold uppercase tracking-wider">
-            Join Our Team
+      <section className="bg-[#050505] text-white py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden border-b border-white/10">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(255,119,0,0.12),transparent_70%)] pointer-events-none" />
+        <div className="max-w-7xl mx-auto text-center space-y-4 relative z-10">
+          <span className="px-3.5 py-1.5 rounded-full bg-[#ff7700]/10 text-[#ff7700] border border-[#ff7700]/30 text-xs font-bold uppercase tracking-wider">
+            Join Our Operational Team
           </span>
-          <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">Build Your Career with Wal Group</h1>
+          <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">
+            Build Your Career with Wal Group
+          </h1>
           <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto font-normal">
-            Remote-first culture, continuous learning, and direct exposure to US logistics and corporate clients.
+            Remote-first culture, competitive compensation, continuous learning, and direct exposure to US logistics and corporate clients.
           </p>
         </div>
       </section>
 
       {/* Main Content & Form */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-slate-50">
-        <div className="max-w-4xl mx-auto space-y-12">
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-[#0a0a0a]">
+        <div className="max-w-4xl mx-auto space-y-10">
           
           {/* Back to Home Button */}
           <div className="flex justify-between items-center">
             <button
               onClick={() => navigate('/')}
-              className="inline-flex items-center gap-2 text-xs font-bold text-[#2271B1] hover:text-[#1B5A8C]"
+              className="inline-flex items-center gap-2 text-xs font-bold text-[#ff7700] hover:text-[#ff9900] transition-colors cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Back to Home</span>
             </button>
-            <span className="text-xs text-slate-500 font-semibold">Remote Positions Available Across India</span>
+            <span className="text-xs text-slate-400 font-semibold">Remote &amp; Hybrid Positions Available</span>
           </div>
 
           {/* Culture Overview */}
-          <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-            <h2 className="text-2xl font-bold text-[#0A2647]">Why Work With Us?</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs text-slate-600">
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
-                <div className="font-bold text-[#0A2647] text-sm">Remote-First Flexibility</div>
-                <div className="mt-1">Work from anywhere in India with flexible scheduling and supportive leadership.</div>
+          <div className="bg-[#0a0a0f] p-6 sm:p-8 rounded-2xl border border-white/10 shadow-xl space-y-4">
+            <h2 className="text-xl font-bold text-white">Why Work With Us?</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs text-slate-300">
+              <div className="p-4 bg-white/[0.03] rounded-xl border border-white/10">
+                <div className="font-bold text-[#ff7700] text-sm">Remote-First Flexibility</div>
+                <div className="mt-1 text-slate-400">Work from anywhere with flexible scheduling, high-speed equipment allowance, and supportive leadership.</div>
               </div>
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
-                <div className="font-bold text-[#0A2647] text-sm">US Client Exposure</div>
-                <div className="mt-1">Gain hands-on expertise with Amazon DSP, AFP, and international BPO operations.</div>
+              <div className="p-4 bg-white/[0.03] rounded-xl border border-white/10">
+                <div className="font-bold text-[#ff7700] text-sm">US Client Exposure</div>
+                <div className="mt-1 text-slate-400">Gain hands-on expertise with Amazon DSP, Amazon Relay, QuickBooks, ADP, and enterprise BPO systems.</div>
               </div>
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
-                <div className="font-bold text-[#0A2647] text-sm">Career Growth</div>
-                <div className="mt-1">Regular performance reviews, skill certification support, and leadership mobility.</div>
+              <div className="p-4 bg-white/[0.03] rounded-xl border border-white/10">
+                <div className="font-bold text-[#ff7700] text-sm">Rapid Career Growth</div>
+                <div className="mt-1 text-slate-400">Quarterly performance reviews, skill certification stipends, and fast-track leadership promotions.</div>
               </div>
             </div>
 
-            {/* General Recruitment Email Banner */}
+            {/* Recruitment Email */}
             <div className="pt-2">
-              <EmailLink email="thewalgroup@gmail.com" label="General Enquiries, Careers & Recruitment" />
+              <EmailLink email="thewalgroups@gmail.com" label="Direct HR &amp; Careers Desk" />
             </div>
           </div>
 
-          {/* Application Form */}
-          <div className="bg-white p-8 sm:p-10 rounded-2xl border border-slate-200 shadow-xl space-y-8">
-            <div className="border-b border-slate-200 pb-4">
-              <h3 className="text-2xl font-extrabold text-[#0A2647]">Job Application Form</h3>
-              <p className="text-xs text-slate-500 mt-1">Please complete all required fields (*). Our HR team reviews applications within 5-7 business days.</p>
-            </div>
+          {/* Standard Application Form */}
+          <div className="bg-[#0a0a0f] p-6 sm:p-8 rounded-3xl border border-white/10 shadow-2xl space-y-8">
+            {!submittedApp ? (
+              <form onSubmit={handleApplicationSubmit} className="space-y-8">
+                <div>
+                  <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                    <Briefcase className="w-5 h-5 text-[#ff7700]" />
+                    Job Application Form
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-1">
+                    Fill out your profile details below. Our recruitment team reviews candidate applications within 5–7 business days.
+                  </p>
+                </div>
 
-            {submittedApp ? (
-              <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-8 text-center space-y-4">
-                <CheckCircle2 className="w-12 h-12 text-emerald-600 mx-auto" />
-                <h4 className="text-2xl font-bold text-emerald-900">Application Submitted Successfully!</h4>
-                <p className="text-xs text-emerald-800 max-w-md mx-auto">
-                  Thank you, {submittedApp.fullName}. Your application for {submittedApp.position} has been received.
-                </p>
-                <div className="bg-white p-4 rounded-lg border border-emerald-200 inline-block text-left text-xs space-y-1">
-                  <div><strong>Reference ID:</strong> {submittedApp.id}</div>
-                  <div><strong>Position:</strong> {submittedApp.position}</div>
-                  <div><strong>Applied Date:</strong> {submittedApp.appliedAt}</div>
-                </div>
-                <div className="pt-2">
-                  <button
-                    onClick={() => navigate('/')}
-                    className="bg-[#0A2647] text-white text-xs font-bold py-2.5 px-6 rounded-lg"
-                  >
-                    Back to Home
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-6">
                 {submitError && (
-                  <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 flex items-center gap-2.5 font-medium">
-                    <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
+                  <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 flex items-start gap-3 text-red-300 text-xs">
+                    <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
                     <span>{submitError}</span>
                   </div>
                 )}
-                
-                {/* Section 1 */}
-                <div className="space-y-4">
-                  <h4 className="text-sm font-bold text-[#0A2647] uppercase tracking-wider border-b border-slate-100 pb-2">1. Personal Information</h4>
-                  
+
+                {/* Section 1: Personal Details */}
+                <div className="space-y-4 border-b border-white/10 pb-6">
+                  <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                    <User className="w-4 h-4 text-[#ff7700]" />
+                    1. Applicant Personal Details
+                  </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">Full Name <span className="text-red-500">*</span></label>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-slate-300">
+                        Full Name <span className="text-[#ff7700]">*</span>
+                      </label>
                       <input
                         type="text"
+                        name="fullName"
                         required
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
-                        placeholder="Enter your full name"
-                        className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-[#2271B1]"
+                        value={formData.fullName}
+                        onChange={handleChange}
+                        placeholder="e.g. Priya Sharma"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#ff7700] transition-colors"
                       />
                     </div>
 
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">Email Address <span className="text-red-500">*</span></label>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-slate-300">
+                        Email Address <span className="text-[#ff7700]">*</span>
+                      </label>
                       <input
                         type="email"
+                        name="email"
                         required
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="you@example.com"
-                        className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-[#2271B1]"
+                        value={formData.email}
+                        onChange={handleChange}
+                        placeholder="e.g. priya.sharma@example.com"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#ff7700] transition-colors"
                       />
                     </div>
 
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">Phone Number <span className="text-red-500">*</span></label>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-slate-300">
+                        Direct Phone Number <span className="text-[#ff7700]">*</span>
+                      </label>
                       <input
                         type="tel"
+                        name="phone"
                         required
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        placeholder="+91 98765 43210"
-                        className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-[#2271B1]"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        placeholder="e.g. +91 98765 43210"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#ff7700] transition-colors"
                       />
                     </div>
 
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">Current Location</label>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-slate-300">
+                        Current Location / City
+                      </label>
                       <input
                         type="text"
-                        value={location}
-                        onChange={(e) => setLocation(e.target.value)}
-                        placeholder="City, State"
-                        className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-[#2271B1]"
+                        name="location"
+                        value={formData.location}
+                        onChange={handleChange}
+                        placeholder="e.g. Bengaluru, Karnataka"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#ff7700] transition-colors"
                       />
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">LinkedIn Profile URL</label>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-slate-300">
+                      LinkedIn Profile URL
+                    </label>
                     <input
                       type="url"
-                      value={linkedinUrl}
-                      onChange={(e) => setLinkedinUrl(e.target.value)}
-                      placeholder="https://linkedin.com/in/username"
-                      className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-[#2271B1]"
+                      name="linkedinUrl"
+                      value={formData.linkedinUrl}
+                      onChange={handleChange}
+                      placeholder="https://linkedin.com/in/yourprofile"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#ff7700] transition-colors"
                     />
                   </div>
                 </div>
 
-                {/* Section 2 */}
-                <div className="space-y-4">
-                  <h4 className="text-sm font-bold text-[#0A2647] uppercase tracking-wider border-b border-slate-100 pb-2">2. Professional Details</h4>
-                  
+                {/* Section 2: Position & Experience */}
+                <div className="space-y-4 border-b border-white/10 pb-6">
+                  <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                    <Briefcase className="w-4 h-4 text-[#ff7700]" />
+                    2. Position &amp; Professional Experience
+                  </h4>
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">Position Applying For <span className="text-red-500">*</span></label>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-slate-300">
+                        Target Position <span className="text-[#ff7700]">*</span>
+                      </label>
                       <select
-                        value={position}
-                        onChange={(e) => setPosition(e.target.value)}
-                        className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-[#2271B1] bg-white"
+                        name="position"
+                        value={formData.position}
+                        onChange={handleChange}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#141414] border border-white/10 text-white text-sm focus:outline-none focus:border-[#ff7700] transition-colors"
                       >
                         <option value="Dispatch Support Specialist">Dispatch Support Specialist</option>
                         <option value="Accounting & Payroll Specialist">Accounting &amp; Payroll Specialist</option>
@@ -283,117 +335,187 @@ export const CareersPage: React.FC<Props> = ({ navigate }) => {
                         <option value="Digital Marketing Specialist">Digital Marketing Specialist</option>
                         <option value="Website Developer">Website Developer</option>
                         <option value="Virtual Assistant">Virtual Assistant</option>
-                        <option value="Team Lead">Team Lead</option>
+                        <option value="Team Lead">Operations Team Lead</option>
                         <option value="Operations Manager">Operations Manager</option>
-                        <option value="Other">Other</option>
                       </select>
                     </div>
 
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">Years of Experience <span className="text-red-500">*</span></label>
-                      <input
-                        type="number"
-                        min="0"
-                        max="30"
-                        value={experienceYears}
-                        onChange={(e) => setExperienceYears(e.target.value)}
-                        className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-[#2271B1]"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">Notice Period <span className="text-red-500">*</span></label>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-slate-300">
+                        Relevant Experience <span className="text-[#ff7700]">*</span>
+                      </label>
                       <select
-                        value={noticePeriod}
-                        onChange={(e) => setNoticePeriod(e.target.value)}
-                        className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-[#2271B1] bg-white"
+                        name="experienceYears"
+                        value={formData.experienceYears}
+                        onChange={handleChange}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#141414] border border-white/10 text-white text-sm focus:outline-none focus:border-[#ff7700] transition-colors"
                       >
-                        <option value="Immediately available">Immediately available</option>
-                        <option value="15 days">15 days</option>
-                        <option value="30 days">30 days</option>
-                        <option value="45 days">45 days</option>
-                        <option value="60 days">60 days</option>
-                        <option value="90 days">90 days</option>
+                        <option value="1">0 – 1 Years (Entry Level / Fresh Graduate)</option>
+                        <option value="3">2 – 3 Years (Associate / Experienced)</option>
+                        <option value="5">4 – 6 Years (Mid-Senior / Specialist)</option>
+                        <option value="8">7+ Years (Senior Lead / Managerial)</option>
                       </select>
                     </div>
 
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">Expected Salary (Per Annum) <span className="text-red-500">*</span></label>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-slate-300">
+                        Current Company / Employer
+                      </label>
                       <input
                         type="text"
-                        required
-                        value={expectedSalary}
-                        onChange={(e) => setExpectedSalary(e.target.value)}
-                        placeholder="e.g. ₹ 6,00,000 PA"
-                        className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-[#2271B1]"
+                        name="currentCompany"
+                        value={formData.currentCompany}
+                        onChange={handleChange}
+                        placeholder="e.g. Amazon / Genpact / Freelance"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#ff7700] transition-colors"
                       />
                     </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-slate-300">
+                        Notice Period <span className="text-[#ff7700]">*</span>
+                      </label>
+                      <select
+                        name="noticePeriod"
+                        value={formData.noticePeriod}
+                        onChange={handleChange}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#141414] border border-white/10 text-white text-sm focus:outline-none focus:border-[#ff7700] transition-colors"
+                      >
+                        <option value="Immediately available">Immediately Available</option>
+                        <option value="15 days">15 Days Notice</option>
+                        <option value="30 days">30 Days Notice</option>
+                        <option value="45 days">45 Days Notice</option>
+                        <option value="60+ days">60+ Days Notice</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-slate-300">
+                      Expected Annual Compensation (CTC) <span className="text-[#ff7700]">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="expectedSalary"
+                      required
+                      value={formData.expectedSalary}
+                      onChange={handleChange}
+                      placeholder="e.g. ₹ 6,00,000 PA / $35,000 USD"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#ff7700] transition-colors"
+                    />
                   </div>
                 </div>
 
-                {/* Section 3 */}
+                {/* Section 3: Resume & Notes */}
                 <div className="space-y-4">
-                  <h4 className="text-sm font-bold text-[#0A2647] uppercase tracking-wider border-b border-slate-100 pb-2">3. Resume Upload</h4>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Attach Resume (PDF, DOC, DOCX up to 10MB) <span className="text-red-500">*</span></label>
-                  
-                  {fileError && (
-                    <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 flex items-center gap-2 font-medium">
-                      <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
-                      <span>{fileError}</span>
-                    </div>
-                  )}
+                  <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-[#ff7700]" />
+                    3. Resume &amp; Candidate Notes
+                  </h4>
 
-                  <label className="cursor-pointer bg-slate-50 hover:bg-slate-100 border-2 border-dashed border-slate-300 rounded-xl p-6 flex flex-col items-center text-center transition-colors">
-                    <Upload className="w-8 h-8 text-[#2271B1] mb-2" />
-                    <span className="text-xs font-bold text-slate-700">
-                      {resumeFile ? resumeFile.name : 'Click or Drag File to Upload Resume'}
-                    </span>
-                    <span className="text-[11px] text-slate-400 mt-1">Accepted formats: PDF, DOC, DOCX (Max 10 MB)</span>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-slate-300">
+                      Upload Resume / CV (PDF, DOC, DOCX up to 10MB) <span className="text-[#ff7700]">*</span>
+                    </label>
+                    
                     <input
+                      ref={fileInputRef}
                       type="file"
-                      accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                      accept=".pdf,.doc,.docx"
+                      onChange={handleFileChange}
                       className="hidden"
-                      onChange={(e) => {
-                        if (e.target.files?.[0]) {
-                          setResumeFile(e.target.files[0]);
-                          setFileError('');
-                        }
-                      }}
                     />
-                  </label>
+
+                    {selectedFile ? (
+                      <div className="flex items-center justify-between p-3.5 rounded-xl bg-white/5 border border-[#ff7700]/50 text-xs">
+                        <div className="flex items-center gap-2.5">
+                          <FileText className="w-5 h-5 text-[#ff7700]" />
+                          <div>
+                            <span className="font-bold text-white block">{selectedFile.name}</span>
+                            <span className="text-slate-400 text-[11px]">
+                              {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                            </span>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedFile(null)}
+                          className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <div
+                        onClick={() => fileInputRef.current?.click()}
+                        className="border-2 border-dashed border-white/20 hover:border-[#ff7700] rounded-xl p-6 text-center cursor-pointer transition-colors bg-white/[0.02] hover:bg-white/[0.04]"
+                      >
+                        <Upload className="w-8 h-8 text-[#ff7700] mx-auto mb-2" />
+                        <p className="text-xs font-bold text-white">Click to browse or drag and drop your resume here</p>
+                        <p className="text-[11px] text-slate-500 mt-1">Accepted: PDF, DOC, DOCX (Max 10MB)</p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-slate-300">
+                      Cover Letter or Note to Hiring Manager
+                    </label>
+                    <textarea
+                      name="coverLetter"
+                      rows={4}
+                      value={formData.coverLetter}
+                      onChange={handleChange}
+                      placeholder="Highlight relevant logistics software experience, certifications, or night-shift availability..."
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#ff7700] transition-colors resize-y"
+                    ></textarea>
+                  </div>
                 </div>
 
-                {/* Section 4 */}
-                <div className="space-y-2">
-                  <label className="block text-xs font-bold text-slate-700">Cover Letter / Why Join Us?</label>
-                  <textarea
-                    rows={4}
-                    value={coverLetter}
-                    onChange={(e) => setCoverLetter(e.target.value)}
-                    placeholder="Tell us about yourself, your career goals, and why you are interested in joining Wal Group..."
-                    className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-[#2271B1]"
-                  ></textarea>
+                <div className="pt-4 border-t border-white/10">
+                  <button
+                    type="submit"
+                    disabled={uploading}
+                    className="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-[#ff8800] to-[#ff5500] hover:from-[#ff9911] hover:to-[#ff6611] text-black font-extrabold text-sm flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(255,119,0,0.3)] transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    {uploading ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        <span>Submitting Application &amp; Uploading Resume...</span>
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle2 className="w-5 h-5" />
+                        <span>Submit Job Application</span>
+                      </>
+                    )}
+                  </button>
+                  <p className="text-[11px] text-slate-500 text-center mt-2.5">
+                    Wal Group is an Equal Opportunity Employer. All candidate information is encrypted and treated with strict confidentiality.
+                  </p>
                 </div>
-
-                <button
-                  type="submit"
-                  disabled={uploading}
-                  className="w-full bg-[#0A2647] hover:bg-[#051A30] text-white font-extrabold text-sm py-3.5 px-6 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
-                >
-                  {uploading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 text-amber-400 animate-spin" />
-                      <span>Uploading Resume & Submitting...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Send className="w-4 h-4 text-amber-400" />
-                      <span>Submit Application</span>
-                    </>
-                  )}
-                </button>
-
               </form>
+            ) : (
+              <div className="bg-emerald-950/40 border border-emerald-500/30 rounded-2xl p-8 text-center space-y-4">
+                <CheckCircle2 className="w-14 h-14 text-emerald-400 mx-auto" />
+                <h4 className="text-2xl font-bold text-white">Application Submitted Successfully!</h4>
+                <p className="text-xs sm:text-sm text-slate-300 max-w-md mx-auto">
+                  Thank you, <span className="text-white font-bold">{submittedApp.fullName}</span>. Your application for <span className="text-[#ff7700] font-bold">{submittedApp.position}</span> has been dispatched to our recruitment directors.
+                </p>
+                <div className="bg-black/50 p-4 rounded-xl border border-white/10 inline-block text-left text-xs space-y-1.5">
+                  <div><strong className="text-slate-400">Reference ID:</strong> <span className="text-[#ff7700] font-mono font-bold">{submittedApp.id}</span></div>
+                  <div><strong className="text-slate-400">Position:</strong> <span className="text-white">{submittedApp.position}</span></div>
+                  <div><strong className="text-slate-400">Applicant:</strong> <span className="text-white">{submittedApp.fullName} ({submittedApp.email})</span></div>
+                </div>
+                <div className="pt-3">
+                  <button
+                    onClick={() => navigate('/')}
+                    className="bg-[#ff7700] hover:bg-[#ff8800] text-black text-xs font-extrabold py-3 px-6 rounded-xl shadow-lg transition-all cursor-pointer"
+                  >
+                    Back to Home
+                  </button>
+                </div>
+              </div>
             )}
           </div>
 

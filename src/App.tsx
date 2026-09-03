@@ -6,7 +6,6 @@ import { ScrollProgress } from './components/ScrollProgress';
 import { AmbientBackground } from './components/AmbientBackground';
 import { MouseSpotlight } from './components/MouseSpotlight';
 import { CursorRipple } from './components/CursorRipple';
-import { FloatingQuickActionMenu } from './components/FloatingQuickActionMenu';
 import { BookingProvider, useBooking } from './context/BookingContext';
 import { BehaviorProvider, useBehavior } from './context/BehaviorContext';
 import { ThemeProvider } from './context/ThemeContext';
@@ -268,9 +267,6 @@ function AppContent() {
       </main>
 
       <Footer navigate={navigate} />
-
-      {/* Floating Quick Action Glass Menu */}
-      <FloatingQuickActionMenu navigate={navigate} />
 
       {/* Fullscreen Discovery Call Demo Booking Modal */}
       <BookDemoModal

@@ -2,9 +2,29 @@ import React, { createContext, useContext, useState, useEffect, useCallback, use
 
 export interface UserBehaviorEvent {
   timestamp: string;
-  type: 'page_view' | 'service_view' | 'cta_click' | 'form_start' | 'scroll_depth';
+  type: 'page_view' | 'service_view' | 'cta_click' | 'form_start' | 'scroll_depth' | 'custom_action';
   path: string;
   details?: string;
+}
+
+export type ContactMethod = 'whatsapp' | 'email' | 'phone' | 'linkedin' | 'instagram';
+
+export interface ContactPreferenceStats {
+  whatsappClicks: number;
+  emailClicks: number;
+  phoneClicks: number;
+  linkedinClicks: number;
+  instagramClicks: number;
+  totalContactClicks: number;
+  preferredMethod: ContactMethod | 'none';
+  lastClickedMethod?: ContactMethod;
+  lastClickedTimestamp?: string;
+  detailsHistory: Array<{
+    method: ContactMethod;
+    target: string;
+    source: string;
+    timestamp: string;
+  }>;
 }
 
 export interface UserBehaviorState {
@@ -15,6 +35,7 @@ export interface UserBehaviorState {
   maxScrollDepth: number;
   events: UserBehaviorEvent[];
   lastPageVisited: string;
+  contactPreferences: ContactPreferenceStats;
 }
 
 interface BehaviorContextType {
@@ -23,8 +44,26 @@ interface BehaviorContextType {
   trackServiceView: (serviceName: string) => void;
   trackCtaClick: (ctaName: string) => void;
   trackFormStart: (formName: string) => void;
+  trackAction: (actionName: string, data?: any) => void;
+  trackContactClick: (
+    method: ContactMethod,
+    details?: { source?: string; target?: string; label?: string } | string
+  ) => void;
+  getPreferredContactMethod: () => ContactMethod | 'none';
+  resetContactPreferences: () => void;
   getPersonalizedGreeting: () => string;
 }
+
+export const initialContactPreferences: ContactPreferenceStats = {
+  whatsappClicks: 0,
+  emailClicks: 0,
+  phoneClicks: 0,
+  linkedinClicks: 0,
+  instagramClicks: 0,
+  totalContactClicks: 0,
+  preferredMethod: 'none',
+  detailsHistory: []
+};
 
 const initialBehavior: UserBehaviorState = {
   pagesVisited: [],
@@ -33,7 +72,8 @@ const initialBehavior: UserBehaviorState = {
   timeSpentSeconds: 0,
   maxScrollDepth: 0,
   events: [],
-  lastPageVisited: '/'
+  lastPageVisited: '/',
+  contactPreferences: initialContactPreferences
 };
 
 const BehaviorContext = createContext<BehaviorContextType>({
@@ -42,14 +82,28 @@ const BehaviorContext = createContext<BehaviorContextType>({
   trackServiceView: () => {},
   trackCtaClick: () => {},
   trackFormStart: () => {},
+  trackAction: () => {},
+  trackContactClick: () => {},
+  getPreferredContactMethod: () => 'none',
+  resetContactPreferences: () => {},
   getPersonalizedGreeting: () => "Welcome to Wal Group! I'm your AI Business Consultant. How can I assist your logistics or backend operations today?"
 });
 
 export const BehaviorProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [behavior, setBehavior] = useState<UserBehaviorState>(() => {
     try {
-      const saved = sessionStorage.getItem('wal_behavior_state');
-      return saved ? JSON.parse(saved) : initialBehavior;
+      const savedStr = sessionStorage.getItem('wal_behavior_state');
+      if (savedStr) {
+        const saved = JSON.parse(savedStr);
+        return {
+          ...initialBehavior,
+          ...saved,
+          contactPreferences: saved.contactPreferences 
+            ? { ...initialContactPreferences, ...saved.contactPreferences }
+            : initialContactPreferences
+        };
+      }
+      return initialBehavior;
     } catch {
       return initialBehavior;
     }
@@ -167,8 +221,129 @@ export const BehaviorProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }));
   }, []);
 
+  const trackAction = useCallback((actionName: string, data?: any) => {
+    setBehavior((prev) => ({
+      ...prev,
+      events: [{
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        type: 'custom_action',
+        path: prev.lastPageVisited,
+        details: typeof data === 'string' ? `${actionName}: ${data}` : `${actionName}${data ? `: ${JSON.stringify(data)}` : ''}`
+      }, ...prev.events].slice(0, 30)
+    }));
+  }, []);
+
+  const trackContactClick = useCallback((
+    method: ContactMethod,
+    detailsInput?: { source?: string; target?: string; label?: string } | string
+  ) => {
+    const source = typeof detailsInput === 'object' ? detailsInput.source || 'footer' : 'footer';
+    const target = typeof detailsInput === 'object' ? detailsInput.target || '' : (detailsInput || '');
+    const label = typeof detailsInput === 'object' ? detailsInput.label || '' : '';
+
+    const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const fullTimestamp = new Date().toISOString();
+
+    setBehavior((prev) => {
+      const currentPrefs = prev.contactPreferences || { ...initialContactPreferences };
+
+      const whatsappClicks = method === 'whatsapp' ? currentPrefs.whatsappClicks + 1 : currentPrefs.whatsappClicks;
+      const emailClicks = method === 'email' ? currentPrefs.emailClicks + 1 : currentPrefs.emailClicks;
+      const phoneClicks = method === 'phone' ? currentPrefs.phoneClicks + 1 : currentPrefs.phoneClicks;
+      const linkedinClicks = method === 'linkedin' ? currentPrefs.linkedinClicks + 1 : currentPrefs.linkedinClicks;
+      const instagramClicks = method === 'instagram' ? currentPrefs.instagramClicks + 1 : currentPrefs.instagramClicks;
+      const totalContactClicks = currentPrefs.totalContactClicks + 1;
+
+      // Determine preferred method: prioritize comparing WhatsApp vs Email preference
+      let preferredMethod: ContactMethod = method;
+      if (whatsappClicks > emailClicks) {
+        preferredMethod = 'whatsapp';
+      } else if (emailClicks > whatsappClicks) {
+        preferredMethod = 'email';
+      } else {
+        // Equal counts - the most recently clicked method takes precedence
+        preferredMethod = method;
+      }
+
+      const newHistoryItem = {
+        method,
+        target,
+        source,
+        timestamp: fullTimestamp
+      };
+
+      const updatedPrefs: ContactPreferenceStats = {
+        whatsappClicks,
+        emailClicks,
+        phoneClicks,
+        linkedinClicks,
+        instagramClicks,
+        totalContactClicks,
+        preferredMethod,
+        lastClickedMethod: method,
+        lastClickedTimestamp: fullTimestamp,
+        detailsHistory: [newHistoryItem, ...(currentPrefs.detailsHistory || [])].slice(0, 50)
+      };
+
+      const descriptor = target || label || 'direct';
+      const eventDetails = `Contact Preference [${method.toUpperCase()}]: ${descriptor} via ${source} (Preferred: ${preferredMethod})`;
+
+      const newEvent: UserBehaviorEvent = {
+        timestamp,
+        type: 'cta_click',
+        path: prev.lastPageVisited,
+        details: eventDetails
+      };
+
+      // Persist to localStorage for cross-session insight
+      try {
+        localStorage.setItem('wal_preferred_contact_method', preferredMethod);
+        localStorage.setItem('wal_contact_stats', JSON.stringify({
+          whatsappClicks,
+          emailClicks,
+          preferredMethod,
+          lastClickedMethod: method,
+          updatedAt: fullTimestamp
+        }));
+      } catch {
+        // ignore
+      }
+
+      return {
+        ...prev,
+        ctaClicks: prev.ctaClicks + 1,
+        contactPreferences: updatedPrefs,
+        events: [newEvent, ...prev.events].slice(0, 30)
+      };
+    });
+  }, []);
+
+  const getPreferredContactMethod = useCallback((): ContactMethod | 'none' => {
+    return behavior.contactPreferences?.preferredMethod || 'none';
+  }, [behavior.contactPreferences]);
+
+  const resetContactPreferences = useCallback(() => {
+    setBehavior((prev) => ({
+      ...prev,
+      contactPreferences: { ...initialContactPreferences }
+    }));
+    try {
+      localStorage.removeItem('wal_preferred_contact_method');
+      localStorage.removeItem('wal_contact_stats');
+    } catch {
+      // ignore
+    }
+  }, []);
+
   const getPersonalizedGreeting = useCallback((): string => {
-    const { lastPageVisited, servicesViewed } = behavior;
+    const { lastPageVisited, servicesViewed, contactPreferences } = behavior;
+
+    if (contactPreferences?.preferredMethod === 'whatsapp') {
+      return "Welcome back to Wal Group! We noted your preference for WhatsApp dispatch updates. Reach our active desk anytime at +91 6363698148, or let me know how I can assist your operations today!";
+    }
+    if (contactPreferences?.preferredMethod === 'email') {
+      return "Welcome back to Wal Group! We noted your preference for direct email correspondence. Send inquiries directly to thewalgroups@gmail.com, or ask me any question right now!";
+    }
 
     if (lastPageVisited.includes('/services/dsp-dispatch') || servicesViewed.includes('Amazon DSP Dispatch')) {
       return "I noticed you're exploring our Amazon DSP Dispatch & Route Optimization solutions. Are you currently operating a DSP fleet or scaling routes? I'd be glad to share how our 24/7 dispatch unit operates.";
@@ -194,8 +369,23 @@ export const BehaviorProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     trackServiceView,
     trackCtaClick,
     trackFormStart,
+    trackAction,
+    trackContactClick,
+    getPreferredContactMethod,
+    resetContactPreferences,
     getPersonalizedGreeting
-  }), [behavior, trackPageView, trackServiceView, trackCtaClick, trackFormStart, getPersonalizedGreeting]);
+  }), [
+    behavior,
+    trackPageView,
+    trackServiceView,
+    trackCtaClick,
+    trackFormStart,
+    trackAction,
+    trackContactClick,
+    getPreferredContactMethod,
+    resetContactPreferences,
+    getPersonalizedGreeting
+  ]);
 
   return (
     <BehaviorContext.Provider value={value}>
