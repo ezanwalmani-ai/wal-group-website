@@ -349,14 +349,14 @@ export const Header: React.FC<HeaderProps> = ({ currentPath, navigate }) => {
             </div>
 
             <button
-              onClick={() => handleNavClick('/digital-marketing')}
+              onClick={() => handleNavClick('/website-design-development')}
               className={`px-3.5 py-2 rounded-lg transition-all ${
-                isLinkActive('/digital-marketing')
+                isLinkActive('/website-design-development')
                   ? 'bg-[#181818] text-[#ff6600] font-bold border border-white/5'
                   : 'text-white hover:text-[#ff6600] hover:bg-white/5'
               }`}
             >
-              Digital Marketing
+              Website Design &amp; Development
             </button>
           </div>
 

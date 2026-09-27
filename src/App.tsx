@@ -110,7 +110,7 @@ function AppContent() {
           title = 'Services Overview | Wal Group Logistics & BPO Solutions';
           break;
         case '/website-design-development':
-          title = 'Website Design & Development Services | Wal Group';
+          title = 'Website Design & Development | WAL GROUPS';
           break;
         case '/dsp-dispatch-support':
           title = '24x7 Amazon DSP Dispatch Support Services | Wal Group';

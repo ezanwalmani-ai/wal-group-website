@@ -1,5 +1,26 @@
 [
   {
+    "id": "LEAD-MUJERHDL",
+    "name": "Carlos Rodriguez",
+    "company": "Lone Star Logistics LLC",
+    "email": "crodriguez@lonestarlogistics.com",
+    "phone": "+1 713-555-8899",
+    "country": "United States",
+    "industry": "Logistics",
+    "fleetSize": "45 vans",
+    "teamSize": "60 drivers",
+    "challenges": "Payroll reconciliation and late night dispatch coverage",
+    "servicesOfInterest": [
+      "Amazon DSP Dispatch",
+      "DSP Accounting & Payroll"
+    ],
+    "score": "Hot",
+    "scoreReason": "Direct web lead form submission",
+    "status": "New",
+    "createdAt": "2026-09-27T05:58:54.393Z",
+    "routedTo": "thewalgroupinfo@gmail.com"
+  },
+  {
     "id": "LEAD-MUJCMQHR",
     "name": "Carlos Rodriguez",
     "company": "Lone Star Logistics LLC",
@@ -462,7 +483,7 @@
     "fleetSize": "30 vans",
     "score": "Hot",
     "scoreReason": "Engaged via AI Business Assistant | Last Page: /contact",
-    "sessionId": "SESS-1790485144431-u7l8",
+    "sessionId": "SESS-1790488723470-1adq",
     "status": "New",
     "createdAt": "2026-07-26T11:01:23.327Z",
     "routedTo": "thewalgroupinfo@gmail.com",

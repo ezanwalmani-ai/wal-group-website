@@ -940,5 +940,41 @@
       "fleetSize": "30 vans"
     },
     "unansweredQuestions": []
+  },
+  "SESS-1790488723470-1adq": {
+    "sessionId": "SESS-1790488723470-1adq",
+    "createdAt": "2026-09-27T05:58:43.470Z",
+    "updatedAt": "2026-09-27T05:58:54.356Z",
+    "pageVisited": "/services/dsp-dispatch",
+    "userBehaviorSummary": "Pages: /, /services/dsp-dispatch | Services: Amazon DSP Dispatch | Time: 120s",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Hello, what services does Wal Group offer for Amazon DSPs?",
+        "timestamp": "05:58 AM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Hello and welcome! I’m the Wal AI Business Assistant, your 24/7 Operations Consultant for The Wal Group. \n\nSince you’re exploring our Amazon DSP support services, I’d love to walk you through our specialized operational backbones built specifically to help Delivery Service Partners protect their scorecard, reduce overhead, and scale seamlessly. \n\nHere is what we provide for Amazon DSPs:\n* **24/7 Live Dispatch & Incident Management:** Continuous coverage using official portals (Amazon Cortex, Geotab, Netradyne, and eMaint) to handle live route tracking, driver delays, roadside assistance, and package rescue routing.\n* **Scorecard Optimization:** Focused strategies to elevate your Amazon Super Fantastic metrics, including proactive safety score management and seatbelt/distraction event remediation.\n* **Driver Recruitment & Onboarding:** AI-assisted candidate pipelines, thorough background and license checks, and structured retention programs.\n* **Accounting & 14-Day Settlement Reconciliation:** Line-by-line auditing of Amazon pay statements, handling disputed claims, van damage deductions, and fuel card reconciliations.\n\nBy partnering with us, DSP owners typically see **35% to 50% operational cost savings** while eliminating shift gaps. \n\nTo give you the most relevant insights, how many routes or delivery vans are you currently operating in your DSP fleet?",
+        "timestamp": "05:58 AM"
+      },
+      {
+        "sender": "user",
+        "text": "We manage 30 vans in Dallas. You can reach me at robert@dallasdispatch.com or +1 214-555-0199 to discuss booking a demo.",
+        "timestamp": "05:58 AM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Hello Robert! Thank you for reaching out and sharing your contact details. Managing a fleet of 30 vans in Dallas is no small feat, and optimizing your dispatch and compliance operations can make a massive impact on your bottom line and safety scorecards. \n\nI’ve made a note of your email (**robert@dallasdispatch.com**) and phone number (**+1 214-555-0199**). Since you are looking to set up a demo, our leadership team and senior logistics specialists would love to walk you through our 24/7 live dispatch, Cortex management, and scorecard optimization strategies tailored specifically for 30-van operations.\n\nTo ensure our team comes fully prepared for our discussion, could you share what your biggest operational bottleneck is right now—such as managing after-hours dispatch coverage, tracking scorecard safety events, or handling driver payroll reconciliation? \n\nIn the meantime, I will also have one of our senior account executives reach out to you directly at the phone number and email provided to lock in a time that works best for your schedule!",
+        "timestamp": "05:58 AM"
+      }
+    ],
+    "leadDetails": {
+      "company": "Amazon DSPs",
+      "email": "robert@dallasdispatch.com",
+      "phone": "+1 214-555-0199",
+      "fleetSize": "30 vans"
+    },
+    "unansweredQuestions": []
   }
 }
