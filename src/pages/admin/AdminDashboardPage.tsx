@@ -9,6 +9,7 @@ import { AdminJobsView, JobAppRecord } from '../../components/admin/AdminJobsVie
 import { AdminBookingsView, BookingRecord } from '../../components/admin/AdminBookingsView';
 import { AdminTicketsView, TicketRecord } from '../../components/admin/AdminTicketsView';
 import { AdminAiLogsView, AiLogRecord } from '../../components/admin/AdminAiLogsView';
+import { AdminWebsiteProjectsView } from '../../components/admin/AdminWebsiteProjectsView';
 import { AdminSettingsView } from '../../components/admin/AdminSettingsView';
 import { 
   fetchContactsFromSupabase,
@@ -17,8 +18,10 @@ import {
   fetchBookingsFromSupabase,
   fetchTicketsFromSupabase,
   fetchAiLogsFromSupabase,
+  fetchWebsiteProjectRequestsFromSupabase,
   fetchDashboardMetrics,
-  DashboardMetricsResult
+  DashboardMetricsResult,
+  WebsiteProjectRequestRecord
 } from '../../lib/supabase';
 
 interface Props {
@@ -33,6 +36,7 @@ export const AdminDashboardPage: React.FC<Props> = ({ currentPath, navigate }) =
   const getTabFromPath = (path: string): AdminTab => {
     if (path.includes('/admin/contacts')) return 'contacts';
     if (path.includes('/admin/leads')) return 'leads';
+    if (path.includes('/admin/website-projects')) return 'website-projects';
     if (path.includes('/admin/jobs')) return 'jobs';
     if (path.includes('/admin/bookings')) return 'bookings';
     if (path.includes('/admin/tickets')) return 'tickets';
@@ -64,6 +68,7 @@ export const AdminDashboardPage: React.FC<Props> = ({ currentPath, navigate }) =
   const [bookings, setBookings] = useState<BookingRecord[]>([]);
   const [tickets, setTickets] = useState<TicketRecord[]>([]);
   const [aiLogs, setAiLogs] = useState<AiLogRecord[]>([]);
+  const [websiteProjects, setWebsiteProjects] = useState<WebsiteProjectRequestRecord[]>([]);
 
   const [loadingMetrics, setLoadingMetrics] = useState(true);
   const [loadingData, setLoadingData] = useState(true);
@@ -89,7 +94,8 @@ export const AdminDashboardPage: React.FC<Props> = ({ currentPath, navigate }) =
         jobsRes,
         bookingsRes,
         ticketsRes,
-        aiLogsRes
+        aiLogsRes,
+        websiteProjectsRes
       ] = await Promise.all([
         metricsPromise,
         fetchContactsFromSupabase(),
@@ -97,7 +103,8 @@ export const AdminDashboardPage: React.FC<Props> = ({ currentPath, navigate }) =
         fetchJobApplicationsFromSupabase(),
         fetchBookingsFromSupabase(),
         fetchTicketsFromSupabase(),
-        fetchAiLogsFromSupabase()
+        fetchAiLogsFromSupabase(),
+        fetchWebsiteProjectRequestsFromSupabase()
       ]);
 
       setMetrics(metricsRes);
@@ -107,6 +114,7 @@ export const AdminDashboardPage: React.FC<Props> = ({ currentPath, navigate }) =
       setBookings((bookingsRes.data as BookingRecord[]) || []);
       setTickets((ticketsRes.data as TicketRecord[]) || []);
       setAiLogs((aiLogsRes.data as AiLogRecord[]) || []);
+      setWebsiteProjects((websiteProjectsRes.data as WebsiteProjectRequestRecord[]) || []);
     } catch (err) {
       console.error('[Admin Dashboard Exception] Failed to fetch data from Supabase:', err);
     } finally {
@@ -222,6 +230,7 @@ export const AdminDashboardPage: React.FC<Props> = ({ currentPath, navigate }) =
   const counts = {
     contacts: metrics?.contacts?.count ?? contacts.length,
     leads: metrics?.leads?.count ?? leads.length,
+    websiteProjects: metrics?.websiteProjects?.count ?? websiteProjects.length,
     jobs: metrics?.jobs?.count ?? jobs.length,
     bookings: metrics?.bookings?.count ?? bookings.length,
     tickets: metrics?.tickets?.count ?? tickets.length,
@@ -275,6 +284,14 @@ export const AdminDashboardPage: React.FC<Props> = ({ currentPath, navigate }) =
           {currentTab === 'leads' && (
             <AdminLeadsView
               leads={leads}
+              loading={loadingData}
+              onRefresh={() => loadAllData(true)}
+            />
+          )}
+
+          {currentTab === 'website-projects' && (
+            <AdminWebsiteProjectsView
+              requests={websiteProjects}
               loading={loadingData}
               onRefresh={() => loadAllData(true)}
             />

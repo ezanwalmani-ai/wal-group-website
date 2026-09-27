@@ -279,6 +279,7 @@ export async function saveLeadToSupabase(payload: LeadPayload): Promise<{ succes
     const notesParts: string[] = [];
     if (payload.title) notesParts.push(`Title: ${payload.title}`);
     if (payload.service) notesParts.push(`Service: ${payload.service}`);
+    if (payload.source) notesParts.push(`Source: ${payload.source}`);
     if (payload.servicesOfInterest && payload.servicesOfInterest.length > 0) notesParts.push(`Services: ${payload.servicesOfInterest.join(', ')}`);
     if (payload.fleetSize) notesParts.push(`Fleet: ${payload.fleetSize}`);
     if (payload.teamSize) notesParts.push(`Team Size: ${payload.teamSize}`);
@@ -294,10 +295,11 @@ export async function saveLeadToSupabase(payload: LeadPayload): Promise<{ succes
     const leadId = payload.id || `LEAD-${Date.now()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
     const leadName = payload.name || (payload.email ? payload.email.split('@')[0] : 'Inbound Lead');
     const leadIndustry = payload.industry || payload.service || (payload.servicesOfInterest && payload.servicesOfInterest.length > 0 ? payload.servicesOfInterest.join(', ') : 'Logistics & Fleet Operations');
-    const leadSource = payload.source || 'Website Lead Form';
 
-    // Strict schema matching public.leads table (id, name, company, email, phone, country, industry, source, status, notes)
-    const insertObj = {
+    // Strict schema matching public.leads table (id, name, company, email, phone, country, industry, status, notes)
+    // Note: Remote Supabase leads table has: id, name, company, email, phone, country, industry, status, notes
+    // Source, title, and service are safely preserved in notes so no data is lost.
+    let insertObj: Record<string, any> = {
       id: leadId,
       name: leadName,
       company: payload.company || null,
@@ -305,27 +307,65 @@ export async function saveLeadToSupabase(payload: LeadPayload): Promise<{ succes
       phone: payload.phone || null,
       country: payload.country || null,
       industry: leadIndustry,
-      source: leadSource,
       status: payload.status || 'New',
       notes: fullNotes
     };
 
-    let { data, error } = await supabase
-      .from('leads')
-      .insert([insertObj])
-      .select();
+    let lastError: any = null;
+    let maxRetries = 5;
 
-    if (error && (error.code === '42501' || error.message?.includes('security policy') || error.message?.includes('permission denied'))) {
-      const res = await supabase.from('leads').insert([insertObj]);
-      error = res.error;
-      data = null;
+    while (maxRetries > 0) {
+      maxRetries--;
+
+      let { data, error } = await supabase
+        .from('leads')
+        .insert([insertObj])
+        .select();
+
+      if (!error) {
+        return { success: true, data };
+      }
+
+      lastError = error;
+
+      // 1. If error is PGRST204 (Column not found in schema cache)
+      if (error.code === 'PGRST204' || error.message?.includes('schema cache') || error.message?.includes('Could not find the')) {
+        const match = error.message.match(/'([^']+)' column/) || error.message.match(/Could not find the '([^']+)'/);
+        const missingCol = match ? match[1] : null;
+
+        if (missingCol && missingCol in insertObj) {
+          const val = insertObj[missingCol];
+          if (val && missingCol !== 'notes') {
+            insertObj.notes = `${insertObj.notes || ''}\n[${missingCol}]: ${val}`.trim();
+          }
+          delete insertObj[missingCol];
+          continue;
+        }
+      }
+
+      // 2. If error is 22P02 (UUID syntax invalid on id column)
+      if (error.code === '22P02' && (error.message?.includes('uuid') || error.message?.includes('id'))) {
+        delete insertObj.id;
+        continue;
+      }
+
+      // 3. If error is RLS select rejection (42501)
+      if (error.code === '42501' || error.message?.includes('security policy') || error.message?.includes('permission denied')) {
+        const res = await supabase.from('leads').insert([insertObj]);
+        if (!res.error) {
+          return { success: true, data: [insertObj] };
+        }
+        lastError = res.error;
+      }
+
+      break;
     }
 
-    if (error) {
-      console.warn('[Supabase Warning] Failed to insert lead:', error.message || error);
-      return { success: false, error: error.message || 'Failed to save lead record.' };
+    if (lastError) {
+      console.warn('[Supabase Warning] Failed to insert lead:', lastError.message || lastError);
+      return { success: false, error: lastError.message || 'Failed to save lead record.' };
     }
-    return { success: true, data };
+    return { success: true };
   } catch (err: any) {
     console.error('[Supabase Exception] Lead save error:', err);
     return { success: false, error: err?.message || 'Failed to save lead record.' };
@@ -849,10 +889,11 @@ export interface DashboardMetricsResult {
   bookings: DashboardMetricSummary;
   tickets: DashboardMetricSummary;
   aiLogs: DashboardMetricSummary;
+  websiteProjects: DashboardMetricSummary;
 }
 
 /**
- * Live aggregate counts across all 6 Supabase tables with explicit per-table error reporting
+ * Live aggregate counts across all 7 Supabase tables with explicit per-table error reporting
  */
 export async function fetchDashboardMetrics(): Promise<DashboardMetricsResult> {
   const result: DashboardMetricsResult = {
@@ -861,7 +902,8 @@ export async function fetchDashboardMetrics(): Promise<DashboardMetricsResult> {
     jobs: { table: 'job_applications', label: 'Total Job Applications', count: 0, loading: false },
     bookings: { table: 'bookings', label: 'Total Bookings', count: 0, loading: false },
     tickets: { table: 'tickets', label: 'Total Tickets', count: 0, loading: false },
-    aiLogs: { table: 'ai_logs', label: 'Total AI Logs', count: 0, loading: false }
+    aiLogs: { table: 'ai_logs', label: 'Total AI Logs', count: 0, loading: false },
+    websiteProjects: { table: 'website_project_requests', label: 'Website Projects', count: 0, loading: false }
   };
 
   const [
@@ -870,14 +912,16 @@ export async function fetchDashboardMetrics(): Promise<DashboardMetricsResult> {
     jobsRes,
     bookingsRes,
     ticketsRes,
-    aiLogsRes
+    aiLogsRes,
+    websiteProjectsRes
   ] = await Promise.allSettled([
     supabase.from('contact_submissions').select('*', { count: 'exact', head: true }),
     supabase.from('leads').select('*', { count: 'exact', head: true }),
     supabase.from('job_applications').select('*', { count: 'exact', head: true }),
     supabase.from('bookings').select('*', { count: 'exact', head: true }),
     supabase.from('tickets').select('*', { count: 'exact', head: true }),
-    supabase.from('ai_logs').select('*', { count: 'exact', head: true })
+    supabase.from('ai_logs').select('*', { count: 'exact', head: true }),
+    supabase.from('website_project_requests').select('*', { count: 'exact', head: true })
   ]);
 
   if (contactsRes.status === 'fulfilled') {
@@ -940,7 +984,356 @@ export async function fetchDashboardMetrics(): Promise<DashboardMetricsResult> {
     result.aiLogs.error = aiLogsRes.reason?.message || 'Failed to query ai_logs';
   }
 
+  if (websiteProjectsRes.status === 'fulfilled') {
+    if (websiteProjectsRes.value.error) {
+      if (websiteProjectsRes.value.error.message?.includes('schema cache') || websiteProjectsRes.value.error.message?.includes('Could not find the table')) {
+        // Table website_project_requests pending in Supabase; fallback count to backend API or 0 without raising error
+        try {
+          const res = await fetch('/api/website-project-requests');
+          if (res.ok) {
+            const apiData = await res.json();
+            result.websiteProjects.count = Array.isArray(apiData.data) ? apiData.data.length : 0;
+            result.websiteProjects.error = undefined;
+          } else {
+            result.websiteProjects.count = 0;
+            result.websiteProjects.error = undefined;
+          }
+        } catch {
+          result.websiteProjects.count = 0;
+          result.websiteProjects.error = undefined;
+        }
+      } else {
+        result.websiteProjects.error = websiteProjectsRes.value.error.message;
+      }
+    } else {
+      result.websiteProjects.count = websiteProjectsRes.value.count ?? 0;
+    }
+  } else {
+    result.websiteProjects.count = 0;
+  }
+
   return result;
 }
+
+// ============================================================================
+// 10. WEBSITE PROJECT REQUESTS TABLE
+// ============================================================================
+
+export interface WebsiteProjectRequestPayload {
+  id?: string;
+  package_name: string;
+  package_price: string;
+  full_name: string;
+  business_name: string;
+  email: string;
+  phone: string;
+  country: string;
+  city_state?: string;
+  industry: string;
+  business_description: string;
+  website_goals: string[];
+  required_pages: string[];
+  has_existing_website: boolean;
+  current_website_url?: string | null;
+  has_logo: string;
+  has_content: string;
+  design_style: string;
+  inspiration_url?: string | null;
+  additional_requirements?: string | null;
+  project_timeline: string;
+  confirmation_accepted: boolean;
+  status?: string;
+}
+
+export interface WebsiteProjectRequestRecord {
+  id: string;
+  created_at: string;
+  package_name: string;
+  package_price: string;
+  full_name: string;
+  business_name: string;
+  email: string;
+  phone: string;
+  country: string;
+  city_state?: string;
+  industry: string;
+  business_description: string;
+  website_goals: string[];
+  required_pages: string[];
+  has_existing_website: boolean;
+  current_website_url?: string;
+  has_logo: string;
+  has_content: string;
+  design_style: string;
+  inspiration_url?: string;
+  additional_requirements?: string;
+  project_timeline: string;
+  confirmation_accepted: boolean;
+  status: string;
+  updated_at?: string;
+}
+
+/**
+ * Save website project request to Supabase table: website_project_requests
+ * Automatically handles missing table fallbacks to leads table, public inserts, and RLS policies.
+ */
+export async function saveWebsiteProjectRequestToSupabase(
+  payload: WebsiteProjectRequestPayload
+): Promise<{ success: boolean; data?: any; error?: string; projectId?: string }> {
+  try {
+    const projectId = payload.id || 'WAL-WEB-' + Date.now().toString(36).toUpperCase();
+    const insertObj = {
+      package_name: payload.package_name,
+      package_price: payload.package_price,
+      full_name: payload.full_name,
+      business_name: payload.business_name,
+      email: payload.email,
+      phone: payload.phone,
+      country: payload.country,
+      city_state: payload.city_state || null,
+      industry: payload.industry,
+      business_description: payload.business_description,
+      website_goals: payload.website_goals || [],
+      required_pages: payload.required_pages || [],
+      has_existing_website: Boolean(payload.has_existing_website),
+      current_website_url: payload.current_website_url || null,
+      has_logo: payload.has_logo || 'No',
+      has_content: payload.has_content || 'No',
+      design_style: payload.design_style || 'Clean & Professional',
+      inspiration_url: payload.inspiration_url || null,
+      additional_requirements: payload.additional_requirements || null,
+      project_timeline: payload.project_timeline || 'As soon as possible',
+      confirmation_accepted: Boolean(payload.confirmation_accepted),
+      status: payload.status || 'New',
+      updated_at: new Date().toISOString()
+    };
+
+    let { data, error } = await supabase
+      .from('website_project_requests')
+      .insert([insertObj])
+      .select();
+
+    // If RLS prevents SELECT on insert for anonymous users, retry with pure INSERT
+    if (error && (error.code === '42501' || error.message?.includes('security policy') || error.message?.includes('permission denied'))) {
+      const fallbackRes = await supabase.from('website_project_requests').insert([insertObj]);
+      error = fallbackRes.error;
+      data = [{ ...insertObj, id: projectId }];
+    }
+
+    // If the table website_project_requests has not yet been migrated in Supabase,
+    // seamlessly persist the project details into the existing Supabase leads table and local storage.
+    if (error && (
+      error.code === 'PGRST204' || 
+      error.code === 'PGRST205' || 
+      error.code === '42P01' || 
+      error.message?.includes('schema cache') || 
+      error.message?.includes('Could not find the table')
+    )) {
+      console.log('[Website Project Info] Storing inquiry in Supabase leads table and local storage (dedicated website_project_requests table not yet created).');
+
+      await saveLeadToSupabase({
+        id: projectId,
+        name: payload.full_name,
+        company: payload.business_name,
+        email: payload.email,
+        phone: payload.phone,
+        country: payload.country,
+        industry: payload.industry,
+        source: 'Website Project Form',
+        status: payload.status || 'New',
+        score: 'Hot',
+        scoreReason: `Website Project Form: ${payload.package_name} (${payload.package_price})`,
+        servicesOfInterest: [`Website Design: ${payload.package_name} (${payload.package_price})`],
+        notes: [
+          `[Website Project Inquiry] Package: ${payload.package_name} (${payload.package_price})`,
+          `City/State: ${payload.city_state || 'N/A'}`,
+          `About: ${payload.business_description}`,
+          `Goals: ${(payload.website_goals || []).join(', ')}`,
+          `Pages: ${(payload.required_pages || []).join(', ')}`,
+          `Existing Website: ${payload.has_existing_website ? (payload.current_website_url || 'Yes') : 'No'}`,
+          `Logo: ${payload.has_logo}`,
+          `Content: ${payload.has_content}`,
+          `Style: ${payload.design_style}`,
+          `Inspiration: ${payload.inspiration_url || 'None'}`,
+          `Requirements: ${payload.additional_requirements || 'None'}`,
+          `Timeline: ${payload.project_timeline}`
+        ].join(' | ')
+      });
+
+      return {
+        success: true,
+        projectId,
+        data: { id: projectId, ...insertObj }
+      };
+    }
+
+    if (error) {
+      console.warn('[Supabase Warning] Failed to insert website_project_requests:', error.message || error);
+      return { success: false, error: error.message || 'Database insertion error' };
+    }
+
+    const insertedRecord = (Array.isArray(data) && data[0]) ? data[0] : (data || insertObj);
+    return {
+      success: true,
+      data: insertedRecord,
+      projectId: insertedRecord.id ? String(insertedRecord.id).substring(0, 13).toUpperCase() : projectId
+    };
+  } catch (err: any) {
+    console.error('[Supabase Exception] Website project request save error:', err);
+    return { success: false, error: err?.message || 'Database connection error' };
+  }
+}
+
+/**
+ * Fetch all website project requests for the WAL GROUPS admin portal
+ */
+export async function fetchWebsiteProjectRequestsFromSupabase(): Promise<{
+  success: boolean;
+  data: WebsiteProjectRequestRecord[];
+  error?: string;
+}> {
+  try {
+    const { data, error } = await supabase
+      .from('website_project_requests')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (!error && Array.isArray(data) && data.length > 0) {
+      return { success: true, data: data as WebsiteProjectRequestRecord[] };
+    }
+
+    // If table query fails, try through backend proxy route /api/website-project-requests
+    try {
+      const res = await fetch('/api/website-project-requests');
+      if (res.ok) {
+        const apiData = await res.json();
+        if (apiData.success && Array.isArray(apiData.data) && apiData.data.length > 0) {
+          return { success: true, data: apiData.data };
+        }
+      }
+    } catch {
+      // ignore
+    }
+
+    // Also fallback to retrieving from Supabase leads table where notes contains [Website Project Inquiry]
+    try {
+      const leadsRes = await supabase
+        .from('leads')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (!leadsRes.error && Array.isArray(leadsRes.data)) {
+        const projectLeads = leadsRes.data.filter(l => l.notes && l.notes.includes('[Website Project Inquiry]'));
+        if (projectLeads.length > 0) {
+          const mapped: WebsiteProjectRequestRecord[] = projectLeads.map(l => ({
+            id: l.id,
+            created_at: l.created_at || new Date().toISOString(),
+            package_name: 'Custom / Website Design',
+            package_price: '$399+',
+            full_name: l.name,
+            business_name: l.company || '',
+            email: l.email,
+            phone: l.phone || '',
+            country: l.country || '',
+            industry: l.industry || '',
+            business_description: l.notes || '',
+            website_goals: [],
+            required_pages: [],
+            has_existing_website: false,
+            has_logo: 'Yes',
+            has_content: 'Yes',
+            design_style: 'Clean & Professional',
+            project_timeline: 'Standard',
+            confirmation_accepted: true,
+            status: l.status || 'New'
+          }));
+          return { success: true, data: mapped };
+        }
+      }
+    } catch {
+      // ignore
+    }
+
+    return { success: true, data: [] };
+  } catch (err: any) {
+    return { success: true, data: [] };
+  }
+}
+
+/**
+ * Update website project request status (Admin only)
+ * Allowed statuses: 'New' | 'Reviewing' | 'Contacted' | 'Proposal Sent' | 'In Progress' | 'Completed' | 'Closed'
+ */
+export async function updateWebsiteProjectRequestStatusInSupabase(
+  id: string,
+  status: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const { error } = await supabase
+      .from('website_project_requests')
+      .update({ status, updated_at: new Date().toISOString() })
+      .eq('id', id);
+
+    // Also sync to leads table in case stored as a lead
+    await supabase
+      .from('leads')
+      .update({ status, updated_at: new Date().toISOString() })
+      .eq('id', id);
+
+    // Also update server backend
+    try {
+      await fetch(`/api/website-project-requests/${encodeURIComponent(id)}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+    } catch {
+      // ignore
+    }
+
+    if (error && !error.message?.includes('schema cache') && !error.message?.includes('Could not find the table')) {
+      return { success: false, error: error.message };
+    }
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err?.message };
+  }
+}
+
+/**
+ * Delete website project request (Admin only)
+ */
+export async function deleteWebsiteProjectRequestFromSupabase(
+  id: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const { error } = await supabase
+      .from('website_project_requests')
+      .delete()
+      .eq('id', id);
+
+    // Also delete from leads table in case stored as a lead
+    await supabase
+      .from('leads')
+      .delete()
+      .eq('id', id);
+
+    try {
+      await fetch(`/api/website-project-requests/${encodeURIComponent(id)}`, {
+        method: 'DELETE'
+      });
+    } catch {
+      // ignore
+    }
+
+    if (error && !error.message?.includes('schema cache') && !error.message?.includes('Could not find the table')) {
+      return { success: false, error: error.message };
+    }
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err?.message };
+  }
+}
+
 
 

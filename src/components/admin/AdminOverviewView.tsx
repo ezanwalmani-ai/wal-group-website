@@ -19,7 +19,8 @@ import {
   Layers,
   MessageCircle,
   Activity,
-  RotateCcw
+  RotateCcw,
+  Globe
 } from 'lucide-react';
 import { AdminTab } from './AdminSidebar';
 import { DashboardMetricsResult } from '../../lib/supabase';
@@ -94,6 +95,18 @@ export const AdminOverviewView: React.FC<OverviewProps> = ({
       borderColor: 'border-[#ff7700]/30',
       iconColor: 'text-[#ff7700]',
       description: 'AI & Inbound qualified leads'
+    },
+    {
+      id: 'website-projects' as AdminTab,
+      label: 'Website Projects',
+      count: metrics?.websiteProjects?.count ?? 0,
+      error: metrics?.websiteProjects?.error,
+      table: 'website_project_requests',
+      icon: Globe,
+      gradient: 'from-orange-500/20 via-orange-500/5 to-transparent',
+      borderColor: 'border-orange-500/30',
+      iconColor: 'text-[#ff6600]',
+      description: 'Client website project requests'
     },
     {
       id: 'jobs' as AdminTab,

@@ -70,6 +70,13 @@ CREATE TABLE IF NOT EXISTS public.leads (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Ensure all columns exist even if the table was created earlier with fewer fields
+ALTER TABLE public.leads ADD COLUMN IF NOT EXISTS source TEXT DEFAULT 'Website Form';
+ALTER TABLE public.leads ADD COLUMN IF NOT EXISTS title TEXT;
+ALTER TABLE public.leads ADD COLUMN IF NOT EXISTS service TEXT;
+ALTER TABLE public.leads ADD COLUMN IF NOT EXISTS notes TEXT;
+ALTER TABLE public.leads ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'New';
+
 -- 3. CONTACT SUBMISSIONS TABLE
 CREATE TABLE IF NOT EXISTS public.contact_submissions (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -188,6 +195,147 @@ CREATE POLICY "Delete ai_logs" ON public.ai_logs FOR DELETE USING (true);
 -- Storage Objects Policies for Resumes Bucket
 CREATE POLICY "Allow public uploads to resumes" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'resumes');
 CREATE POLICY "Allow public reads from resumes" ON storage.objects FOR SELECT USING (bucket_id = 'resumes');
+
+-- 10. WEBSITE PROJECT REQUESTS TABLE
+CREATE TABLE IF NOT EXISTS public.website_project_requests (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  package_name TEXT NOT NULL,
+  package_price TEXT NOT NULL,
+  full_name TEXT NOT NULL,
+  business_name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  phone TEXT NOT NULL,
+  country TEXT NOT NULL,
+  city_state TEXT,
+  industry TEXT NOT NULL,
+  business_description TEXT NOT NULL,
+  website_goals JSONB NOT NULL DEFAULT '[]'::jsonb,
+  required_pages JSONB NOT NULL DEFAULT '[]'::jsonb,
+  has_existing_website BOOLEAN DEFAULT false,
+  current_website_url TEXT,
+  has_logo TEXT,
+  has_content TEXT,
+  design_style TEXT,
+  inspiration_url TEXT,
+  additional_requirements TEXT,
+  project_timeline TEXT,
+  confirmation_accepted BOOLEAN DEFAULT true,
+  status TEXT DEFAULT 'New',
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Enable Row Level Security (RLS)
+ALTER TABLE public.website_project_requests ENABLE ROW LEVEL SECURITY;
+
+-- Allow anonymous inserts for website project form
+DROP POLICY IF EXISTS "Allow public inserts to website_project_requests" ON public.website_project_requests;
+CREATE POLICY "Allow public inserts to website_project_requests" 
+ON public.website_project_requests 
+FOR INSERT 
+TO anon, authenticated 
+WITH CHECK (true);
+
+-- Allow authenticated users to view, update, delete project requests
+DROP POLICY IF EXISTS "Allow authenticated read website_project_requests" ON public.website_project_requests;
+CREATE POLICY "Allow authenticated read website_project_requests" 
+ON public.website_project_requests 
+FOR SELECT 
+TO authenticated 
+USING (true);
+
+DROP POLICY IF EXISTS "Allow authenticated update website_project_requests" ON public.website_project_requests;
+CREATE POLICY "Allow authenticated update website_project_requests" 
+ON public.website_project_requests 
+FOR UPDATE 
+TO authenticated 
+USING (true);
+
+DROP POLICY IF EXISTS "Allow authenticated delete website_project_requests" ON public.website_project_requests;
+CREATE POLICY "Allow authenticated delete website_project_requests" 
+ON public.website_project_requests 
+FOR DELETE 
+TO authenticated 
+USING (true);
+
+-- Performance Indexes
+CREATE INDEX IF NOT EXISTS idx_website_projects_created_at ON public.website_project_requests(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_website_projects_status ON public.website_project_requests(status);
+CREATE INDEX IF NOT EXISTS idx_website_projects_email ON public.website_project_requests(email);
+CREATE INDEX IF NOT EXISTS idx_website_projects_package ON public.website_project_requests(package_name);
+`;
+
+const WEBSITE_PROJECTS_SQL = `-- ====================================================================
+-- WAL GROUPS: CREATE 'website_project_requests' TABLE & RLS POLICIES
+-- ====================================================================
+CREATE TABLE IF NOT EXISTS public.website_project_requests (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  package_name TEXT NOT NULL,
+  package_price TEXT NOT NULL,
+  full_name TEXT NOT NULL,
+  business_name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  phone TEXT NOT NULL,
+  country TEXT NOT NULL,
+  city_state TEXT,
+  industry TEXT NOT NULL,
+  business_description TEXT NOT NULL,
+  website_goals JSONB NOT NULL DEFAULT '[]'::jsonb,
+  required_pages JSONB NOT NULL DEFAULT '[]'::jsonb,
+  has_existing_website BOOLEAN DEFAULT false,
+  current_website_url TEXT,
+  has_logo TEXT,
+  has_content TEXT,
+  design_style TEXT,
+  inspiration_url TEXT,
+  additional_requirements TEXT,
+  project_timeline TEXT,
+  confirmation_accepted BOOLEAN DEFAULT true,
+  status TEXT DEFAULT 'New',
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Enable Row Level Security (RLS)
+ALTER TABLE public.website_project_requests ENABLE ROW LEVEL SECURITY;
+
+-- 1. PUBLIC / ANONYMOUS INSERTS POLICY
+-- Allows visitors to submit the website project enquiry form without authentication
+DROP POLICY IF EXISTS "Allow public inserts to website_project_requests" ON public.website_project_requests;
+CREATE POLICY "Allow public inserts to website_project_requests" 
+ON public.website_project_requests 
+FOR INSERT 
+TO anon, authenticated 
+WITH CHECK (true);
+
+-- 2. AUTHENTICATED ADMIN ACCESS POLICIES
+-- Restricted to authenticated staff to view, update, and manage requests
+DROP POLICY IF EXISTS "Allow authenticated read website_project_requests" ON public.website_project_requests;
+CREATE POLICY "Allow authenticated read website_project_requests" 
+ON public.website_project_requests 
+FOR SELECT 
+TO authenticated 
+USING (true);
+
+DROP POLICY IF EXISTS "Allow authenticated update website_project_requests" ON public.website_project_requests;
+CREATE POLICY "Allow authenticated update website_project_requests" 
+ON public.website_project_requests 
+FOR UPDATE 
+TO authenticated 
+USING (true);
+
+DROP POLICY IF EXISTS "Allow authenticated delete website_project_requests" ON public.website_project_requests;
+CREATE POLICY "Allow authenticated delete website_project_requests" 
+ON public.website_project_requests 
+FOR DELETE 
+TO authenticated 
+USING (true);
+
+-- 3. INDEXES FOR PERFORMANCE
+CREATE INDEX IF NOT EXISTS idx_website_projects_created_at ON public.website_project_requests(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_website_projects_status ON public.website_project_requests(status);
+CREATE INDEX IF NOT EXISTS idx_website_projects_email ON public.website_project_requests(email);
+CREATE INDEX IF NOT EXISTS idx_website_projects_package ON public.website_project_requests(package_name);
 `;
 
 interface SettingsViewProps {
@@ -201,6 +349,7 @@ export const AdminSettingsView: React.FC<SettingsViewProps> = ({
 }) => {
   const { user } = useAuth();
   const [copiedSchema, setCopiedSchema] = useState(false);
+  const [copiedWebsiteSchema, setCopiedWebsiteSchema] = useState(false);
 
   const handleCopySchema = () => {
     navigator.clipboard.writeText(FULL_SQL_SCHEMA_AND_RLS);
@@ -208,9 +357,16 @@ export const AdminSettingsView: React.FC<SettingsViewProps> = ({
     setTimeout(() => setCopiedSchema(false), 2500);
   };
 
+  const handleCopyWebsiteSchema = () => {
+    navigator.clipboard.writeText(WEBSITE_PROJECTS_SQL);
+    setCopiedWebsiteSchema(true);
+    setTimeout(() => setCopiedWebsiteSchema(false), 2500);
+  };
+
   const tables = [
     { name: 'bookings', label: 'Bookings Table', count: metrics?.bookings.count, error: metrics?.bookings.error },
     { name: 'leads', label: 'Leads Table', count: metrics?.leads.count, error: metrics?.leads.error },
+    { name: 'website_project_requests', label: 'Website Project Requests Table', count: metrics?.websiteProjects?.count, error: metrics?.websiteProjects?.error },
     { name: 'contact_submissions', label: 'Contact Submissions Table', count: metrics?.contacts.count, error: metrics?.contacts.error },
     { name: 'job_applications', label: 'Job Applications Table', count: metrics?.jobs.count, error: metrics?.jobs.error },
     { name: 'tickets', label: 'Support Tickets Table', count: metrics?.tickets.count, error: metrics?.tickets.error },
@@ -339,6 +495,48 @@ export const AdminSettingsView: React.FC<SettingsViewProps> = ({
               Access to customer bookings, sales leads, job candidate applications, and internal support tickets is restricted to authorized Wal Group administrative staff.
             </p>
           </div>
+        </div>
+      </div>
+
+      {/* Website Project Requests Table Setup Card */}
+      <div className="rounded-2xl bg-[#09101d] border border-[#ff7700]/30 p-6 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-white/5">
+          <div>
+            <div className="flex items-center gap-2">
+              <Database className="w-4 h-4 text-[#ff7700]" />
+              <h3 className="text-sm font-extrabold text-white uppercase tracking-wider">
+                Website Project Requests Table (Supabase SQL)
+              </h3>
+            </div>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Execute this script in your Supabase SQL Editor to create the dedicated <code className="text-amber-300 bg-white/5 px-1 py-0.5 rounded font-mono">website_project_requests</code> table with Row Level Security and anonymous insert permissions.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            <a
+              href="https://supabase.com/dashboard/project/yzkjivknyalgfnpklxgr/sql/new"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white font-semibold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+            >
+              <ExternalLink className="w-3.5 h-3.5 text-blue-400" />
+              <span>Open Supabase SQL Editor</span>
+            </a>
+            <button
+              onClick={handleCopyWebsiteSchema}
+              className="px-4 py-2 rounded-xl bg-[#ff7700] hover:bg-[#ff8811] text-black font-extrabold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+            >
+              {copiedWebsiteSchema ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+              <span>{copiedWebsiteSchema ? 'SQL Copied!' : 'Copy Table SQL'}</span>
+            </button>
+          </div>
+        </div>
+
+        <div className="relative">
+          <pre className="p-4 rounded-xl bg-black/60 border border-white/10 text-[11px] font-mono text-slate-300 overflow-x-auto max-h-60 custom-scrollbar">
+            {WEBSITE_PROJECTS_SQL}
+          </pre>
         </div>
       </div>
 

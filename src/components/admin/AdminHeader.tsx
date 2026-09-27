@@ -25,6 +25,7 @@ const TAB_TITLES: Record<AdminTab, { title: string; subtitle: string }> = {
   dashboard: { title: 'Executive Overview', subtitle: 'Live activity and database counts across all operations' },
   contacts: { title: 'Contact Submissions', subtitle: 'Manage inquiries received from the public contact forms' },
   leads: { title: 'AI Business Leads', subtitle: 'Visitor captures and consultation pipeline from AI assistant' },
+  'website-projects': { title: 'Website Project Requests', subtitle: 'Manage client project requests submitted via the Website Project Form' },
   jobs: { title: 'Job Applications & Resumes', subtitle: 'Candidate profiles, experience records and resume storage' },
   bookings: { title: 'Discovery Call Bookings', subtitle: 'Scheduled client consultations and Google Meet sessions' },
   tickets: { title: 'Client Support Tickets', subtitle: 'Support requests, status workflows and message threads' },

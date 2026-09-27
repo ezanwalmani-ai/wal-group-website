@@ -10,6 +10,7 @@
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
     "test": "vitest run",
+    "test:website-projects": "tsx scripts/test-website-projects-submission.ts",
     "lint": "tsc --noEmit"
   },
   "dependencies": {
@@ -26,6 +27,7 @@
     "motion": "^12.23.24",
     "openai": "^7.1.0",
     "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^6.3.289",
     "react": "^19.0.1",
     "react-dom": "^19.0.1",
     "vite": "^6.2.3"

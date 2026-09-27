@@ -4,7 +4,7 @@ import fs from 'fs';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
 import OpenAI from 'openai';
-import { saveBookingToSupabase, saveLeadToSupabase, saveContactSubmissionToSupabase, saveJobApplicationToSupabase, saveTicketToSupabase, saveAiLogToSupabase } from './src/lib/supabase';
+import { saveBookingToSupabase, saveLeadToSupabase, saveContactSubmissionToSupabase, saveJobApplicationToSupabase, saveTicketToSupabase, saveAiLogToSupabase, saveWebsiteProjectRequestToSupabase, supabase } from './src/lib/supabase';
 
 const app = express();
 const PORT = 3000;
@@ -76,6 +76,7 @@ const BOOKINGS_FILE = path.join(DATA_DIR, 'bookings.json');
 const LEADS_FILE = path.join(DATA_DIR, 'leads.json');
 const TRANSCRIPTS_FILE = path.join(DATA_DIR, 'transcripts.json');
 const KNOWLEDGE_FILE = path.join(DATA_DIR, 'knowledge.json');
+const WEBSITE_PROJECTS_FILE = path.join(DATA_DIR, 'website_projects.json');
 
 if (!fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -164,6 +165,7 @@ interface LeadRecord {
   status: 'New' | 'Contacted' | 'Qualified' | 'Closed';
   createdAt: string;
   routedTo: string;
+  notes?: string;
 }
 
 interface ChatTranscriptSession {
@@ -1543,6 +1545,277 @@ app.post('/api/leads', (req, res) => {
   });
 });
 
+// Website Project Form Submission Route (Universal Website Enquiries)
+app.post('/api/website-projects', async (req, res) => {
+  try {
+    const {
+      packageName,
+      packagePrice,
+      fullName,
+      companyName,
+      email,
+      phone,
+      country,
+      cityState,
+      industry,
+      aboutBusiness,
+      goals,
+      pages,
+      hasWebsite,
+      websiteUrl,
+      hasLogo,
+      hasContent,
+      designStyle,
+      inspiration,
+      specificRequirements,
+      timeline,
+      confirmationAccepted
+    } = req.body;
+
+    if (!fullName || !companyName || !email || !phone || !country || !industry || !aboutBusiness || !goals || goals.length === 0) {
+      return res.status(400).json({ success: false, message: 'Please complete all required fields.' });
+    }
+
+    // 1. Prepare structured database payload
+    const structuredPayload = {
+      package_name: packageName || 'Business Website',
+      package_price: packagePrice || '$699',
+      full_name: fullName.trim(),
+      business_name: companyName.trim(),
+      email: email.trim(),
+      phone: phone.trim(),
+      country: country.trim(),
+      city_state: cityState ? cityState.trim() : null,
+      industry: industry.trim(),
+      business_description: aboutBusiness.trim(),
+      website_goals: Array.isArray(goals) ? goals : [goals],
+      required_pages: Array.isArray(pages) ? pages : [pages],
+      has_existing_website: hasWebsite === 'Yes' || hasWebsite === true,
+      current_website_url: websiteUrl ? websiteUrl.trim() : null,
+      has_logo: hasLogo || 'No',
+      has_content: hasContent || 'No',
+      design_style: designStyle || 'Clean & Professional',
+      inspiration_url: inspiration ? inspiration.trim() : null,
+      additional_requirements: specificRequirements ? specificRequirements.trim() : null,
+      project_timeline: timeline || 'As soon as possible',
+      confirmation_accepted: Boolean(confirmationAccepted),
+      status: 'New'
+    };
+
+    // 2. Insert into Supabase dedicated table: website_project_requests
+    const supabaseRes = await saveWebsiteProjectRequestToSupabase(structuredPayload);
+
+    // 3. Fallback tracking ID if UUID not generated
+    const projectId = supabaseRes.projectId || (supabaseRes.data?.id ? String(supabaseRes.data.id).substring(0, 13).toUpperCase() : `WAL-WEB-${Date.now().toString(36).toUpperCase()}`);
+
+    // 4. Save to local website_projects.json file backup
+    const newProjectRecord = {
+      id: supabaseRes.data?.id || projectId,
+      created_at: new Date().toISOString(),
+      ...structuredPayload,
+      updated_at: new Date().toISOString()
+    };
+    const projects = loadData<any[]>(WEBSITE_PROJECTS_FILE, []);
+    projects.unshift(newProjectRecord);
+    saveData(WEBSITE_PROJECTS_FILE, projects);
+
+    // 5. Also log into leads.json for CRM compatibility
+    const newLead: LeadRecord = {
+      id: projectId,
+      name: fullName,
+      company: companyName,
+      email,
+      phone,
+      country,
+      industry,
+      servicesOfInterest: [`Website Design: ${packageName} (${packagePrice})`],
+      score: 'Hot',
+      scoreReason: `Website Project Form Submission for ${packageName}`,
+      status: 'New',
+      createdAt: new Date().toISOString(),
+      routedTo: 'thewalgroupinfo@gmail.com',
+      notes: `Package: ${packageName} (${packagePrice})\nCity/State: ${cityState || 'N/A'}\nAbout: ${aboutBusiness}\nGoals: ${(goals || []).join(', ')}\nPages: ${(pages || []).join(', ')}\nExisting Website: ${hasWebsite === 'Yes' ? (websiteUrl || 'Yes') : 'No'}\nLogo: ${hasLogo}\nContent Ready: ${hasContent}\nStyle: ${designStyle || 'Not Specified'}\nInspiration: ${inspiration || 'None'}\nSpecific Needs: ${specificRequirements || 'None'}\nTimeline: ${timeline || 'Flexible'}`
+    };
+    const leads = loadData<LeadRecord[]>(LEADS_FILE, []);
+    leads.unshift(newLead);
+    saveData(LEADS_FILE, leads);
+
+    // Also persist lead to Supabase leads table
+    saveLeadToSupabase({
+      id: newLead.id,
+      name: newLead.name,
+      company: newLead.company,
+      email: newLead.email,
+      phone: newLead.phone,
+      country: newLead.country,
+      industry: newLead.industry,
+      servicesOfInterest: newLead.servicesOfInterest,
+      score: newLead.score,
+      scoreReason: newLead.scoreReason,
+      status: newLead.status,
+      routedTo: newLead.routedTo,
+      notes: newLead.notes
+    }).catch(err => console.error('[Supabase Lead Sync Error]', err));
+
+    // Send Admin Email Notification
+    const adminHtml = `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; color: #1e293b; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0;">
+        <div style="border-bottom: 2px solid #ff6600; padding-bottom: 16px; margin-bottom: 20px;">
+          <h2 style="color: #041e42; margin: 0 0 6px 0; font-size: 22px;">New Website Project Inquiry</h2>
+          <span style="background: #ff6600; color: #000; font-weight: bold; font-size: 12px; padding: 3px 8px; border-radius: 6px;">${packageName} — ${packagePrice}</span>
+        </div>
+        <p><strong>Project ID:</strong> ${projectId}</p>
+        <p><strong>Client Name:</strong> ${fullName}</p>
+        <p><strong>Company:</strong> ${companyName}</p>
+        <p><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
+        <p><strong>Phone / WhatsApp:</strong> <a href="tel:${phone}">${phone}</a></p>
+        <p><strong>Location:</strong> ${cityState ? `${cityState}, ` : ''}${country}</p>
+        <p><strong>Industry:</strong> ${industry}</p>
+        <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 16px 0;" />
+        <h3 style="color: #041e42; margin-top: 0; font-size: 16px;">About the Business</h3>
+        <blockquote style="background: #f8fafc; padding: 12px; border-left: 4px solid #ff6600; margin: 0 0 16px 0; font-style: normal;">
+          ${aboutBusiness}
+        </blockquote>
+        <p><strong>Website Goals:</strong> ${(goals || []).join(', ')}</p>
+        <p><strong>Pages Needed:</strong> ${(pages || []).length > 0 ? (pages || []).join(', ') : 'Standard package scope'}</p>
+        <p><strong>Existing Website:</strong> ${hasWebsite === 'Yes' ? (websiteUrl || 'Yes') : 'No'}</p>
+        <p><strong>Has Logo:</strong> ${hasLogo}</p>
+        <p><strong>Content Ready:</strong> ${hasContent}</p>
+        <p><strong>Design Style:</strong> ${designStyle || 'Recommended by Wal Groups'}</p>
+        <p><strong>Website Inspiration:</strong> ${inspiration || 'N/A'}</p>
+        <p><strong>Specific Requirements:</strong> ${specificRequirements || 'N/A'}</p>
+        <p><strong>Target Timeline:</strong> ${timeline || 'Flexible'}</p>
+      </div>
+    `;
+    sendEmailNotification('thewalgroupinfo@gmail.com', `[New Project] ${packageName} — ${companyName} (${projectId})`, adminHtml);
+
+    // Send Client Confirmation Email
+    const clientHtml = `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; color: #1e293b; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0;">
+        <h2 style="color: #041e42; margin-top: 0;">Project Request Received</h2>
+        <p>Dear ${fullName},</p>
+        <p>Thank you for contacting WAL GROUPS regarding your <strong>${packageName}</strong> (${packagePrice}).</p>
+        <p>We’ve received your website project requirements. Our web engineering team is reviewing your details and will contact you directly via email or WhatsApp to discuss your project.</p>
+        <div style="background: #f8fafc; border-left: 4px solid #041e42; padding: 12px; margin: 16px 0;">
+          <p style="margin: 0 0 4px 0;"><strong>Project Reference:</strong> ${projectId}</p>
+          <p style="margin: 0 0 4px 0;"><strong>Package:</strong> ${packageName} (${packagePrice})</p>
+          <p style="margin: 0;"><strong>Company:</strong> ${companyName}</p>
+        </div>
+        <p>If you have any immediate questions, feel free to reach out to our team at <a href="mailto:thewalgroupinfo@gmail.com">thewalgroupinfo@gmail.com</a> or via WhatsApp.</p>
+        <br />
+        <p>Warm regards,<br /><strong>WAL GROUPS Web Engineering Division</strong><br />thewalgroupinfo@gmail.com</p>
+      </div>
+    `;
+    sendEmailNotification(email, `We Received Your Website Project Request — WAL GROUPS (${projectId})`, clientHtml);
+
+    console.log(`[WEBSITE PROJECT SUBMITTED] ID: ${projectId} | Pkg: ${packageName} | Name: ${fullName} | Company: ${companyName}`);
+
+    return res.json({
+      success: true,
+      projectId,
+      message: 'Project request received successfully.',
+      data: {
+        projectId,
+        packageName,
+        packagePrice,
+        fullName,
+        companyName,
+        email,
+        phone
+      }
+    });
+  } catch (err: any) {
+    console.error('[WEBSITE PROJECT API ERROR]', err);
+    return res.status(500).json({ success: false, message: "We couldn't submit your request. Please check your information and try again." });
+  }
+});
+
+// GET Website Project Requests (Admin API)
+app.get('/api/website-project-requests', async (req, res) => {
+  try {
+    // Attempt query from Supabase table
+    const { data: supaData, error } = await supabase
+      .from('website_project_requests')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (!error && Array.isArray(supaData) && supaData.length > 0) {
+      return res.json({ success: true, data: supaData });
+    }
+
+    // Fallback to local storage if Supabase table is empty or pending SQL execution
+    const localProjects = loadData<any[]>(WEBSITE_PROJECTS_FILE, []);
+    return res.json({ success: true, data: localProjects });
+  } catch (err: any) {
+    const localProjects = loadData<any[]>(WEBSITE_PROJECTS_FILE, []);
+    return res.json({ success: true, data: localProjects });
+  }
+});
+
+// PATCH Website Project Request Status (Admin API)
+app.patch('/api/website-project-requests/:id/status', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const allowedStatuses = ['New', 'Reviewing', 'Contacted', 'Proposal Sent', 'In Progress', 'Completed', 'Closed'];
+    if (!allowedStatuses.includes(status)) {
+      return res.status(400).json({ success: false, message: 'Invalid status value' });
+    }
+
+    // Update in Supabase (both dedicated table and leads table)
+    await supabase
+      .from('website_project_requests')
+      .update({ status, updated_at: new Date().toISOString() })
+      .eq('id', id);
+
+    await supabase
+      .from('leads')
+      .update({ status, updated_at: new Date().toISOString() })
+      .eq('id', id);
+
+    // Update in local file
+    const projects = loadData<any[]>(WEBSITE_PROJECTS_FILE, []);
+    const idx = projects.findIndex(p => p.id === id || String(p.id).startsWith(id));
+    if (idx !== -1) {
+      projects[idx].status = status;
+      projects[idx].updated_at = new Date().toISOString();
+      saveData(WEBSITE_PROJECTS_FILE, projects);
+    }
+
+    return res.json({ success: true, message: 'Status updated successfully' });
+  } catch (err: any) {
+    return res.status(500).json({ success: false, message: 'Failed to update status' });
+  }
+});
+
+// DELETE Website Project Request (Admin API)
+app.delete('/api/website-project-requests/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Delete in Supabase (both dedicated table and leads table)
+    await supabase
+      .from('website_project_requests')
+      .delete()
+      .eq('id', id);
+
+    await supabase
+      .from('leads')
+      .delete()
+      .eq('id', id);
+
+    // Delete in local file
+    let projects = loadData<any[]>(WEBSITE_PROJECTS_FILE, []);
+    projects = projects.filter(p => p.id !== id && !String(p.id).startsWith(id));
+    saveData(WEBSITE_PROJECTS_FILE, projects);
+
+    return res.json({ success: true, message: 'Project request deleted' });
+  } catch (err: any) {
+    return res.status(500).json({ success: false, message: 'Failed to delete project request' });
+  }
+});
+
 // GET Leads (Admin with search and filter)
 app.get('/api/leads', (req, res) => {
   let leads = loadData<LeadRecord[]>(LEADS_FILE, []);
@@ -1637,6 +1910,39 @@ app.get('/api/leads/export-json', (_req, res) => {
 app.get('/api/ai-transcripts', (_req, res) => {
   const transcripts = loadData<Record<string, ChatTranscriptSession>>(TRANSCRIPTS_FILE, {});
   return res.json({ success: true, total: Object.keys(transcripts).length, transcripts: Object.values(transcripts) });
+});
+
+// Dedicated Brochure PDF Delivery Route (Chrome, Firefox, Safari, Edge compatible)
+app.get('/brochures/:filename', (req, res, next) => {
+  try {
+    const filename = decodeURIComponent(req.params.filename);
+    const brochuresDir = path.join(process.cwd(), 'public', 'brochures');
+    const safePath = path.resolve(brochuresDir, filename);
+
+    if (!safePath.startsWith(brochuresDir) || !fs.existsSync(safePath)) {
+      return next();
+    }
+
+    const stat = fs.statSync(safePath);
+    const isDownload = req.query.download === '1' || req.query.dl === '1';
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Length', stat.size);
+    res.setHeader('Accept-Ranges', 'bytes');
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader(
+      'Content-Disposition',
+      `${isDownload ? 'attachment' : 'inline'}; filename="${filename.replace(/"/g, '')}"`
+    );
+
+    const stream = fs.createReadStream(safePath);
+    stream.pipe(res);
+  } catch (err) {
+    console.error('Error serving brochure PDF:', err);
+    next(err);
+  }
 });
 
 // SEO: Dynamic Robots.txt

@@ -39,6 +39,8 @@ import {
   ArrowUpRight
 } from 'lucide-react';
 import { useBooking } from '../context/BookingContext';
+import { PdfViewerModal } from '../components/PdfViewerModal';
+import { WebsiteProjectModal, WebsitePackageInfo } from '../components/WebsiteProjectModal';
 
 interface Props {
   navigate: (path: string) => void;
@@ -47,7 +49,10 @@ interface Props {
 interface PortfolioItem {
   id: string;
   title: string;
+  sectorTag: string;
   industry: string;
+  headline: string;
+  deliberateRelationship: string;
   description: string;
   label: string;
   url?: string;
@@ -76,10 +81,60 @@ export const WebsiteDesignPage: React.FC<Props> = ({ navigate }) => {
 
   // State
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
-  const [selectedPackage, setSelectedPackage] = useState<PackageItem | null>(null);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
-  const [isBrochureModalOpen, setIsBrochureModalOpen] = useState(false);
-  const [brochurePage, setBrochurePage] = useState(1);
+  const [heroActiveSector, setHeroActiveSector] = useState<string>('ml-worldwide');
+  
+  // PDF Viewer Modal State: tracks active PDF URL and modal visibility
+  const [isPdfModalOpen, setIsPdfModalOpen] = useState<boolean>(false);
+  const [activePdfUrl, setActivePdfUrl] = useState<string>('/brochures/wal-groups-website-services-brochure-2026.pdf');
+  const [activePdfTitle, setActivePdfTitle] = useState<string>('Website Services Brochure');
+  const [activePdfSubtitle, setActivePdfSubtitle] = useState<string>('Official Master PDF — 2026 Edition');
+  const [activePdfFilename, setActivePdfFilename] = useState<string>('wal-groups-website-services-brochure-2026.pdf');
+
+  // Universal Website Project Form State
+  const [isProjectModalOpen, setIsProjectModalOpen] = useState<boolean>(false);
+  const [projectModalPackage, setProjectModalPackage] = useState<WebsitePackageInfo | null>(null);
+
+  const openProjectForm = (pkg?: PackageItem | WebsitePackageInfo) => {
+    if (pkg) {
+      setProjectModalPackage({
+        id: pkg.id,
+        name: pkg.name,
+        price: pkg.price.includes('$1,499') ? 'Starting at $1,499+' : pkg.price,
+        delivery: (pkg as any).delivery,
+        pages: (pkg as any).pages,
+        badge: (pkg as any).badge
+      });
+    } else {
+      setProjectModalPackage({
+        id: 'business',
+        name: 'Business Website',
+        price: '$699',
+        delivery: '5–7 business days',
+        pages: 'Up to 8 pages',
+        badge: 'MOST POPULAR'
+      });
+    }
+    setIsProjectModalOpen(true);
+  };
+
+  const openPdfModal = (
+    url = '/brochures/wal-groups-website-services-brochure-2026.pdf',
+    title = 'Website Services Brochure',
+    subtitle = 'Official Master PDF — 2026 Edition',
+    downloadFilename = 'wal-groups-website-services-brochure-2026.pdf'
+  ) => {
+    setActivePdfUrl(url);
+    setActivePdfTitle(title);
+    setActivePdfSubtitle(subtitle);
+    setActivePdfFilename(downloadFilename);
+    setIsPdfModalOpen(true);
+  };
+
+  // Alias for backward compatibility across all call sites
+  const openPdfViewer = openPdfModal;
+  const closePdfModal = () => setIsPdfModalOpen(false);
+
   const [reviewFormState, setReviewFormState] = useState({
     url: '',
     fullName: '',
@@ -101,19 +156,12 @@ export const WebsiteDesignPage: React.FC<Props> = ({ navigate }) => {
   // Portfolio items strictly from prompt & uploaded screenshots
   const portfolioItems: PortfolioItem[] = [
     {
-      id: 'abhijobs',
-      title: 'ABHI JOBS',
-      industry: 'Jobs & Career Platform',
-      description: 'Skills-first career platform designed to connect talent with meaningful opportunities. Features candidate search, skills classification, applicant workflow, and employer talent acquisition.',
-      label: 'DEMO / CONCEPT WEBSITE',
-      url: 'https://abhijobs.netlify.app',
-      image: '/images/portfolio/abhijobs.webp',
-      tags: ['Job Search Portal', 'Candidate Workflow', 'Employer Hub', 'Responsive UI']
-    },
-    {
       id: 'ml-worldwide',
       title: 'M&L WORLDWIDE LOGISTICS',
-      industry: 'Transportation & Logistics',
+      sectorTag: 'TRANSPORTATION & SUPPLY CHAIN',
+      industry: 'Freight Brokerage & Fleet Operations',
+      headline: 'High-Velocity Freight Booking & Live Shipment Tracking',
+      deliberateRelationship: 'Transportation companies lose contracts when shippers cannot verify fleet equipment or track loads in real time. We engineered this platform around real-time PRO/BOL tracking lookup, interactive lane freight quotes, specialized drive-away vehicle capabilities, and rapid driver qualification.',
       description: 'Integrated supply chain platform featuring domestic freight brokerage, single drive-away vehicle movements, PRO/BOL tracking lookup, interactive quote request, and fleet capabilities.',
       label: 'DEMO / CONCEPT WEBSITE',
       url: 'https://m-l-worldwide-logistics.netlify.app',
@@ -121,19 +169,12 @@ export const WebsiteDesignPage: React.FC<Props> = ({ navigate }) => {
       tags: ['Freight Brokerage', 'Live Tracking Bar', 'Quote Request', 'Fleet Showcase']
     },
     {
-      id: 'alpine-medical',
-      title: 'ALPINE MEDICAL SERVICES',
-      industry: 'Healthcare',
-      description: 'Regulated medical waste management platform across Arizona. Features statewide manifest tracking, compliance dossier access, sharps & biohazard services, and emergency dispatch contact.',
-      label: 'DEMO / CONCEPT WEBSITE',
-      url: 'https://alpine-medical-services.netlify.app',
-      image: '/images/portfolio/alpine-medical.webp',
-      tags: ['Medical Waste Logistics', 'Compliance Dossier', 'Statewide Coverage', 'Direct Dispatch']
-    },
-    {
       id: 'southdekalb',
       title: 'SOUTH DEKALB TOWING',
-      industry: 'Towing & Roadside Services',
+      sectorTag: 'TOWING & EMERGENCY ROADSIDE',
+      industry: 'Emergency Roadside & Vehicle Transport',
+      headline: 'Urgent High-Intent Mobile Conversion & Instant Dispatch',
+      deliberateRelationship: 'Motorists stranded on highways search for roadside assistance under intense stress directly on smartphones. The interface prioritizes immediate one-tap 24/7 emergency dispatch calls, live GPS directions to the vehicle storage yard, impound checklist transparency, and fast online tow requests.',
       description: 'High-conversion emergency towing and vehicle transport platform serving Lithonia & South DeKalb. Features 24/7 click-to-call, request-a-tow booking, storage yard details, and Google Maps directions.',
       label: 'DEMO / CONCEPT WEBSITE',
       url: 'https://southdekalb.netlify.app',
@@ -141,9 +182,38 @@ export const WebsiteDesignPage: React.FC<Props> = ({ navigate }) => {
       tags: ['24/7 Roadside Dispatch', 'Click-to-Call', 'Instant Tow Booking', 'Local Map Integration']
     },
     {
+      id: 'alpine-medical',
+      title: 'ALPINE MEDICAL SERVICES',
+      sectorTag: 'HEALTHCARE & REGULATED SERVICES',
+      industry: 'Regulated Medical Waste & Biohazard Logistics',
+      headline: 'Trust-First Regulatory Compliance & Statewide Manifest Tracking',
+      deliberateRelationship: 'Hospitals, medical practices, and laboratories require strict adherence to state health and federal EPA/OSHA regulations. This platform establishes immediate legal authority with an interactive Arizona coverage directory, downloadable compliance certificates, sharps disposal protocols, and emergency biohazard dispatch.',
+      description: 'Regulated medical waste management platform across Arizona. Features statewide manifest tracking, compliance dossier access, sharps & biohazard services, and emergency dispatch contact.',
+      label: 'DEMO / CONCEPT WEBSITE',
+      url: 'https://alpine-medical-services.netlify.app',
+      image: '/images/portfolio/alpine-medical.webp',
+      tags: ['Medical Waste Logistics', 'Compliance Dossier', 'Statewide Coverage', 'Direct Dispatch']
+    },
+    {
+      id: 'abhijobs',
+      title: 'ABHI JOBS',
+      sectorTag: 'STAFFING & TALENT PLATFORMS',
+      industry: 'Skills-First Careers & Recruitment Portal',
+      headline: 'Dual-Faceted Candidate Search & Employer Talent Sourcing',
+      deliberateRelationship: 'Recruitment and staffing firms must seamlessly engage two distinct audiences: jobseekers looking for verified roles and corporate employers hiring talent. We architected a dual-audience portal featuring live keyword role filtering, fast candidate application workflows, employer hiring packages, and talent request intake.',
+      description: 'Skills-first career platform designed to connect talent with meaningful opportunities. Features candidate search, skills classification, applicant workflow, and employer talent acquisition.',
+      label: 'DEMO / CONCEPT WEBSITE',
+      url: 'https://abhijobs.netlify.app',
+      image: '/images/portfolio/abhijobs.webp',
+      tags: ['Job Search Portal', 'Candidate Workflow', 'Employer Hub', 'Responsive UI']
+    },
+    {
       id: 'wal-groups',
       title: 'WAL GROUPS',
+      sectorTag: 'ENTERPRISE OPERATIONS & FLEET BACKBONE',
       industry: 'Logistics Operations & Backend Outsourcing',
+      headline: 'Mission-Critical Operations Control Center & Executive Portal',
+      deliberateRelationship: 'Amazon DSPs, AFPs, and commercial trucking fleets operate 24/7 and require seamless operational coordination. Our own platform showcases live dispatch monitoring systems, automated route reconciliation, payroll audit infrastructure, and client executive workspace logins.',
       description: 'Complete digital operational backbone for Amazon DSPs, AFPs, and trucking businesses. Combines 24/7 dispatch monitoring, automated reconciliation, and executive client portals.',
       label: 'OUR OWN SITE',
       url: 'https://thewalgroup.in',
@@ -499,51 +569,101 @@ export const WebsiteDesignPage: React.FC<Props> = ({ navigate }) => {
               </div>
             </div>
 
-            {/* Right Column: Layered Multi-Device Composition */}
+            {/* Right Column: Clean Editorial Device Presentation */}
             <div className="lg:col-span-5 relative">
               {/* Browser Mockup Wrapper */}
-              <div className="relative rounded-2xl bg-[#091524] border border-white/15 p-2 sm:p-3 shadow-2xl backdrop-blur-xl">
+              <div className="relative rounded-2xl bg-[#091524] border border-white/15 p-3 shadow-2xl backdrop-blur-xl">
                 {/* Browser bar */}
-                <div className="flex items-center justify-between px-3 py-2 border-b border-white/10 mb-2">
+                <div className="flex items-center justify-between px-3 py-2 border-b border-white/10 mb-2.5">
                   <div className="flex items-center gap-1.5">
                     <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
                     <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
                     <div className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
                   </div>
-                  <div className="bg-white/10 px-3 py-0.5 rounded text-[11px] text-slate-300 font-mono tracking-tight flex items-center gap-1">
+                  <div className="bg-white/10 px-3 py-0.5 rounded text-[11px] text-slate-300 font-mono tracking-tight flex items-center gap-1.5">
                     <Lock className="w-3 h-3 text-emerald-400" />
-                    <span>yourbusiness.com</span>
+                    <span>
+                      {heroActiveSector === 'southdekalb' 
+                        ? 'southdekalb.netlify.app' 
+                        : heroActiveSector === 'alpine-medical'
+                        ? 'alpine-medical-services.netlify.app'
+                        : heroActiveSector === 'abhijobs'
+                        ? 'abhijobs.netlify.app'
+                        : heroActiveSector === 'wal-groups'
+                        ? 'thewalgroup.in'
+                        : 'm-l-worldwide-logistics.netlify.app'}
+                    </span>
                   </div>
-                  <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
-                    RESPONSIVE
-                  </div>
+                  <a
+                    href={
+                      heroActiveSector === 'southdekalb' 
+                        ? 'https://southdekalb.netlify.app' 
+                        : heroActiveSector === 'alpine-medical'
+                        ? 'https://alpine-medical-services.netlify.app'
+                        : heroActiveSector === 'abhijobs'
+                        ? 'https://abhijobs.netlify.app'
+                        : heroActiveSector === 'wal-groups'
+                        ? 'https://thewalgroup.in'
+                        : 'https://m-l-worldwide-logistics.netlify.app'
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[10px] text-[#ff8533] hover:underline font-bold uppercase tracking-wider flex items-center gap-1"
+                  >
+                    <span>Live Demo</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
                 </div>
 
-                {/* Layered Website Preview Graphic */}
-                <div className="relative rounded-xl overflow-hidden aspect-[16/10] bg-[#0c1829]">
+                {/* Website Preview Graphic — Strictly Preserves 16:9 Aspect Ratio with No Cropping */}
+                <div className="relative rounded-xl overflow-hidden aspect-[16/9] bg-[#0c1829] border border-white/10 shadow-inner">
                   <img 
-                    src="/images/portfolio/ml-worldwide.webp" 
-                    alt="Transportation & Logistics Website Design Preview"
-                    className="w-full h-full object-cover object-top hover:scale-105 transition-transform duration-700"
+                    src={
+                      heroActiveSector === 'southdekalb' 
+                        ? '/images/portfolio/southdekalb.webp' 
+                        : heroActiveSector === 'alpine-medical'
+                        ? '/images/portfolio/alpine-medical.webp'
+                        : heroActiveSector === 'abhijobs'
+                        ? '/images/portfolio/abhijobs.webp'
+                        : heroActiveSector === 'wal-groups'
+                        ? '/images/portfolio/wal-groups.webp'
+                        : '/images/portfolio/ml-worldwide.webp'
+                    } 
+                    alt="Custom Built Website Tailored to Your Sector Preview"
+                    className="w-full h-full object-cover object-top transition-all duration-300"
                     loading="eager"
                   />
-                  
-                  {/* Floating Mobile Preview Overlay */}
-                  <div className="absolute -bottom-3 -right-3 w-36 sm:w-44 rounded-xl bg-[#06101c] p-1.5 shadow-2xl border border-white/20 hidden sm:block">
-                    <div className="w-12 h-1 bg-white/30 rounded-full mx-auto mb-1" />
-                    <div className="rounded-lg overflow-hidden aspect-[9/16] bg-slate-900">
-                      <img 
-                        src="/images/portfolio/southdekalb.webp" 
-                        alt="Mobile Responsive Towing Website"
-                        className="w-full h-full object-cover object-top"
-                      />
-                    </div>
+                </div>
+
+                {/* Sector Switcher Chips */}
+                <div className="mt-3 pt-2 border-t border-white/10 flex items-center justify-between gap-1 overflow-x-auto text-[11px]">
+                  <span className="text-slate-400 font-medium shrink-0 hidden sm:inline">Preview:</span>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {[
+                      { id: 'ml-worldwide', label: 'Logistics' },
+                      { id: 'southdekalb', label: 'Towing' },
+                      { id: 'alpine-medical', label: 'Healthcare' },
+                      { id: 'abhijobs', label: 'Staffing' },
+                      { id: 'wal-groups', label: 'Enterprise' }
+                    ].map(tab => (
+                      <button
+                        key={tab.id}
+                        onClick={() => setHeroActiveSector(tab.id)}
+                        className={`px-2 py-1 rounded text-[11px] font-semibold transition-all ${
+                          heroActiveSector === tab.id 
+                            ? 'bg-[#ff6600] text-black font-extrabold shadow-sm' 
+                            : 'bg-white/5 hover:bg-white/15 text-slate-300'
+                        }`}
+                      >
+                        {tab.label}
+                      </button>
+                    ))}
                   </div>
                 </div>
 
                 {/* Subtitle tag */}
-                <div className="mt-3 px-2 flex items-center justify-between text-[11px] text-slate-400">
-                  <span>Custom Built · Tailored to Your Sector</span>
+                <div className="mt-2.5 px-1 flex items-center justify-between text-[11px] text-slate-400">
+                  <span className="font-semibold text-slate-200">Custom Built · Tailored to Your Sector</span>
                   <span className="text-[#ff8533] font-semibold">100% Mobile Ready</span>
                 </div>
               </div>
@@ -623,127 +743,163 @@ export const WebsiteDesignPage: React.FC<Props> = ({ navigate }) => {
       </section>
 
       {/* =========================================================================
-          10–17. FEATURED WEBSITE WORK (Portfolio with Exact Screenshots & Verified URLs)
+          10–17. CUSTOM BUILT · TAILORED TO YOUR SECTOR (Premium Editorial Presentation)
           ========================================================================= */}
-      <section id="portfolio" className="py-24 px-4 sm:px-6 lg:px-8 bg-[#f4f7fb] scroll-mt-20">
-        <div className="max-w-7xl mx-auto space-y-14">
+      <section id="portfolio" className="py-24 px-4 sm:px-6 lg:px-8 bg-[#f4f7fb] scroll-mt-20 border-b border-slate-200/60">
+        <div className="max-w-7xl mx-auto space-y-16">
           
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div className="space-y-3 max-w-2xl">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 max-w-4xl">
+            <div className="space-y-3">
               <span className="text-xs font-bold uppercase tracking-widest text-[#ff6600]">
-                PORTFOLIO SHOWCASE
+                CUSTOM BUILT · TAILORED TO YOUR SECTOR
               </span>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#041e42] tracking-tight">
-                Websites We've Designed
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#041e42] tracking-tight leading-tight">
+                Websites Engineered for Specific Business Requirements
               </h2>
-              <p className="text-slate-600 text-base sm:text-lg">
-                Explore website concepts created by WAL GROUPS across different industries and business models.
+              <p className="text-slate-600 text-base sm:text-lg leading-relaxed">
+                We don't force generic templates onto unique industries. Every sector has distinct workflows, compliance requirements, and customer conversion paths. Here is how WAL GROUPS builds websites around the operational reality of each sector.
               </p>
             </div>
 
             <div className="shrink-0">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#041e42]/5 border border-[#041e42]/10 text-xs font-bold text-[#041e42]">
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold text-[#041e42] shadow-sm">
                 <Sparkles className="w-3.5 h-3.5 text-[#ff6600]" />
-                <span>Responsive &amp; Live Systems</span>
+                <span>5 Verified Sector Architecture Demos</span>
               </span>
             </div>
           </div>
 
-          {/* Portfolio Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-            {portfolioItems.map((item) => (
-              <div 
-                key={item.id}
-                className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group"
-              >
-                {/* Browser Frame */}
-                <div className="bg-[#0b1626] px-4 py-3 border-b border-slate-800 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
-                    <span className="ml-2 text-xs font-mono text-slate-300">
-                      {item.url?.replace('https://', '') || 'preview'}
-                    </span>
-                  </div>
+          {/* Premium Editorial Showcase: Balanced Text + Image Composition */}
+          <div className="space-y-16 lg:space-y-20">
+            {portfolioItems.map((item, index) => {
+              const isEven = index % 2 === 0;
 
-                  {/* Clean unboxed label per zero-pill discipline */}
-                  <span className="text-[11px] font-bold text-[#ff8533] uppercase tracking-wider">
-                    {item.label}
-                  </span>
-                </div>
+              return (
+                <div 
+                  key={item.id}
+                  className="bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-md transition-shadow overflow-hidden p-6 sm:p-8 lg:p-10"
+                >
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+                    
+                    {/* Visual Column: Preserves Natural 16:9 Proportions with Crisp Device Chrome */}
+                    <div className={`lg:col-span-7 ${isEven ? 'lg:order-1' : 'lg:order-2'}`}>
+                      <div className="rounded-xl overflow-hidden border border-slate-300 shadow-md bg-[#0a1424]">
+                        {/* Browser Chrome Header */}
+                        <div className="bg-[#0b1626] px-4 py-3 border-b border-slate-800 flex items-center justify-between select-none">
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1.5">
+                              <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
+                              <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
+                              <div className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
+                            </div>
+                            <div className="ml-2 px-2.5 py-0.5 rounded bg-white/10 text-slate-300 font-mono text-[11px] flex items-center gap-1.5">
+                              <Lock className="w-3 h-3 text-emerald-400" />
+                              <span className="truncate max-w-[200px] sm:max-w-xs">
+                                {item.url?.replace('https://', '') || 'demo.walgroup.in'}
+                              </span>
+                            </div>
+                          </div>
 
-                {/* Screenshot Visual */}
-                <div className="relative aspect-[16/9] bg-slate-950 overflow-hidden border-b border-slate-100">
-                  <img 
-                    src={item.image} 
-                    alt={`${item.title} - ${item.industry} Website Preview`}
-                    className="w-full h-full object-cover object-top group-hover:scale-[1.02] transition-transform duration-500"
-                    loading="lazy"
-                  />
-                  
-                  {item.url && (
-                    <a
-                      href={item.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="absolute bottom-3 right-3 bg-[#041e42]/90 hover:bg-[#ff6600] text-white hover:text-black text-xs font-bold px-3 py-2 rounded-lg backdrop-blur-md transition-all flex items-center gap-1.5 shadow-lg"
-                    >
-                      <span>View Live Demo</span>
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    </a>
-                  )}
-                </div>
+                          <span className="text-[10px] font-bold text-[#ff8533] uppercase tracking-wider hidden sm:inline">
+                            {item.label}
+                          </span>
+                        </div>
 
-                {/* Content Details */}
-                <div className="p-6 sm:p-8 flex-1 flex flex-col justify-between space-y-5">
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-xl font-extrabold text-[#041e42] tracking-tight">{item.title}</h3>
-                      <span className="text-xs font-semibold text-slate-500">{item.industry}</span>
+                        {/* Screenshot Image: 16:9 Aspect Ratio Maintained, Sharp & Uncropped */}
+                        <div className="relative aspect-[16/9] w-full bg-slate-950 overflow-hidden group">
+                          <img 
+                            src={item.image} 
+                            alt={`${item.title} — ${item.industry} Custom Built Website Preview`}
+                            className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.01]"
+                            loading="lazy"
+                          />
+
+                          {item.url && (
+                            <a
+                              href={item.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="absolute bottom-3 right-3 bg-[#041e42]/90 hover:bg-[#ff6600] text-white hover:text-black text-xs font-bold px-3.5 py-2 rounded-lg backdrop-blur-md transition-all flex items-center gap-1.5 shadow-lg"
+                            >
+                              <span>View Live Website</span>
+                              <ExternalLink className="w-3.5 h-3.5" />
+                            </a>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                    <p className="text-sm text-slate-600 leading-relaxed">
-                      {item.description}
-                    </p>
-                  </div>
 
-                  {/* Feature tags */}
-                  <div className="pt-2 border-t border-slate-100 flex flex-wrap gap-2 text-xs text-slate-500">
-                    {item.tags.map((tag, i) => (
-                      <span key={i} className="inline-flex items-center gap-1">
-                        <span>{tag}</span>
-                        {i < item.tags.length - 1 && <span className="text-slate-300">·</span>}
-                      </span>
-                    ))}
-                  </div>
+                    {/* Editorial Text Column: Deliberate Relationship with the Sector */}
+                    <div className={`lg:col-span-5 space-y-5 ${isEven ? 'lg:order-2' : 'lg:order-1'}`}>
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold tracking-wider text-[#ff6600] uppercase">
+                            {item.sectorTag}
+                          </span>
+                          <span className="text-slate-300">·</span>
+                          <span className="text-xs font-semibold text-slate-500">
+                            {item.industry}
+                          </span>
+                        </div>
 
-                  {/* CTA row */}
-                  {item.url && (
-                    <div className="pt-2">
-                      <a
-                        href={item.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-sm font-bold text-[#041e42] hover:text-[#ff6600] transition-colors"
-                      >
-                        <span>View Live Demo</span>
-                        <ArrowUpRight className="w-4 h-4" />
-                      </a>
+                        <h3 className="text-2xl sm:text-3xl font-extrabold text-[#041e42] tracking-tight">
+                          {item.title}
+                        </h3>
+
+                        <h4 className="text-sm sm:text-base font-bold text-slate-700">
+                          {item.headline}
+                        </h4>
+                      </div>
+
+                      {/* Deliberate Sector Relationship Copy */}
+                      <p className="text-sm text-slate-600 leading-relaxed">
+                        {item.deliberateRelationship}
+                      </p>
+
+                      {/* Built-In Architecture Highlights */}
+                      <div className="space-y-2.5 pt-2 border-t border-slate-100">
+                        <span className="text-xs font-bold uppercase tracking-wider text-[#041e42] block">
+                          Tailored Capabilities Built In:
+                        </span>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-700">
+                          {item.tags.map((tag, i) => (
+                            <div key={i} className="flex items-center gap-1.5">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-[#ff6600] shrink-0" />
+                              <span>{tag}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Action Links */}
+                      {item.url && (
+                        <div className="pt-3 flex items-center gap-4">
+                          <a
+                            href={item.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 text-sm font-bold text-[#ff6600] hover:text-[#e65c00] transition-colors"
+                          >
+                            <span>Open Live Website Demo</span>
+                            <ArrowUpRight className="w-4 h-4" />
+                          </a>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
 
-              </div>
-            ))}
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
-          {/* 17. DEMO DISCLAIMER */}
-          <div className="bg-white p-5 rounded-xl border border-slate-200/80 text-center max-w-4xl mx-auto shadow-sm">
+          {/* DEMO / CONCEPT DISCLAIMER */}
+          <div className="bg-white p-5 rounded-xl border border-slate-200 text-center max-w-4xl mx-auto shadow-sm">
             <span className="text-[11px] font-bold text-[#ff6600] uppercase tracking-wider block mb-1">
               DEMO / CONCEPT DISCLAIMER
             </span>
-            <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">
-              These websites are design and development examples created to demonstrate website capabilities. They are not presented as paid client projects unless explicitly identified as such.
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              These websites are custom design and development examples created to demonstrate website architecture across distinct sectors. They are not presented as paid client projects unless explicitly identified as such.
             </p>
           </div>
 
@@ -754,21 +910,21 @@ export const WebsiteDesignPage: React.FC<Props> = ({ navigate }) => {
           18–22. WEBSITE PACKAGES (Pricing, Inclusions, and Direct PDF Downloads)
           ========================================================================= */}
       <section id="packages" className="py-24 px-4 sm:px-6 lg:px-8 bg-white scroll-mt-20">
-        <div className="max-w-7xl mx-auto space-y-14">
+        <div className="max-w-7xl mx-auto space-y-16">
           
           <div className="text-center max-w-3xl mx-auto space-y-3">
             <span className="text-xs font-bold uppercase tracking-widest text-[#ff6600]">
               TRANSPARENT PRICING
             </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#041e42] tracking-tight">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#041e42] tracking-tight">
               Choose the Website Built for Your Business
             </h2>
-            <p className="text-slate-600 text-base sm:text-lg">
-              From a professional business presence to a fully custom digital system, choose the level of functionality that fits your requirements.
+            <p className="text-slate-600 text-base sm:text-lg leading-relaxed">
+              Straightforward pricing with zero hidden fees. From essential business sites to custom enterprise platforms, choose the level of functionality that fits your operations.
             </p>
           </div>
 
-          {/* 4 Pricing Cards */}
+          {/* 4 Pricing Cards with High Readability */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
             {packages.map((pkg) => (
               <div 
@@ -776,48 +932,48 @@ export const WebsiteDesignPage: React.FC<Props> = ({ navigate }) => {
                 className={`rounded-2xl p-7 flex flex-col justify-between transition-all duration-300 relative ${
                   pkg.badge 
                     ? 'bg-[#041e42] text-white shadow-2xl ring-2 ring-[#ff6600] md:-translate-y-2' 
-                    : 'bg-[#f8fafc] text-[#041e42] border border-slate-200 hover:shadow-lg'
+                    : 'bg-[#f8fafc] text-[#041e42] border border-slate-200/90 hover:border-slate-300 hover:shadow-lg'
                 }`}
               >
-                {/* Badge if Most Popular */}
+                {/* Popular Badge */}
                 {pkg.badge && (
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#ff6600] text-black text-[11px] font-black uppercase tracking-wider px-3.5 py-1 rounded-full shadow-md">
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#ff6600] text-black text-[11px] font-black uppercase tracking-wider px-4 py-1 rounded-full shadow-md">
                     {pkg.badge}
                   </div>
                 )}
 
                 <div className="space-y-6">
                   <div>
-                    <h3 className={`text-xl font-bold ${pkg.badge ? 'text-white' : 'text-[#041e42]'}`}>
+                    <h3 className={`text-xl font-extrabold tracking-tight ${pkg.badge ? 'text-white' : 'text-[#041e42]'}`}>
                       {pkg.name}
                     </h3>
                     <div className="mt-3 flex items-baseline gap-2">
-                      <span className={`text-4xl font-extrabold tracking-tight ${pkg.badge ? 'text-[#ff8533]' : 'text-[#ff6600]'}`}>
+                      <span className={`text-4xl font-black tracking-tight ${pkg.badge ? 'text-[#ff8533]' : 'text-[#ff6600]'}`}>
                         {pkg.price}
                       </span>
                       {pkg.period && (
-                        <span className={`text-xs ${pkg.badge ? 'text-slate-300' : 'text-slate-500'}`}>
+                        <span className={`text-xs font-medium ${pkg.badge ? 'text-slate-300' : 'text-slate-500'}`}>
                           {pkg.period}
                         </span>
                       )}
                     </div>
-                    <p className={`mt-3 text-xs leading-relaxed ${pkg.badge ? 'text-slate-300' : 'text-slate-600'}`}>
+                    <p className={`mt-3 text-xs leading-relaxed font-normal ${pkg.badge ? 'text-slate-300' : 'text-slate-600'}`}>
                       {pkg.description}
                     </p>
                   </div>
 
                   {/* Delivery & Revisions metadata */}
-                  <div className={`p-3 rounded-xl space-y-1.5 text-xs ${pkg.badge ? 'bg-white/10' : 'bg-white border border-slate-200'}`}>
-                    <div className="flex justify-between">
-                      <span className="font-semibold">Pages:</span>
+                  <div className={`p-3.5 rounded-xl space-y-2 text-xs ${pkg.badge ? 'bg-white/10' : 'bg-white border border-slate-200/80 shadow-xs'}`}>
+                    <div className="flex justify-between items-center">
+                      <span className={pkg.badge ? 'text-slate-300 font-medium' : 'text-slate-500 font-medium'}>Pages:</span>
                       <span className="font-bold">{pkg.pages}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="font-semibold">Revisions:</span>
+                    <div className="flex justify-between items-center">
+                      <span className={pkg.badge ? 'text-slate-300 font-medium' : 'text-slate-500 font-medium'}>Revisions:</span>
                       <span className="font-bold">{pkg.revisions}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="font-semibold">Turnaround:</span>
+                    <div className="flex justify-between items-center">
+                      <span className={pkg.badge ? 'text-slate-300 font-medium' : 'text-slate-500 font-medium'}>Timeline:</span>
                       <span className="font-bold">{pkg.delivery}</span>
                     </div>
                   </div>
@@ -829,7 +985,7 @@ export const WebsiteDesignPage: React.FC<Props> = ({ navigate }) => {
                     </span>
                     <ul className="space-y-2 text-xs">
                       {pkg.highlights.slice(0, 7).map((hl, i) => (
-                        <li key={i} className="flex items-start gap-2">
+                        <li key={i} className="flex items-start gap-2 leading-snug">
                           <Check className={`w-4 h-4 shrink-0 mt-0.5 ${pkg.badge ? 'text-[#ff8533]' : 'text-[#ff6600]'}`} />
                           <span className={pkg.badge ? 'text-slate-200' : 'text-slate-700'}>{hl}</span>
                         </li>
@@ -838,34 +994,50 @@ export const WebsiteDesignPage: React.FC<Props> = ({ navigate }) => {
                   </div>
                 </div>
 
-                {/* Buttons: View Package & Download Brochure */}
+                {/* Actions: Primary Select Plan & Secondary Brochure Links */}
                 <div className="pt-6 mt-6 border-t border-slate-200/50 space-y-2.5">
                   <button
-                    onClick={() => setSelectedPackage(pkg)}
-                    className={`w-full py-2.5 px-4 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                    onClick={() => openProjectForm(pkg)}
+                    className={`w-full py-3.5 px-5 rounded-xl text-sm font-extrabold transition-all cursor-pointer flex items-center justify-center gap-2 shadow-md ${
                       pkg.badge 
-                        ? 'bg-[#ff6600] hover:bg-[#e65c00] text-black shadow-md' 
-                        : 'bg-[#041e42] hover:bg-[#062c60] text-white'
+                        ? 'bg-[#ff6600] hover:bg-[#e65c00] text-black shadow-[0_4px_20px_rgba(255,102,0,0.35)] hover:shadow-[0_6px_25px_rgba(255,102,0,0.45)]' 
+                        : 'bg-[#041e42] hover:bg-[#062c60] text-white hover:shadow-lg'
                     }`}
                   >
-                    <span>View Package Details</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
+                    <span>Select Plan</span>
+                    <ArrowRight className="w-4 h-4" />
                   </button>
 
-                  <a
-                    href={pkg.pdfUrl}
-                    download={pkg.pdfFilename}
-                    className={`w-full py-2 px-3 rounded-xl text-xs font-semibold border transition-all flex items-center justify-center gap-1.5 ${
-                      pkg.badge 
-                        ? 'border-white/20 text-slate-200 hover:bg-white/10' 
-                        : 'border-slate-300 text-slate-700 hover:bg-slate-100'
-                    }`}
-                  >
-                    <Download className="w-3.5 h-3.5" />
-                    <span>Download Package PDF</span>
-                  </a>
+                  <div className="grid grid-cols-2 gap-2 pt-0.5">
+                    <button
+                      type="button"
+                      onClick={() => openPdfViewer(pkg.pdfUrl, `${pkg.name} Brochure`, 'Package Specifications & Inclusions', pkg.pdfFilename)}
+                      className={`py-2 px-2.5 rounded-xl text-[11px] font-semibold border transition-all flex items-center justify-center gap-1 cursor-pointer ${
+                        pkg.badge 
+                          ? 'border-white/20 text-slate-200 hover:bg-white/10' 
+                          : 'border-slate-300 text-slate-700 hover:bg-slate-100'
+                      }`}
+                    >
+                      <Eye className="w-3 h-3 text-[#ff8533]" />
+                      <span>Brochure</span>
+                    </button>
 
-                  <div className={`text-[10px] text-center ${pkg.badge ? 'text-slate-400' : 'text-slate-500'}`}>
+                    <a
+                      href={`${pkg.pdfUrl}?download=1`}
+                      download={pkg.pdfFilename}
+                      className={`py-2 px-2.5 rounded-xl text-[11px] font-semibold border transition-all flex items-center justify-center gap-1 cursor-pointer ${
+                        pkg.badge 
+                          ? 'border-white/20 text-slate-200 hover:bg-white/10' 
+                          : 'border-slate-300 text-slate-700 hover:bg-slate-100'
+                      }`}
+                      title="Download PDF directly"
+                    >
+                      <Download className="w-3 h-3" />
+                      <span>Download</span>
+                    </a>
+                  </div>
+
+                  <div className={`text-[11px] text-center pt-1 font-medium ${pkg.badge ? 'text-slate-300' : 'text-slate-500'}`}>
                     {pkg.renewal}
                   </div>
                 </div>
@@ -874,8 +1046,156 @@ export const WebsiteDesignPage: React.FC<Props> = ({ navigate }) => {
             ))}
           </div>
 
-          <div className="text-center text-xs text-slate-500 max-w-2xl mx-auto">
-            All prices in USD. Simple 50% deposit before start and 50% on final approval via PayPal invoice. Custom projects scoped individually.
+          {/* Transparent Deposit & Ownership Policy Banner */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6 sm:p-8 rounded-2xl bg-[#041e42] text-white">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-[#ff8533] font-bold text-sm">
+                <CheckCircle2 className="w-4 h-4" />
+                <span>50% Deposit / 50% On Approval</span>
+              </div>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Simple 50% deposit before start and 50% only upon final approval via PayPal invoice. You never pay the final balance until satisfied.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-[#ff8533] font-bold text-sm">
+                <ShieldCheck className="w-4 h-4" />
+                <span>100% Client Ownership</span>
+              </div>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                You retain complete ownership of your domain, website code, and creative assets. No vendor lock-in or licensing fees ever.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-[#ff8533] font-bold text-sm">
+                <Clock className="w-4 h-4" />
+                <span>30 Days Free Post-Launch Support</span>
+              </div>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Every website includes 30 days of free post-launch support and bug fixes to ensure smooth deployment and peace of mind.
+              </p>
+            </div>
+          </div>
+
+          {/* Side-by-Side Detailed Features Comparison Table */}
+          <div className="space-y-6 pt-4">
+            <div className="text-center space-y-2 max-w-2xl mx-auto">
+              <h3 className="text-2xl font-bold text-[#041e42]">
+                Detailed Package Comparison
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-600">
+                Compare scope, deliverables, and technical inclusions side by side to choose the perfect package.
+              </p>
+            </div>
+
+            <div className="border border-slate-200 rounded-2xl overflow-hidden shadow-xs bg-white overflow-x-auto">
+              <table className="w-full text-left border-collapse text-xs sm:text-sm">
+                <thead>
+                  <tr className="bg-[#0b1626] text-white border-b border-slate-800">
+                    <th className="py-4 px-4 sm:px-6 font-bold text-slate-200">Specification</th>
+                    <th className="py-4 px-3 sm:px-4 font-bold text-center">Starter ($399)</th>
+                    <th className="py-4 px-3 sm:px-4 font-bold text-center text-[#ff8533] bg-[#041e42]">Business ($699)</th>
+                    <th className="py-4 px-3 sm:px-4 font-bold text-center">Growth ($999)</th>
+                    <th className="py-4 px-3 sm:px-4 font-bold text-center">Custom ($1,499+)</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 text-slate-700">
+                  <tr className="hover:bg-slate-50/80">
+                    <td className="py-3 px-4 sm:px-6 font-semibold text-[#041e42]">Page Scope</td>
+                    <td className="py-3 px-3 sm:px-4 text-center">Up to 5 Pages</td>
+                    <td className="py-3 px-3 sm:px-4 text-center font-bold bg-[#041e42]/5 text-[#041e42]">Up to 8 Pages</td>
+                    <td className="py-3 px-3 sm:px-4 text-center">Up to 12 Pages</td>
+                    <td className="py-3 px-3 sm:px-4 text-center font-bold">Custom Scope</td>
+                  </tr>
+                  <tr className="hover:bg-slate-50/80">
+                    <td className="py-3 px-4 sm:px-6 font-semibold text-[#041e42]">Turnaround Timeline</td>
+                    <td className="py-3 px-3 sm:px-4 text-center">3–5 Days</td>
+                    <td className="py-3 px-3 sm:px-4 text-center font-bold bg-[#041e42]/5 text-[#041e42]">5–7 Days</td>
+                    <td className="py-3 px-3 sm:px-4 text-center">7–10 Days</td>
+                    <td className="py-3 px-3 sm:px-4 text-center">10–15+ Days</td>
+                  </tr>
+                  <tr className="hover:bg-slate-50/80">
+                    <td className="py-3 px-4 sm:px-6 font-semibold text-[#041e42]">Revision Rounds</td>
+                    <td className="py-3 px-3 sm:px-4 text-center">1 Round</td>
+                    <td className="py-3 px-3 sm:px-4 text-center font-bold bg-[#041e42]/5 text-[#041e42]">3 Rounds</td>
+                    <td className="py-3 px-3 sm:px-4 text-center text-emerald-600 font-bold">Unlimited</td>
+                    <td className="py-3 px-3 sm:px-4 text-center text-emerald-600 font-bold">Unlimited</td>
+                  </tr>
+                  <tr className="hover:bg-slate-50/80">
+                    <td className="py-3 px-4 sm:px-6 font-semibold text-[#041e42]">1-Year Domain Registration</td>
+                    <td className="py-3 px-3 sm:px-4 text-center text-emerald-600 font-bold">Included</td>
+                    <td className="py-3 px-3 sm:px-4 text-center text-emerald-600 font-bold bg-[#041e42]/5">Included</td>
+                    <td className="py-3 px-3 sm:px-4 text-center text-emerald-600 font-bold">Included</td>
+                    <td className="py-3 px-3 sm:px-4 text-center text-emerald-600 font-bold">Included</td>
+                  </tr>
+                  <tr className="hover:bg-slate-50/80">
+                    <td className="py-3 px-4 sm:px-6 font-semibold text-[#041e42]">1-Year Fast SSD Cloud Hosting</td>
+                    <td className="py-3 px-3 sm:px-4 text-center text-emerald-600 font-bold">Included</td>
+                    <td className="py-3 px-3 sm:px-4 text-center text-emerald-600 font-bold bg-[#041e42]/5">Included</td>
+                    <td className="py-3 px-3 sm:px-4 text-center text-emerald-600 font-bold">Included</td>
+                    <td className="py-3 px-3 sm:px-4 text-center text-emerald-600 font-bold">Included</td>
+                  </tr>
+                  <tr className="hover:bg-slate-50/80">
+                    <td className="py-3 px-4 sm:px-6 font-semibold text-[#041e42]">Annual Hosting Renewal (Yr 2+)</td>
+                    <td className="py-3 px-3 sm:px-4 text-center">$79/year</td>
+                    <td className="py-3 px-3 sm:px-4 text-center font-bold bg-[#041e42]/5 text-[#041e42]">$99/year</td>
+                    <td className="py-3 px-3 sm:px-4 text-center">$129/year</td>
+                    <td className="py-3 px-3 sm:px-4 text-center">$149+/year</td>
+                  </tr>
+                  <tr className="hover:bg-slate-50/80">
+                    <td className="py-3 px-4 sm:px-6 font-semibold text-[#041e42]">Mobile &amp; Tablet Optimization</td>
+                    <td className="py-3 px-3 sm:px-4 text-center text-emerald-600 font-bold">100% Responsive</td>
+                    <td className="py-3 px-3 sm:px-4 text-center text-emerald-600 font-bold bg-[#041e42]/5">100% Responsive</td>
+                    <td className="py-3 px-3 sm:px-4 text-center text-emerald-600 font-bold">100% Responsive</td>
+                    <td className="py-3 px-3 sm:px-4 text-center text-emerald-600 font-bold">100% Responsive</td>
+                  </tr>
+                  <tr className="hover:bg-slate-50/80">
+                    <td className="py-3 px-4 sm:px-6 font-semibold text-[#041e42]">Inquiry &amp; Quote Forms</td>
+                    <td className="py-3 px-3 sm:px-4 text-center">Standard Contact</td>
+                    <td className="py-3 px-3 sm:px-4 text-center font-bold bg-[#041e42]/5 text-[#041e42]">Dynamic Service Forms</td>
+                    <td className="py-3 px-3 sm:px-4 text-center">Multi-Step Inquiries</td>
+                    <td className="py-3 px-3 sm:px-4 text-center font-bold">Custom Client Portal</td>
+                  </tr>
+                  <tr className="hover:bg-slate-50/80">
+                    <td className="py-3 px-4 sm:px-6 font-semibold text-[#041e42]">Google Maps &amp; WhatsApp</td>
+                    <td className="py-3 px-3 sm:px-4 text-center text-emerald-600 font-bold">Included</td>
+                    <td className="py-3 px-3 sm:px-4 text-center text-emerald-600 font-bold bg-[#041e42]/5">Included</td>
+                    <td className="py-3 px-3 sm:px-4 text-center text-emerald-600 font-bold">Included</td>
+                    <td className="py-3 px-3 sm:px-4 text-center text-emerald-600 font-bold">Included</td>
+                  </tr>
+                  <tr className="hover:bg-slate-50/80">
+                    <td className="py-3 px-4 sm:px-6 font-semibold text-[#041e42]">On-Page SEO Optimization</td>
+                    <td className="py-3 px-3 sm:px-4 text-center">Basic Google Setup</td>
+                    <td className="py-3 px-3 sm:px-4 text-center font-bold bg-[#041e42]/5 text-[#041e42]">On-Page Keyword SEO</td>
+                    <td className="py-3 px-3 sm:px-4 text-center">Multi-Page Deep SEO</td>
+                    <td className="py-3 px-3 sm:px-4 text-center font-bold">Full Enterprise SEO</td>
+                  </tr>
+                  <tr className="hover:bg-slate-50/80">
+                    <td className="py-3 px-4 sm:px-6 font-semibold text-[#041e42]">Analytics &amp; Search Console</td>
+                    <td className="py-3 px-3 sm:px-4 text-center">Setup Included</td>
+                    <td className="py-3 px-3 sm:px-4 text-center font-bold bg-[#041e42]/5 text-[#041e42]">Setup &amp; Verified</td>
+                    <td className="py-3 px-3 sm:px-4 text-center">Goals &amp; Conversion Tracking</td>
+                    <td className="py-3 px-3 sm:px-4 text-center font-bold">Custom Funnel Metrics</td>
+                  </tr>
+                  <tr className="hover:bg-slate-50/80">
+                    <td className="py-3 px-4 sm:px-6 font-semibold text-[#041e42]">Free Post-Launch Support</td>
+                    <td className="py-3 px-3 sm:px-4 text-center">30 Days</td>
+                    <td className="py-3 px-3 sm:px-4 text-center font-bold bg-[#041e42]/5 text-[#041e42]">30 Days</td>
+                    <td className="py-3 px-3 sm:px-4 text-center">30 Days</td>
+                    <td className="py-3 px-3 sm:px-4 text-center text-emerald-600 font-bold">60 Days Extended</td>
+                  </tr>
+                  <tr className="hover:bg-slate-50/80">
+                    <td className="py-3 px-4 sm:px-6 font-semibold text-[#041e42]">Domain &amp; Code Ownership</td>
+                    <td className="py-3 px-3 sm:px-4 text-center text-emerald-600 font-bold">100% Yours</td>
+                    <td className="py-3 px-3 sm:px-4 text-center text-emerald-600 font-bold bg-[#041e42]/5">100% Yours</td>
+                    <td className="py-3 px-3 sm:px-4 text-center text-emerald-600 font-bold">100% Yours</td>
+                    <td className="py-3 px-3 sm:px-4 text-center text-emerald-600 font-bold">100% Yours</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
 
         </div>
@@ -926,17 +1246,17 @@ export const WebsiteDesignPage: React.FC<Props> = ({ navigate }) => {
 
                   <div className="pt-2 flex gap-3">
                     <button
-                      onClick={() => setIsBrochureModalOpen(true)}
-                      className="flex-1 py-2.5 px-4 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5"
+                      onClick={() => openPdfViewer('/brochures/wal-groups-website-services-brochure-2026.pdf', 'Website Services Brochure', 'Official Master PDF — 2026 Edition', 'wal-groups-website-services-brochure-2026.pdf')}
+                      className="flex-1 py-2.5 px-4 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                     >
                       <Eye className="w-4 h-4 text-[#ff8533]" />
                       <span>View Brochure</span>
                     </button>
 
                     <a
-                      href="/brochures/wal-groups-website-services-brochure-2026.pdf"
+                      href="/brochures/wal-groups-website-services-brochure-2026.pdf?download=1"
                       download="wal-groups-website-services-brochure-2026.pdf"
-                      className="flex-1 py-2.5 px-4 rounded-xl bg-[#ff6600] hover:bg-[#e65c00] text-black text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-lg"
+                      className="flex-1 py-2.5 px-4 rounded-xl bg-[#ff6600] hover:bg-[#e65c00] text-black text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-lg cursor-pointer"
                     >
                       <Download className="w-4 h-4" />
                       <span>Download PDF</span>
@@ -995,17 +1315,17 @@ export const WebsiteDesignPage: React.FC<Props> = ({ navigate }) => {
 
               <div className="pt-4 flex flex-wrap gap-4">
                 <button
-                  onClick={() => setIsBrochureModalOpen(true)}
-                  className="bg-[#ff6600] hover:bg-[#e65c00] text-black font-extrabold text-sm px-6 py-3 rounded-xl transition-all shadow-lg flex items-center gap-2"
+                  onClick={() => openPdfViewer('/brochures/wal-groups-website-services-brochure-2026.pdf', 'Website Services Brochure', 'Official Master PDF — 2026 Edition', 'wal-groups-website-services-brochure-2026.pdf')}
+                  className="bg-[#ff6600] hover:bg-[#e65c00] text-black font-extrabold text-sm px-6 py-3 rounded-xl transition-all shadow-lg flex items-center gap-2 cursor-pointer"
                 >
                   <Eye className="w-4 h-4" />
                   <span>View Brochure (Interactive)</span>
                 </button>
 
                 <a
-                  href="/brochures/wal-groups-website-services-brochure-2026.pdf"
+                  href="/brochures/wal-groups-website-services-brochure-2026.pdf?download=1"
                   download="wal-groups-website-services-brochure-2026.pdf"
-                  className="bg-white/10 hover:bg-white/15 text-white border border-white/20 font-bold text-sm px-6 py-3 rounded-xl transition-all flex items-center gap-2"
+                  className="bg-white/10 hover:bg-white/15 text-white border border-white/20 font-bold text-sm px-6 py-3 rounded-xl transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <Download className="w-4 h-4 text-[#ff8533]" />
                   <span>Download Master PDF</span>
@@ -1436,14 +1756,25 @@ export const WebsiteDesignPage: React.FC<Props> = ({ navigate }) => {
                   <p className="text-xs text-slate-600 leading-relaxed">{pkg.description}</p>
                 </div>
 
-                <a
-                  href={pkg.pdfUrl}
-                  download={pkg.pdfFilename}
-                  className="w-full py-2.5 px-4 rounded-xl bg-white hover:bg-[#041e42] text-[#041e42] hover:text-white border border-slate-300 text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-sm"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>Download Package Brochure →</span>
-                </a>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => openPdfModal(pkg.pdfUrl, `${pkg.name} Brochure`, 'Package Specifications & Inclusions', pkg.pdfFilename)}
+                    className="flex-1 py-2 px-3 rounded-xl bg-[#041e42] hover:bg-[#062c60] text-white text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer"
+                  >
+                    <Eye className="w-3.5 h-3.5 text-[#ff8533]" />
+                    <span>View Brochure</span>
+                  </button>
+
+                  <a
+                    href={`${pkg.pdfUrl}?download=1`}
+                    download={pkg.pdfFilename}
+                    className="flex-1 py-2 px-3 rounded-xl bg-white hover:bg-slate-100 text-[#041e42] border border-slate-300 text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer"
+                    title="Download original PDF"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Download</span>
+                  </a>
+                </div>
               </div>
             ))}
           </div>
@@ -1529,7 +1860,7 @@ export const WebsiteDesignPage: React.FC<Props> = ({ navigate }) => {
 
               <div className="flex flex-wrap gap-4 pt-4">
                 <button
-                  onClick={openBookDemo}
+                  onClick={() => openProjectForm(packages[1])}
                   className="bg-[#ff6600] hover:bg-[#e65c00] text-black font-extrabold text-sm sm:text-base px-7 py-3.5 rounded-xl transition-all shadow-[0_4px_20px_rgba(255,102,0,0.35)] cursor-pointer flex items-center gap-2"
                 >
                   <span>Start Your Project</span>
@@ -1740,291 +2071,33 @@ export const WebsiteDesignPage: React.FC<Props> = ({ navigate }) => {
       </AnimatePresence>
 
       {/* =========================================================================
-          MODAL: PACKAGE DETAILS MODAL
+          MODAL: IN-PAGE PDF VIEWER (Renders the Exact Original PDF Document)
           ========================================================================= */}
-      <AnimatePresence>
-        {selectedPackage && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 15 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 15 }}
-              className="bg-white rounded-2xl max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative text-[#041e42] max-h-[90vh] overflow-y-auto"
-            >
-              <button
-                onClick={() => setSelectedPackage(null)}
-                className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 rounded-lg"
-              >
-                <X className="w-5 h-5" />
-              </button>
-
-              <div className="space-y-4">
-                <div>
-                  <span className="text-[11px] font-bold text-[#ff6600] uppercase tracking-wider">
-                    PACKAGE DETAILS
-                  </span>
-                  <div className="flex items-baseline justify-between mt-1">
-                    <h3 className="text-2xl font-bold">{selectedPackage.name}</h3>
-                    <span className="text-2xl font-extrabold text-[#ff6600]">{selectedPackage.price}</span>
-                  </div>
-                  <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-                    {selectedPackage.description}
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-3 gap-2 p-3 bg-slate-50 rounded-xl text-xs text-center border border-slate-200">
-                  <div>
-                    <div className="font-semibold text-slate-500">Pages</div>
-                    <div className="font-bold text-[#041e42] mt-0.5">{selectedPackage.pages}</div>
-                  </div>
-                  <div>
-                    <div className="font-semibold text-slate-500">Revisions</div>
-                    <div className="font-bold text-[#041e42] mt-0.5">{selectedPackage.revisions}</div>
-                  </div>
-                  <div>
-                    <div className="font-semibold text-slate-500">Timeline</div>
-                    <div className="font-bold text-[#041e42] mt-0.5">{selectedPackage.delivery}</div>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#041e42]">
-                    Complete Deliverables &amp; Inclusions:
-                  </h4>
-                  <ul className="space-y-2 text-xs">
-                    {selectedPackage.highlights.map((hl, i) => (
-                      <li key={i} className="flex items-start gap-2">
-                        <Check className="w-4 h-4 text-[#ff6600] shrink-0 mt-0.5" />
-                        <span className="text-slate-700">{hl}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-900">
-                  <span className="font-bold">Renewal Information: </span>
-                  {selectedPackage.renewal}. Domain registration renewed separately at standard registrar rates.
-                </div>
-
-                <div className="pt-2 flex flex-col sm:flex-row gap-3">
-                  <a
-                    href={selectedPackage.pdfUrl}
-                    download={selectedPackage.pdfFilename}
-                    className="flex-1 py-3 px-4 rounded-xl bg-[#041e42] hover:bg-[#062c60] text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5"
-                  >
-                    <Download className="w-4 h-4" />
-                    <span>Download Package PDF</span>
-                  </a>
-
-                  <button
-                    onClick={() => {
-                      setSelectedPackage(null);
-                      openBookDemo();
-                    }}
-                    className="flex-1 py-3 px-4 rounded-xl bg-[#ff6600] hover:bg-[#e65c00] text-black text-xs font-extrabold transition-all flex items-center justify-center gap-1.5"
-                  >
-                    <span>Start This Package</span>
-                    <ArrowRight className="w-4 h-4 text-black" />
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+      <PdfViewerModal
+        isOpen={isPdfModalOpen}
+        onClose={closePdfModal}
+        pdfUrl={activePdfUrl}
+        title={activePdfTitle}
+        subtitle={activePdfSubtitle}
+        downloadFilename={activePdfFilename}
+      />
 
       {/* =========================================================================
-          MODAL: INTERACTIVE BROCHURE VIEWER (18 Pages from Master PDF)
+          MODAL: UNIVERSAL WEBSITE PROJECT FORM
           ========================================================================= */}
-      <AnimatePresence>
-        {isBrochureModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-[#0b1626] rounded-2xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl border border-white/20 overflow-hidden text-white"
-            >
-              {/* Header */}
-              <div className="px-5 py-3 border-b border-white/10 flex items-center justify-between bg-[#041e42]">
-                <div className="flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-[#ff8533]" />
-                  <span className="text-xs sm:text-sm font-bold">
-                    WAL GROUPS — Website Services Brochure (2026)
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <a
-                    href="/brochures/wal-groups-website-services-brochure-2026.pdf"
-                    download="wal-groups-website-services-brochure-2026.pdf"
-                    className="hidden sm:flex items-center gap-1.5 text-xs text-[#ff8533] hover:underline"
-                  >
-                    <Download className="w-3.5 h-3.5" />
-                    <span>Download PDF</span>
-                  </a>
-                  <button
-                    onClick={() => setIsBrochureModalOpen(false)}
-                    className="p-1.5 text-slate-400 hover:text-white rounded-lg"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Viewer Content */}
-              <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-[#030e1c] flex items-center justify-center">
-                <div className="max-w-2xl w-full bg-white text-[#041e42] rounded-xl p-8 sm:p-12 shadow-2xl min-h-[500px] flex flex-col justify-between border border-slate-300">
-                  
-                  {/* Page-Specific Content Representation */}
-                  {brochurePage === 1 && (
-                    <div className="space-y-6 text-center py-6">
-                      <div className="w-12 h-12 rounded-xl bg-[#041e42] text-[#ff6600] flex items-center justify-center font-bold text-xl mx-auto">
-                        W
-                      </div>
-                      <span className="text-xs font-bold tracking-widest text-[#ff6600] uppercase block">
-                        WAL GROUPS BUSINESS SERVICES · BROCHURE 2026
-                      </span>
-                      <h3 className="text-3xl sm:text-4xl font-black text-[#041e42] leading-tight">
-                        Professional websites built for businesses that move.
-                      </h3>
-                      <p className="text-sm text-slate-600 max-w-md mx-auto">
-                        Websites that make your business look credible, explain what you do, and make it easy for customers to get in touch.
-                      </p>
-                      <div className="p-4 bg-slate-50 rounded-xl text-xs text-slate-700 font-semibold max-w-sm mx-auto border border-slate-200">
-                        USA · Canada · UK · Australia · Worldwide
-                      </div>
-                    </div>
-                  )}
-
-                  {brochurePage === 2 && (
-                    <div className="space-y-4">
-                      <span className="text-xs font-bold text-[#ff6600]">01 — WHO WE ARE</span>
-                      <h3 className="text-2xl font-bold">Your website is often the first impression. Make it count.</h3>
-                      <p className="text-xs text-slate-600 leading-relaxed">
-                        Wal Groups is a business services company providing professional website development and digital solutions for businesses in the USA, Canada, the UK, Australia and worldwide.
-                      </p>
-                      <div className="p-4 bg-[#041e42] text-white rounded-xl text-xs space-y-1">
-                        <div className="font-bold text-[#ff8533]">OUR FOCUS:</div>
-                        <div>We build professional websites that make your business look credible, help you stand out from competitors, and make it easier for potential customers to contact you.</div>
-                      </div>
-                    </div>
-                  )}
-
-                  {brochurePage >= 3 && brochurePage <= 6 && (
-                    <div className="space-y-4">
-                      <span className="text-xs font-bold text-[#ff6600]">SECTION 02 — ARCHITECTURE &amp; SECTORS</span>
-                      <h3 className="text-2xl font-bold">
-                        {brochurePage === 3 ? 'What We Build' : brochurePage === 4 ? 'Why Wal Groups?' : brochurePage === 5 ? 'Industries We Serve' : 'Transportation Specialization'}
-                      </h3>
-                      <p className="text-xs text-slate-600 leading-relaxed">
-                        Custom website development tailored to your business requirements — designed, built, tested and launched for you with complete domain ownership.
-                      </p>
-                      <div className="grid grid-cols-2 gap-3 text-xs">
-                        <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">✓ Credibility from first visit</div>
-                        <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">✓ Mobile responsiveness</div>
-                        <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">✓ Clear service breakdown</div>
-                        <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">✓ Contact visibility on all screens</div>
-                      </div>
-                    </div>
-                  )}
-
-                  {brochurePage >= 7 && brochurePage <= 9 && (
-                    <div className="space-y-4">
-                      <span className="text-xs font-bold text-[#ff6600]">SECTION 06 — PACKAGES &amp; COMPARISON</span>
-                      <h3 className="text-2xl font-bold">Clear packages. Straightforward pricing.</h3>
-                      <div className="grid grid-cols-2 gap-3 text-xs">
-                        <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
-                          <div className="font-bold text-[#041e42]">Starter Website ($399)</div>
-                          <div className="text-slate-600">Up to 5 pages · 3–5 days · 1 revision round</div>
-                        </div>
-                        <div className="p-3 bg-[#041e42] text-white rounded-xl space-y-1">
-                          <div className="font-bold text-[#ff8533]">Business Website ($699)</div>
-                          <div className="text-slate-300">Up to 8 pages · 5–7 days · 3 revisions</div>
-                        </div>
-                        <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
-                          <div className="font-bold text-[#041e42]">Growth Website ($999)</div>
-                          <div className="text-slate-600">Up to 12 pages · 7–10 days · Unlimited revs</div>
-                        </div>
-                        <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
-                          <div className="font-bold text-[#041e42]">Custom Website ($1,499+)</div>
-                          <div className="text-slate-600">Custom scope · 10–15+ days · Portals &amp; CRM</div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {brochurePage >= 10 && brochurePage <= 18 && (
-                    <div className="space-y-4">
-                      <span className="text-xs font-bold text-[#ff6600]">SECTION {brochurePage} — POLICIES &amp; LAUNCH</span>
-                      <h3 className="text-2xl font-bold">
-                        {brochurePage === 10 ? "What's Included & SEO" :
-                         brochurePage === 11 ? 'Lead Generation Design' :
-                         brochurePage === 12 ? '8-Step Website Process' :
-                         brochurePage === 13 ? 'Domain, Hosting & Ownership' :
-                         brochurePage === 14 ? 'Maintenance & Support ($199/yr)' :
-                         brochurePage === 15 ? 'Selected Portfolio Works' :
-                         brochurePage === 16 ? 'Existing Website Review (12 Points)' :
-                         brochurePage === 17 ? 'Frequently Asked Questions' :
-                         'Ready to Build Your Website?'}
-                      </h3>
-                      <p className="text-xs text-slate-600 leading-relaxed">
-                        {brochurePage === 13 
-                          ? 'Once the project is fully paid, you retain full ownership of your domain and content. We never lock you in.'
-                          : brochurePage === 14
-                          ? '30 days free post-launch support included with every website. Optional annual maintenance available at $199/year.'
-                          : brochurePage === 17
-                          ? 'Common questions answered with complete clarity. Packages start at $399 with no hidden hosting surprise.'
-                          : 'Explore our complete brochure or download the PDF file directly to keep on file.'}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Brochure Page Footer */}
-                  <div className="pt-6 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-500">
-                    <span>thewalgroup.in · WAL GROUPS 2026</span>
-                    <span className="font-bold font-mono">Page {brochurePage} of 18</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Navigation Controls */}
-              <div className="p-4 bg-[#041e42] border-t border-white/10 flex items-center justify-between">
-                <button
-                  disabled={brochurePage <= 1}
-                  onClick={() => setBrochurePage(p => Math.max(1, p - 1))}
-                  className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 disabled:opacity-30 text-xs font-bold transition-all cursor-pointer disabled:cursor-not-allowed"
-                >
-                  ← Previous Page
-                </button>
-
-                <div className="flex items-center gap-1">
-                  {[1, 2, 7, 8, 9, 12, 13, 15, 17, 18].map(p => (
-                    <button
-                      key={p}
-                      onClick={() => setBrochurePage(p)}
-                      className={`w-7 h-7 rounded text-[11px] font-bold transition-all ${
-                        brochurePage === p 
-                          ? 'bg-[#ff6600] text-black font-extrabold' 
-                          : 'text-slate-300 hover:bg-white/10'
-                      }`}
-                    >
-                      {p}
-                    </button>
-                  ))}
-                </div>
-
-                <button
-                  disabled={brochurePage >= 18}
-                  onClick={() => setBrochurePage(p => Math.min(18, p + 1))}
-                  className="px-4 py-2 rounded-lg bg-[#ff6600] hover:bg-[#e65c00] text-black disabled:opacity-30 text-xs font-bold transition-all cursor-pointer disabled:cursor-not-allowed"
-                >
-                  Next Page →
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+      <WebsiteProjectModal
+        isOpen={isProjectModalOpen}
+        onClose={() => {
+          setIsProjectModalOpen(false);
+          scrollToSection('packages');
+        }}
+        selectedPackage={projectModalPackage}
+        onPackageChange={(pkg) => setProjectModalPackage(pkg)}
+        onChangePackageClick={() => {
+          setIsProjectModalOpen(false);
+          scrollToSection('packages');
+        }}
+      />
 
     </div>
   );

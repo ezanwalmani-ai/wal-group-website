@@ -13,7 +13,8 @@ import {
   ChevronRight,
   Shield,
   Loader2,
-  X
+  X,
+  Globe
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -21,6 +22,7 @@ export type AdminTab =
   | 'dashboard'
   | 'contacts'
   | 'leads'
+  | 'website-projects'
   | 'jobs'
   | 'bookings'
   | 'tickets'
@@ -34,6 +36,7 @@ interface SidebarProps {
   counts?: {
     contacts?: number;
     leads?: number;
+    websiteProjects?: number;
     jobs?: number;
     bookings?: number;
     tickets?: number;
@@ -58,6 +61,7 @@ export const AdminSidebar: React.FC<SidebarProps> = ({
     { id: 'dashboard' as AdminTab, label: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
     { id: 'contacts' as AdminTab, label: 'Contacts', path: '/admin/contacts', icon: Mail, count: counts?.contacts },
     { id: 'leads' as AdminTab, label: 'Leads', path: '/admin/leads', icon: UserCheck, count: counts?.leads },
+    { id: 'website-projects' as AdminTab, label: 'Website Projects', path: '/admin/website-projects', icon: Globe, count: counts?.websiteProjects },
     { id: 'jobs' as AdminTab, label: 'Job Applications', path: '/admin/jobs', icon: Briefcase, count: counts?.jobs },
     { id: 'bookings' as AdminTab, label: 'Bookings', path: '/admin/bookings', icon: Calendar, count: counts?.bookings },
     { id: 'tickets' as AdminTab, label: 'Tickets', path: '/admin/tickets', icon: LifeBuoy, count: counts?.tickets },

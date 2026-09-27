@@ -50,6 +50,13 @@ CREATE TABLE IF NOT EXISTS public.leads (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Ensure all columns exist even if the table was created earlier with fewer fields
+ALTER TABLE public.leads ADD COLUMN IF NOT EXISTS source TEXT DEFAULT 'Website Form';
+ALTER TABLE public.leads ADD COLUMN IF NOT EXISTS title TEXT;
+ALTER TABLE public.leads ADD COLUMN IF NOT EXISTS service TEXT;
+ALTER TABLE public.leads ADD COLUMN IF NOT EXISTS notes TEXT;
+ALTER TABLE public.leads ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'New';
+
 -- 3. CONTACT SUBMISSIONS TABLE
 CREATE TABLE IF NOT EXISTS public.contact_submissions (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -174,3 +181,76 @@ CREATE INDEX IF NOT EXISTS idx_contacts_created_at ON public.contact_submissions
 CREATE INDEX IF NOT EXISTS idx_job_apps_applied_at ON public.job_applications(applied_at DESC);
 CREATE INDEX IF NOT EXISTS idx_ai_logs_created_at ON public.ai_logs(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_ai_logs_session_id ON public.ai_logs(session_id);
+
+-- ====================================================================
+-- 9. WEBSITE PROJECT REQUESTS TABLE
+-- Dedicated table for WAL GROUPS Website Project Form submissions
+-- ====================================================================
+CREATE TABLE IF NOT EXISTS public.website_project_requests (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  package_name TEXT NOT NULL,
+  package_price TEXT NOT NULL,
+  full_name TEXT NOT NULL,
+  business_name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  phone TEXT NOT NULL,
+  country TEXT NOT NULL,
+  city_state TEXT,
+  industry TEXT NOT NULL,
+  business_description TEXT NOT NULL,
+  website_goals JSONB NOT NULL DEFAULT '[]'::jsonb,
+  required_pages JSONB NOT NULL DEFAULT '[]'::jsonb,
+  has_existing_website BOOLEAN DEFAULT false,
+  current_website_url TEXT,
+  has_logo TEXT,
+  has_content TEXT,
+  design_style TEXT,
+  inspiration_url TEXT,
+  additional_requirements TEXT,
+  project_timeline TEXT,
+  confirmation_accepted BOOLEAN DEFAULT true,
+  status TEXT DEFAULT 'New',
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Enable Row Level Security (RLS)
+ALTER TABLE public.website_project_requests ENABLE ROW LEVEL SECURITY;
+
+-- RLS: Public can INSERT only (submit project requests)
+DROP POLICY IF EXISTS "Allow public inserts to website_project_requests" ON public.website_project_requests;
+CREATE POLICY "Allow public inserts to website_project_requests" 
+ON public.website_project_requests 
+FOR INSERT 
+TO anon, authenticated 
+WITH CHECK (true);
+
+-- RLS: Public CANNOT select, update, or delete.
+-- Only authenticated / admin users can view, update, or delete submissions.
+DROP POLICY IF EXISTS "Allow authenticated read website_project_requests" ON public.website_project_requests;
+CREATE POLICY "Allow authenticated read website_project_requests" 
+ON public.website_project_requests 
+FOR SELECT 
+TO authenticated 
+USING (true);
+
+DROP POLICY IF EXISTS "Allow authenticated update website_project_requests" ON public.website_project_requests;
+CREATE POLICY "Allow authenticated update website_project_requests" 
+ON public.website_project_requests 
+FOR UPDATE 
+TO authenticated 
+USING (true);
+
+DROP POLICY IF EXISTS "Allow authenticated delete website_project_requests" ON public.website_project_requests;
+CREATE POLICY "Allow authenticated delete website_project_requests" 
+ON public.website_project_requests 
+FOR DELETE 
+TO authenticated 
+USING (true);
+
+-- Indexes for Fast Search & Filter Performance
+CREATE INDEX IF NOT EXISTS idx_website_projects_created_at ON public.website_project_requests(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_website_projects_status ON public.website_project_requests(status);
+CREATE INDEX IF NOT EXISTS idx_website_projects_email ON public.website_project_requests(email);
+CREATE INDEX IF NOT EXISTS idx_website_projects_package ON public.website_project_requests(package_name);
+
