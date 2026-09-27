@@ -1236,12 +1236,13 @@ The user is currently viewing: "${behavior?.lastPageVisited || '/'}". Pages view
         sanitizedContents.push({ role: 'user', parts: [{ text: userText }] });
       }
 
+      const apiTimeoutMs = process.env.NODE_ENV === 'test' || process.env.VITEST ? 3500 : 10000;
       const timeoutPromise = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error('Gemini API timeout')), 25000)
+        setTimeout(() => reject(new Error('Gemini API timeout')), apiTimeoutMs)
       );
 
       const responsePromise = ai.models.generateContent({
-        model: 'gemini-3.7-flash',
+        model: 'gemini-3.8-flash',
         contents: sanitizedContents,
         config: {
           systemInstruction: { parts: [{ text: systemPrompt }] },
@@ -1255,43 +1256,32 @@ The user is currently viewing: "${behavior?.lastPageVisited || '/'}". Pages view
       if (response && response.text) {
         responseText = response.text;
         activeProvider = 'Gemini';
-        activeModel = 'gemini-3.7-flash';
+        activeModel = 'gemini-3.8-flash';
         return true;
       }
     } catch (err: any) {
       console.warn('[AI Assistant] Gemini API issue:', err?.message || err);
-      // Try fallback to gemini-3.6-flash
+      // Try fallback to gemini-3.5-flash-lite
       try {
         if (ai) {
-          const fallbackRes = await ai.models.generateContent({
-            model: 'gemini-3.6-flash',
+          const fallbackTimeout = process.env.NODE_ENV === 'test' || process.env.VITEST ? 2000 : 5000;
+          const fallbackPromise = ai.models.generateContent({
+            model: 'gemini-3.5-flash-lite',
             contents: [{ role: 'user', parts: [{ text: `${systemPrompt}\n\nUser Question: ${userText}` }] }]
           });
+          const fallbackTimeoutPromise = new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error('Gemini fallback timeout')), fallbackTimeout)
+          );
+          const fallbackRes = await Promise.race([fallbackPromise, fallbackTimeoutPromise]);
           if (fallbackRes && fallbackRes.text) {
             responseText = fallbackRes.text;
             activeProvider = 'Gemini';
-            activeModel = 'gemini-3.6-flash';
+            activeModel = 'gemini-3.5-flash-lite';
             return true;
           }
         }
       } catch (fallbackErr: any) {
-        console.warn('[AI Assistant] Gemini 3.6 fallback issue, trying 3.1-flash-lite:', fallbackErr?.message || fallbackErr);
-        try {
-          if (ai) {
-            const liteRes = await ai.models.generateContent({
-              model: 'gemini-3.1-flash-lite',
-              contents: [{ role: 'user', parts: [{ text: `${systemPrompt}\n\nUser Question: ${userText}` }] }]
-            });
-            if (liteRes && liteRes.text) {
-              responseText = liteRes.text;
-              activeProvider = 'Gemini';
-              activeModel = 'gemini-3.1-flash-lite';
-              return true;
-            }
-          }
-        } catch (liteErr: any) {
-          console.warn('[AI Assistant] Gemini lite fallback issue:', liteErr?.message || liteErr);
-        }
+        console.warn('[AI Assistant] Gemini fallback issue:', fallbackErr?.message || fallbackErr);
       }
     }
     return false;
