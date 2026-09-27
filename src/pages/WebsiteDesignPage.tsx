@@ -1012,14 +1012,15 @@ export const WebsiteDesignPage: React.FC<Props> = ({ navigate }) => {
                     <button
                       type="button"
                       onClick={() => openPdfViewer(pkg.pdfUrl, `${pkg.name} Brochure`, 'Package Specifications & Inclusions', pkg.pdfFilename)}
-                      className={`py-2 px-2.5 rounded-xl text-[11px] font-semibold border transition-all flex items-center justify-center gap-1 cursor-pointer ${
+                      className={`py-2 px-2.5 rounded-xl text-[11px] font-semibold border transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                         pkg.badge 
                           ? 'border-white/20 text-slate-200 hover:bg-white/10' 
                           : 'border-slate-300 text-slate-700 hover:bg-slate-100'
                       }`}
+                      title={`View ${pkg.name} Brochure PDF`}
                     >
-                      <Eye className="w-3 h-3 text-[#ff8533]" />
-                      <span>Brochure</span>
+                      <Eye className="w-3.5 h-3.5 text-[#ff8533]" />
+                      <span>View Brochure</span>
                     </button>
 
                     <a

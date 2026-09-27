@@ -1,5 +1,44 @@
 [
   {
+    "id": "LEAD-MUJKTLQ5",
+    "name": "Carlos Rodriguez",
+    "company": "Lone Star Logistics LLC",
+    "email": "crodriguez@lonestarlogistics.com",
+    "phone": "+1 713-555-8899",
+    "country": "United States",
+    "industry": "Logistics",
+    "fleetSize": "45 vans",
+    "teamSize": "60 drivers",
+    "challenges": "Payroll reconciliation and late night dispatch coverage",
+    "servicesOfInterest": [
+      "Amazon DSP Dispatch",
+      "DSP Accounting & Payroll"
+    ],
+    "score": "Hot",
+    "scoreReason": "Direct web lead form submission",
+    "status": "New",
+    "createdAt": "2026-09-27T08:48:31.037Z",
+    "routedTo": "thewalgroupinfo@gmail.com"
+  },
+  {
+    "id": "WAL-WEB-MUJKB",
+    "name": "Salim Ezhan Walmani",
+    "company": "tttt",
+    "email": "ezanwalmani@gmail.com",
+    "phone": "+916363698248",
+    "country": "India",
+    "industry": "Construction",
+    "servicesOfInterest": [
+      "Website Design: Business Website ($699)"
+    ],
+    "score": "Hot",
+    "scoreReason": "Website Project Form Submission for Business Website",
+    "status": "New",
+    "createdAt": "2026-09-27T08:34:45.186Z",
+    "routedTo": "thewalgroupinfo@gmail.com",
+    "notes": "Package: Business Website ($699)\nCity/State: Belagavi\nAbout: We ae a gjjs akkljojs jkjnskjnn hhdhdh jkkjnknknd jd We ae a gjjs akkljojs jkjnskjnn hhdhdh jkkjnknknd jd We ae a gjjs akkljojs jkjnskjnn hhdhdh jkkjnknknd jd\nGoals: Build credibility, Generate enquiries\nPages: Home, About, Services, Contact\nExisting Website: No\nLogo: Yes\nContent Ready: Some\nStyle: Modern & Premium\nInspiration: None\nSpecific Needs: None\nTimeline: Within 1–2 weeks"
+  },
+  {
     "id": "WAL-WEB-MUJJRMNR",
     "name": "Dev Verification",
     "company": "Acme Logistics",
@@ -615,7 +654,7 @@
     "fleetSize": "30 vans",
     "score": "Hot",
     "scoreReason": "Engaged via AI Business Assistant | Last Page: /contact",
-    "sessionId": "SESS-1790492687592-4z43",
+    "sessionId": "SESS-1790498900685-edic",
     "status": "New",
     "createdAt": "2026-07-26T11:01:23.327Z",
     "routedTo": "thewalgroupinfo@gmail.com",
