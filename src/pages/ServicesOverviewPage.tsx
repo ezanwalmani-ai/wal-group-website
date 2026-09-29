@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { MotionSection } from '../components/MotionSection';
 import { AnimatedHeading } from '../components/AnimatedHeading';
+import { InfiniteSliderHoverSpeed } from '../components/InfiniteSliderHoverSpeed';
 import { 
   Monitor, 
   Headphones, 
@@ -177,6 +178,9 @@ export const ServicesOverviewPage: React.FC<ServicesOverviewPageProps> = ({ navi
 
         </div>
       </MotionSection>
+
+      {/* TECHNICAL FLUENCY & PLATFORM ECOSYSTEM SLIDER */}
+      <InfiniteSliderHoverSpeed />
 
       {/* CTA */}
       <MotionSection className="py-16 px-4 sm:px-6 lg:px-8 bg-[#050505] border-t border-white/10 text-white text-center">

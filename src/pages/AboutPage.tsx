@@ -1,6 +1,7 @@
 import React from 'react';
 import { Target, Rocket, Star, ShieldCheck, HeartHandshake, Award } from 'lucide-react';
 import { AnimatedImage } from '../components/AnimatedImage';
+import { TextRoll } from '@/components/core/text-roll';
 
 interface AboutPageProps {
   navigate: (path: string) => void;
@@ -21,8 +22,9 @@ export const AboutPage: React.FC<AboutPageProps> = ({ navigate }) => {
             </div>
 
             <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
-              Relationships First. <br />
-              <span className="text-amber-400">Business Follows.</span>
+              <TextRoll className="text-4xl text-black dark:text-white">
+                Relationships First. Business Follows.
+              </TextRoll>
             </h1>
 
             <p className="text-lg text-slate-200 leading-relaxed max-w-2xl font-normal">

@@ -101,10 +101,10 @@ function AppContent() {
     } else {
       switch (currentPath) {
         case '/':
-          title = 'Wal Group | We Run the Backend So You Can Run the Business';
+          title = 'Wal Group | We Run the Backend. So You Can Run the Business.';
           break;
         case '/about':
-          title = 'About Us | Wal Group - Relationships First, Business Follows';
+          title = 'About Us | Wal Group - Relationships First. Business Follows.';
           break;
         case '/services':
           title = 'Services Overview | Wal Group Logistics & BPO Solutions';

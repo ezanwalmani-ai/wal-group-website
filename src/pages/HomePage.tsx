@@ -4,7 +4,7 @@ import { useBooking } from '../context/BookingContext';
 import { AnimatedWhiteLinesBackground } from '../components/AnimatedWhiteLinesBackground';
 import { CinematicHeroScanLight } from '../components/CinematicHeroScanLight';
 import { StatsCounter } from '../components/StatsCounter';
-import { AnimatedHeading } from '../components/AnimatedHeading';
+import { TextRoll } from '@/components/core/text-roll';
 import { MotionSection } from '../components/MotionSection';
 import { AnimatedIcon } from '../components/AnimatedIcon';
 import { AnimatedImage } from '../components/AnimatedImage';
@@ -91,9 +91,11 @@ export const HomePage: React.FC<HomePageProps> = ({ navigate }) => {
               <span>24×7×365 BACKEND OPERATIONS &amp; OUTSOURCING</span>
             </motion.div>
 
-            {/* H1 Headline Reveal Word by Word */}
+            {/* H1 Headline with TextRoll */}
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.1]">
-              <AnimatedHeading text="We Run the Backend So You Can Run the Business." highlightWord="So You Can" />
+              <TextRoll className="text-4xl text-black dark:text-white">
+                We Run the Backend. So You Can Run the Business.
+              </TextRoll>
             </h1>
 
             {/* Subheadline Fade */}

@@ -108,6 +108,21 @@ html.light section:first-of-type div {
   color: #ffffff;
 }
 
+/* Ensure TextRoll headlines in hero sections remain high-contrast and readable in all themes */
+section:first-of-type h1 span,
+section:first-of-type h1 [class*="text-black"],
+html.light section:first-of-type h1 [class*="text-black"] {
+  color: #ffffff !important;
+}
+
+/* Responsive typography scaling for TextRoll headlines */
+@media (min-width: 640px) {
+  section:first-of-type h1 > span.text-4xl {
+    font-size: inherit;
+    line-height: inherit;
+  }
+}
+
 html.light section:first-of-type p {
   color: #e2e8f0 !important;
 }
