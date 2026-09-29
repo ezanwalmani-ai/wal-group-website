@@ -320,7 +320,13 @@ export const WorkspaceHub: React.FC<WorkspaceHubProps> = ({
               {user && !needsAuth && (
                 <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl p-2 px-3">
                   {user.photoURL ? (
-                    <img src={user.photoURL} alt={user.displayName || 'User'} className="w-7 h-7 rounded-full" />
+                    <img 
+                      src={user.photoURL} 
+                      alt={user.displayName || 'User'} 
+                      loading="lazy" 
+                      decoding="async" 
+                      className="w-7 h-7 rounded-full" 
+                    />
                   ) : (
                     <div className="w-7 h-7 rounded-full bg-[#ff7700] text-black font-extrabold flex items-center justify-center text-xs">
                       {(user.email || 'U')[0].toUpperCase()}

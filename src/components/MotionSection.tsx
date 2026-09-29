@@ -12,18 +12,16 @@ export const MotionSection: React.FC<MotionSectionProps> = ({
   children,
   className = '',
   delay = 0,
-  duration = 0.8,
+  duration = 0.4,
 }) => {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24, filter: 'blur(8px)' }}
-      whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-      viewport={{ once: true, margin: '-60px' }}
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '200px 0px 50px 0px' }}
       transition={{
-        type: 'spring',
-        stiffness: 80,
-        damping: 18,
         duration: duration,
+        ease: [0.22, 1, 0.36, 1],
         delay: delay,
       }}
       className={className}

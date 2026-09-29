@@ -41,8 +41,8 @@ export const AnimatedHeading: React.FC<AnimatedHeadingProps> = ({
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.08,
-        delayChildren: 0.1,
+        staggerChildren: 0.03,
+        delayChildren: 0.02,
       },
     },
   };
@@ -50,20 +50,16 @@ export const AnimatedHeading: React.FC<AnimatedHeadingProps> = ({
   const wordVariants = {
     hidden: {
       opacity: 0,
-      filter: 'blur(10px)',
-      y: 20,
-      scale: 0.98,
+      y: 12,
+      scale: 0.99,
     },
     visible: {
       opacity: 1,
-      filter: 'blur(0px)',
       y: 0,
       scale: 1,
       transition: {
-        type: 'spring',
-        damping: 20,
-        stiffness: 90,
-        duration: 0.9,
+        duration: 0.35,
+        ease: [0.22, 1, 0.36, 1],
       },
     },
   };
@@ -80,7 +76,7 @@ export const AnimatedHeading: React.FC<AnimatedHeadingProps> = ({
       variants={containerVariants}
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, margin: '-50px' }}
+      viewport={{ once: true, margin: '200px 0px 50px 0px' }}
       className={`inline-flex flex-wrap gap-x-[0.25em] gap-y-[0.1em] ${className}`}
     >
       {words.map((word, i) => {

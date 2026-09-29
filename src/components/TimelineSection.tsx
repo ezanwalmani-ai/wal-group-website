@@ -129,10 +129,10 @@ export const TimelineSection: React.FC<{ navigate: (path: string) => void }> = (
               return (
                 <motion.div
                   key={index}
-                  initial={{ opacity: 0, y: 30 }}
+                  initial={{ opacity: 0, y: 16 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: '-50px' }}
-                  transition={{ duration: 0.6, delay: index * 0.15 }}
+                  viewport={{ once: true, margin: '200px 0px 50px 0px' }}
+                  transition={{ duration: 0.35, delay: index * 0.08 }}
                   whileHover={{ y: -8, scale: 1.02 }}
                   className={`glass-panel p-6 rounded-2xl border transition-all duration-500 relative flex flex-col justify-between cursor-default group shadow-2xl ${
                     isReached 

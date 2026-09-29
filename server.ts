@@ -4,6 +4,7 @@ import fs from 'fs';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
 import OpenAI from 'openai';
+import { handleImageOptimization } from './src/server/imageService';
 import { saveBookingToSupabase, saveLeadToSupabase, saveContactSubmissionToSupabase, saveJobApplicationToSupabase, saveTicketToSupabase, saveAiLogToSupabase, saveWebsiteProjectRequestToSupabase, supabase } from './src/lib/supabase';
 
 const app = express();
@@ -2006,6 +2007,37 @@ ${xmlUrls}
 </urlset>`;
 
   res.type('application/xml').send(sitemapXml);
+});
+
+// Dynamic Image Resizing & WebP Conversion Endpoints
+app.get('/api/optimize-image', handleImageOptimization);
+app.get('/api/images', handleImageOptimization);
+
+// Transparent middleware for direct image requests under /images/*:
+// Handles on-the-fly resizing (?w=400), quality (?q=75), WebP format negotiation
+app.get('/images/*', (req, res, next) => {
+  const hasResizeParams = req.query.w || req.query.width || req.query.h || req.query.height || req.query.q || req.query.format || req.query.fm;
+  if (hasResizeParams) {
+    req.query.url = req.path;
+    return handleImageOptimization(req, res);
+  }
+
+  // Transparent WebP negotiation for legacy .jpg/.png requests when browser supports image/webp
+  const accept = req.headers.accept || '';
+  if (accept.includes('image/webp')) {
+    const ext = path.extname(req.path).toLowerCase();
+    if (ext === '.jpg' || ext === '.jpeg' || ext === '.png') {
+      const webpRelative = req.path.slice(0, -ext.length) + '.webp';
+      const webpDiskPath = path.join(process.cwd(), 'public', webpRelative.replace(/^\//, ''));
+      if (fs.existsSync(webpDiskPath)) {
+        res.type('image/webp');
+        res.set('Cache-Control', 'public, max-age=31536000, immutable');
+        res.set('Vary', 'Accept');
+        return res.sendFile(webpDiskPath);
+      }
+    }
+  }
+  next();
 });
 
 // Vite & Static file handling

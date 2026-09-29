@@ -41,6 +41,7 @@ import {
 import { useBooking } from '../context/BookingContext';
 import { PdfViewerModal } from '../components/PdfViewerModal';
 import { WebsiteProjectModal, WebsitePackageInfo } from '../components/WebsiteProjectModal';
+import { getOptimizedImageUrl, getResponsiveSrcSet } from '../lib/imageOptimizer';
 
 interface Props {
   navigate: (path: string) => void;
@@ -615,10 +616,10 @@ export const WebsiteDesignPage: React.FC<Props> = ({ navigate }) => {
                   </a>
                 </div>
 
-                {/* Website Preview Graphic — Strictly Preserves 16:9 Aspect Ratio with No Cropping */}
+                {/* Website Preview Graphic — Strictly Preserves 16:9 Aspect Ratio with Dynamic WebP */}
                 <div className="relative rounded-xl overflow-hidden aspect-[16/9] bg-[#0c1829] border border-white/10 shadow-inner">
-                  <img 
-                    src={
+                  {(() => {
+                    const heroImgSrc = 
                       heroActiveSector === 'southdekalb' 
                         ? '/images/portfolio/southdekalb.webp' 
                         : heroActiveSector === 'alpine-medical'
@@ -627,12 +628,26 @@ export const WebsiteDesignPage: React.FC<Props> = ({ navigate }) => {
                         ? '/images/portfolio/abhijobs.webp'
                         : heroActiveSector === 'wal-groups'
                         ? '/images/portfolio/wal-groups.webp'
-                        : '/images/portfolio/ml-worldwide.webp'
-                    } 
-                    alt="Custom Built Website Tailored to Your Sector Preview"
-                    className="w-full h-full object-cover object-top transition-all duration-300"
-                    loading="eager"
-                  />
+                        : '/images/portfolio/ml-worldwide.webp';
+                    return (
+                      <picture className="w-full h-full block">
+                        <source
+                          type="image/webp"
+                          srcSet={getResponsiveSrcSet(heroImgSrc, [400, 800, 1200], 80, 'webp')}
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 60vw, 800px"
+                        />
+                        <img 
+                          src={getOptimizedImageUrl(heroImgSrc, 800, 80, 'webp')} 
+                          alt="Custom Built Website Tailored to Your Sector Preview"
+                          className="w-full h-full object-cover object-top transition-all duration-300"
+                          loading="lazy"
+                          decoding="async"
+                          width={1200}
+                          height={675}
+                        />
+                      </picture>
+                    );
+                  })()}
                 </div>
 
                 {/* Sector Switcher Chips */}
@@ -805,14 +820,24 @@ export const WebsiteDesignPage: React.FC<Props> = ({ navigate }) => {
                           </span>
                         </div>
 
-                        {/* Screenshot Image: 16:9 Aspect Ratio Maintained, Sharp & Uncropped */}
+                        {/* Screenshot Image: 16:9 Aspect Ratio Maintained, Dynamic WebP & Resized */}
                         <div className="relative aspect-[16/9] w-full bg-slate-950 overflow-hidden group">
-                          <img 
-                            src={item.image} 
-                            alt={`${item.title} — ${item.industry} Custom Built Website Preview`}
-                            className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.01]"
-                            loading="lazy"
-                          />
+                          <picture className="w-full h-full block">
+                            <source
+                              type="image/webp"
+                              srcSet={getResponsiveSrcSet(item.image, [400, 800, 1200], 80, 'webp')}
+                              sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 650px"
+                            />
+                            <img 
+                              src={getOptimizedImageUrl(item.image, 800, 80, 'webp')} 
+                              alt={`${item.title} — ${item.industry} Custom Built Website Preview`}
+                              className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.01]"
+                              loading="lazy"
+                              decoding="async"
+                              width={1200}
+                              height={675}
+                            />
+                          </picture>
 
                           {item.url && (
                             <a

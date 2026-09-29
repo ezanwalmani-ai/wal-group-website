@@ -96,11 +96,11 @@ export const HomePage: React.FC<HomePageProps> = ({ navigate }) => {
               <AnimatedHeading text="We Run the Backend So You Can Run the Business." highlightWord="So You Can" />
             </h1>
 
-            {/* Subheadline with Blur-to-Sharp Fade */}
+            {/* Subheadline Fade */}
             <motion.p 
-              initial={{ opacity: 0, filter: 'blur(8px)', y: 15 }}
-              animate={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.2 }}
               className="text-lg sm:text-xl text-slate-300 max-w-2xl leading-relaxed font-normal"
             >
               Smart outsourcing, streamlined delivery services, and professional websites — all in one place. Engineered for Amazon DSPs, Amazon Freight Partners, and growing logistics fleets.

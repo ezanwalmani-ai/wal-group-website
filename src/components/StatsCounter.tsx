@@ -19,7 +19,7 @@ export const StatsCounter: React.FC = () => {
           setIsVisible(true);
         }
       },
-      { threshold: 0.2 }
+      { threshold: 0.05, rootMargin: '150px 0px 50px 0px' }
     );
 
     if (containerRef.current) {
@@ -63,10 +63,10 @@ export const StatsCounter: React.FC = () => {
           
           {/* Stat 1 */}
           <motion.div 
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.1 }}
+            viewport={{ once: true, margin: '200px 0px 50px 0px' }}
+            transition={{ duration: 0.35, delay: 0.05 }}
             className="glass-panel p-6 hover:border-[#ff7700]/40 transition-all flex flex-col items-center text-center group cursor-default"
           >
             <AnimatedIcon animation="rotate" className="p-3 rounded-lg bg-white/5 border border-white/10 text-[#ff7700] mb-3 group-hover:border-[#ff7700]/50 transition-all">
@@ -85,10 +85,10 @@ export const StatsCounter: React.FC = () => {
 
           {/* Stat 2 */}
           <motion.div 
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            viewport={{ once: true, margin: '200px 0px 50px 0px' }}
+            transition={{ duration: 0.35, delay: 0.1 }}
             className="glass-panel p-6 hover:border-[#ff7700]/40 transition-all flex flex-col items-center text-center group cursor-default"
           >
             <AnimatedIcon animation="pulse" className="p-3 rounded-lg bg-white/5 border border-white/10 text-[#ff7700] mb-3 group-hover:border-[#ff7700]/50 transition-all">
@@ -107,10 +107,10 @@ export const StatsCounter: React.FC = () => {
 
           {/* Stat 3 */}
           <motion.div 
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.3 }}
+            viewport={{ once: true, margin: '200px 0px 50px 0px' }}
+            transition={{ duration: 0.35, delay: 0.15 }}
             className="glass-panel p-6 hover:border-[#ff7700]/40 transition-all flex flex-col items-center text-center group cursor-default"
           >
             <AnimatedIcon animation="bounce" className="p-3 rounded-lg bg-white/5 border border-white/10 text-[#ff7700] mb-3 group-hover:border-[#ff7700]/50 transition-all">
@@ -129,10 +129,10 @@ export const StatsCounter: React.FC = () => {
 
           {/* Stat 4 */}
           <motion.div 
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.4 }}
+            viewport={{ once: true, margin: '200px 0px 50px 0px' }}
+            transition={{ duration: 0.35, delay: 0.2 }}
             className="glass-panel p-6 hover:border-[#ff7700]/40 transition-all flex flex-col items-center text-center group cursor-default"
           >
             <AnimatedIcon animation="float" className="p-3 rounded-lg bg-white/5 border border-white/10 text-[#ff7700] mb-3 group-hover:border-[#ff7700]/50 transition-all">

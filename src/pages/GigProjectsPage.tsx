@@ -1,11 +1,13 @@
 import React from 'react';
 import { Database, ShieldCheck, Bot, CheckCircle2, ArrowRight, Clock, FileText, Calendar } from 'lucide-react';
+import { useBooking } from '../context/BookingContext';
 
 interface Props {
   navigate: (path: string) => void;
 }
 
 export const GigProjectsPage: React.FC<Props> = ({ navigate }) => {
+  const { openBookDemo } = useBooking();
   return (
     <div className="font-sans text-slate-800 bg-white">
       {/* Hero */}
@@ -149,8 +151,8 @@ export const GigProjectsPage: React.FC<Props> = ({ navigate }) => {
                 Key Benefit: 100% timecard compliance before payroll deadlines
               </div>
               <button
-                onClick={() => navigate('/contact')}
-                className="bg-[#2271B1] hover:bg-[#1B5A8C] text-white text-xs font-bold py-2.5 px-5 rounded-lg shadow transition-all"
+                onClick={openBookDemo}
+                className="bg-[#2271B1] hover:bg-[#1B5A8C] text-white text-xs font-bold py-2.5 px-5 rounded-lg shadow transition-all cursor-pointer"
               >
                 Request Voicebot Demo
               </button>

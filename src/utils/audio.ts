@@ -6,9 +6,15 @@ class SoundManager {
 
   constructor() {
     // Check local storage for mute preference
-    const savedMute = localStorage.getItem('wal_ui_muted');
-    if (savedMute !== null) {
-      this.isMuted = savedMute === 'true';
+    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+      try {
+        const savedMute = localStorage.getItem('wal_ui_muted');
+        if (savedMute !== null) {
+          this.isMuted = savedMute === 'true';
+        }
+      } catch {
+        // Fallback for sandboxed or private browsing environments
+      }
     }
   }
 

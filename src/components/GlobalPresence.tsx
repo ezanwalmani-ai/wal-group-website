@@ -50,7 +50,7 @@ interface ServiceCard {
 
 export const GlobalPresence: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const isInView = useInView(containerRef, { once: true, amount: 0.15 });
+  const isInView = useInView(containerRef, { once: true, margin: '200px 0px 50px 0px' });
 
   const [activeRegion, setActiveRegion] = useState<string | null>(null);
   const [activeService, setActiveService] = useState<string | null>(null);
@@ -292,9 +292,9 @@ export const GlobalPresence: React.FC = () => {
           {/* LEFT COLUMN: INTERACTIVE WORLD MAP (7 cols) */}
           <motion.div 
             style={{ y: mapY }}
-            initial={{ opacity: 0, scale: 0.96, filter: 'blur(8px)' }}
-            animate={isInView ? { opacity: 1, scale: 1, filter: 'blur(0px)' } : {}}
-            transition={{ duration: 0.8, delay: 0.3 }}
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={isInView ? { opacity: 1, scale: 1 } : {}}
+            transition={{ duration: 0.4, delay: 0.1 }}
             className="lg:col-span-7 glass-panel rounded-3xl border border-white/10 bg-[#0d0d12]/90 p-4 sm:p-6 backdrop-blur-xl relative shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-hidden group"
           >
             {/* Top Bar Indicator */}

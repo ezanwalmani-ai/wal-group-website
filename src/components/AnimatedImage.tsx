@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { getUnsplashSrcSet, getOptimizedUnsplashUrl, cleanUnsplashUrl } from '../lib/imageOptimizer';
+import { getResponsiveSrcSet, getOptimizedImageUrl } from '../lib/imageOptimizer';
 
 export interface AnimatedImageProps {
   src: string;
@@ -38,28 +38,24 @@ export const AnimatedImage: React.FC<AnimatedImageProps> = ({
   overlay,
 }) => {
   const [isLoaded, setIsLoaded] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
 
-  const isUnsplash = src.includes('images.unsplash.com');
+  // Compute optimized default fallback WebP URL with dynamic resizing
+  const computedSrc = getOptimizedImageUrl(src, priority ? 1200 : width, 80, 'webp');
 
-  // Compute optimized default fallback URL
-  const computedSrc = isUnsplash
-    ? getOptimizedUnsplashUrl(src, priority ? 1200 : 800, 75, 'auto')
-    : src;
-
-  // Auto-generate AVIF and WebP responsive srcSets
-  const computedAvifSrcSet = avifSrcSet || (isUnsplash
-    ? getUnsplashSrcSet(src, [360, 600, 800, 1200, 1600], 75, 'avif')
-    : undefined);
-
-  const computedWebpSrcSet = webpSrcSet || (isUnsplash
-    ? getUnsplashSrcSet(src, [360, 600, 800, 1200, 1600], 75, 'webp')
-    : undefined);
-
-  const computedSrcSet = srcSet || (isUnsplash
-    ? getUnsplashSrcSet(src, [360, 600, 800, 1200, 1600], 75, 'auto')
-    : undefined);
+  // Auto-generate AVIF and WebP responsive srcSets for all assets
+  const computedAvifSrcSet = avifSrcSet || getResponsiveSrcSet(src, [360, 600, 800, 1200, 1600], 75, 'avif');
+  const computedWebpSrcSet = webpSrcSet || getResponsiveSrcSet(src, [360, 600, 800, 1200, 1600], 75, 'webp');
+  const computedSrcSet = srcSet || computedWebpSrcSet;
 
   const computedSizes = sizes || '(max-width: 640px) 100vw, (max-width: 1024px) 60vw, 800px';
+
+  // Immediately reveal already-cached images without waiting for onLoad
+  useEffect(() => {
+    if (imgRef.current && imgRef.current.complete) {
+      setIsLoaded(true);
+    }
+  }, [computedSrc]);
 
   // Define entrance variants based on prop
   const getEntranceVariants = () => {
@@ -67,28 +63,28 @@ export const AnimatedImage: React.FC<AnimatedImageProps> = ({
       case 'fadeIn':
         return {
           hidden: { opacity: 0 },
-          visible: { opacity: 1, transition: { duration: 0.7, ease: 'easeOut' } },
+          visible: { opacity: 1, transition: { duration: 0.35, ease: 'easeOut' } },
         };
       case 'slideUp':
         return {
-          hidden: { opacity: 0, y: 24 },
-          visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
+          hidden: { opacity: 0, y: 16 },
+          visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] } },
         };
       case 'slideLeft':
         return {
-          hidden: { opacity: 0, x: -24 },
-          visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
+          hidden: { opacity: 0, x: -16 },
+          visible: { opacity: 1, x: 0, transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] } },
         };
       case 'slideRight':
         return {
-          hidden: { opacity: 0, x: 24 },
-          visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
+          hidden: { opacity: 0, x: 16 },
+          visible: { opacity: 1, x: 0, transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] } },
         };
       case 'scaleUp':
       default:
         return {
-          hidden: { opacity: 0, scale: 0.96, y: 12 },
-          visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
+          hidden: { opacity: 0, scale: 0.98, y: 8 },
+          visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] } },
         };
     }
   };
@@ -116,7 +112,7 @@ export const AnimatedImage: React.FC<AnimatedImageProps> = ({
     <motion.div
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, margin: '-40px' }}
+      viewport={{ once: true, margin: '300px 0px 100px 0px' }}
       variants={entranceVariants}
       whileHover={getHoverAnimation()}
       animate={
@@ -155,6 +151,7 @@ export const AnimatedImage: React.FC<AnimatedImageProps> = ({
           />
         )}
         <motion.img
+          ref={imgRef}
           src={computedSrc}
           srcSet={computedSrcSet}
           sizes={computedSizes}
@@ -167,7 +164,7 @@ export const AnimatedImage: React.FC<AnimatedImageProps> = ({
           fetchPriority={priority ? 'high' : 'auto'}
           onLoad={() => setIsLoaded(true)}
           animate={{ opacity: isLoaded ? 1 : 0 }}
-          transition={{ duration: 0.35, ease: 'easeOut' }}
+          transition={{ duration: 0.25, ease: 'easeOut' }}
           whileHover={
             hoverEffect === 'zoom'
               ? { scale: 1.06, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } }

@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Logo } from './Logo';
 import { AnimatedIcon } from './AnimatedIcon';
+import { AnimatedBackground } from './core/animated-background';
 import { soundFx } from '../utils/audio';
 import { useBooking } from '../context/BookingContext';
 import { useTheme } from '../context/ThemeContext';
@@ -104,6 +105,18 @@ export const Header: React.FC<HeaderProps> = ({ currentPath, navigate }) => {
     { title: 'Virtual Assistants', path: '/virtual-assistants' },
   ];
 
+  const currentTabId = useMemo(() => {
+    if (!currentPath || currentPath === '/') return 'home';
+    if (currentPath === '/about') return 'about';
+    if (currentPath === '/website-design-development') return 'webdev';
+    if (currentPath === '/contact') return 'contact';
+    if (currentPath.includes('/dsp-')) return 'dsp';
+    if (currentPath.includes('/afp-') || currentPath === '/dedicated-lane-services') return 'afp';
+    if (currentPath.includes('/hr-bpo') || currentPath.includes('/virtual-assistants')) return 'bpo';
+    if (currentPath.startsWith('/services') || currentPath === '/digital-marketing') return 'services';
+    return 'home';
+  }, [currentPath]);
+
   return (
     <header className="sticky top-0 z-50 w-full font-sans">
       {/* Main Navigation Bar */}
@@ -125,239 +138,282 @@ export const Header: React.FC<HeaderProps> = ({ currentPath, navigate }) => {
             <Logo onClick={() => handleNavClick('/')} />
           </div>
 
-          {/* Desktop Navigation Links - Exact Match to Screenshot */}
-          <div className="hidden xl:flex items-center gap-2.5 text-sm font-semibold">
-            <button
-              onClick={() => handleNavClick('/')}
-              className={`px-3.5 py-2 rounded-lg transition-all ${
-                isLinkActive('/') && currentPath === '/'
-                  ? 'bg-[#181818] text-[#ff6600] font-bold border border-white/5'
-                  : 'text-white hover:text-[#ff6600] hover:bg-white/5'
-              }`}
+          {/* Desktop Navigation Links with Animated Tabs Hover */}
+          <div className="hidden xl:flex items-center gap-1 text-sm font-semibold p-1 rounded-xl bg-black/20 dark:bg-white/[0.03] border border-white/5">
+            <AnimatedBackground
+              defaultValue={currentTabId}
+              value={currentTabId}
+              className="rounded-lg bg-zinc-200/90 dark:bg-zinc-800/90 border border-black/5 dark:border-white/10 shadow-sm"
+              transition={{
+                type: 'spring',
+                bounce: 0.2,
+                duration: 0.3,
+              }}
+              enableHover
             >
-              Home
-            </button>
-
-            <button
-              onClick={() => handleNavClick('/about')}
-              className={`px-3.5 py-2 rounded-lg transition-all ${
-                isLinkActive('/about')
-                  ? 'bg-[#181818] text-[#ff6600] font-bold border border-white/5'
-                  : 'text-white hover:text-[#ff6600] hover:bg-white/5'
-              }`}
-            >
-              About Us
-            </button>
-
-            {/* Services Dropdown */}
-            <div 
-              className="relative"
-              onMouseEnter={() => setServicesDropdown(true)}
-              onMouseLeave={() => setServicesDropdown(false)}
-            >
+              {/* Home */}
               <button
-                onClick={() => handleNavClick('/services')}
-                className={`flex items-center gap-1 px-3.5 py-2 rounded-lg transition-all ${
-                  isLinkActive('/services') || servicesList.some(s => currentPath === s.path)
-                    ? 'bg-[#181818] text-[#ff6600] font-bold border border-white/5'
-                    : 'text-white hover:text-[#ff6600] hover:bg-white/5'
+                data-id="home"
+                type="button"
+                onClick={() => handleNavClick('/')}
+                className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
+                  currentTabId === 'home'
+                    ? 'text-[#ff6600] font-bold'
+                    : 'text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white'
                 }`}
               >
-                <span>Services</span>
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${servicesDropdown ? 'rotate-180 text-[#ff6600]' : 'text-slate-400'}`} />
+                <span className="relative z-10">Home</span>
               </button>
 
-              {/* Services Dropdown Panel */}
-              <AnimatePresence>
-                {servicesDropdown && (
-                  <motion.div 
-                    initial={{ opacity: 0, y: 10, scale: 0.98 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 8, scale: 0.98 }}
-                    transition={{ duration: 0.2, ease: 'easeOut' }}
-                    className="absolute top-full left-0 w-[580px] mt-1 bg-[#121212]/98 border border-[#ff6600]/30 rounded-xl shadow-2xl p-4 grid grid-cols-2 gap-2 z-50 backdrop-blur-2xl"
-                  >
-                    <div className="col-span-2 pb-2 mb-2 border-b border-white/10 flex justify-between items-center">
-                      <span className="text-xs font-bold uppercase tracking-wider text-[#ff6600]">Our Operations Suite</span>
-                      <button 
-                        onClick={() => handleNavClick('/services')}
-                        className="text-xs text-[#ff6600] hover:underline"
-                      >
-                        View All Services &rarr;
-                      </button>
-                    </div>
-                    {servicesList.map((item) => {
-                      const IconComponent = item.icon;
-                      return (
+              {/* About Us */}
+              <button
+                data-id="about"
+                type="button"
+                onClick={() => handleNavClick('/about')}
+                className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
+                  currentTabId === 'about'
+                    ? 'text-[#ff6600] font-bold'
+                    : 'text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white'
+                }`}
+              >
+                <span className="relative z-10">About Us</span>
+              </button>
+
+              {/* Services Dropdown */}
+              <div 
+                data-id="services"
+                className="relative"
+                onMouseEnter={() => setServicesDropdown(true)}
+                onMouseLeave={() => setServicesDropdown(false)}
+              >
+                <button
+                  type="button"
+                  onClick={() => handleNavClick('/services')}
+                  className={`flex items-center gap-1 px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
+                    currentTabId === 'services'
+                      ? 'text-[#ff6600] font-bold'
+                      : 'text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white'
+                  }`}
+                >
+                  <span className="relative z-10">Services</span>
+                  <ChevronDown className={`w-3.5 h-3.5 relative z-10 transition-transform duration-200 ${servicesDropdown ? 'rotate-180 text-[#ff6600]' : 'text-slate-400'}`} />
+                </button>
+
+                {/* Services Dropdown Panel */}
+                <AnimatePresence>
+                  {servicesDropdown && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                      transition={{ duration: 0.2, ease: 'easeOut' }}
+                      className="absolute top-full left-0 w-[580px] mt-1 bg-[#121212]/98 border border-[#ff6600]/30 rounded-xl shadow-2xl p-4 grid grid-cols-2 gap-2 z-50 backdrop-blur-2xl"
+                    >
+                      <div className="col-span-2 pb-2 mb-2 border-b border-white/10 flex justify-between items-center">
+                        <span className="text-xs font-bold uppercase tracking-wider text-[#ff6600]">Our Operations Suite</span>
+                        <button 
+                          onClick={() => handleNavClick('/services')}
+                          className="text-xs text-[#ff6600] hover:underline cursor-pointer"
+                        >
+                          View All Services &rarr;
+                        </button>
+                      </div>
+                      {servicesList.map((item) => {
+                        const IconComponent = item.icon;
+                        return (
+                          <button
+                            key={item.path}
+                            onClick={() => handleNavClick(item.path)}
+                            className={`flex items-start gap-3 p-2.5 rounded-lg text-left transition-all cursor-pointer ${
+                              currentPath === item.path
+                                ? 'bg-white/10 border border-[#ff6600]/40 text-[#ff6600]'
+                                : 'hover:bg-white/5 text-slate-300 hover:text-white'
+                            }`}
+                          >
+                            <AnimatedIcon animation="rotate" className="p-2 rounded-md bg-[#1a1a1a] text-[#ff6600] shrink-0 border border-white/5">
+                              <IconComponent className="w-4 h-4" />
+                            </AnimatedIcon>
+                            <div>
+                              <div className="font-semibold text-xs text-white leading-tight">{item.title}</div>
+                              <div className="text-[11px] text-slate-400 mt-0.5 line-clamp-1">{item.desc}</div>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* DSP Solutions Dropdown */}
+              <div 
+                data-id="dsp"
+                className="relative"
+                onMouseEnter={() => setDspDropdown(true)}
+                onMouseLeave={() => setDspDropdown(false)}
+              >
+                <button
+                  type="button"
+                  onClick={() => handleNavClick('/dsp-dispatch-support')}
+                  className={`flex items-center gap-1 px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
+                    currentTabId === 'dsp'
+                      ? 'text-[#ff6600] font-bold'
+                      : 'text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white'
+                  }`}
+                >
+                  <span className="relative z-10">DSP Solutions</span>
+                  <ChevronDown className={`w-3.5 h-3.5 relative z-10 transition-transform duration-200 ${dspDropdown ? 'rotate-180 text-[#ff6600]' : 'text-slate-400'}`} />
+                </button>
+
+                <AnimatePresence>
+                  {dspDropdown && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                      transition={{ duration: 0.2, ease: 'easeOut' }}
+                      className="absolute top-full left-0 w-64 mt-1 bg-[#121212]/98 border border-[#ff6600]/30 rounded-xl shadow-2xl p-2 z-50 backdrop-blur-2xl"
+                    >
+                      {dspList.map((item) => (
                         <button
                           key={item.path}
                           onClick={() => handleNavClick(item.path)}
-                          className={`flex items-start gap-3 p-2.5 rounded-lg text-left transition-all ${
+                          className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                             currentPath === item.path
-                              ? 'bg-white/10 border border-[#ff6600]/40 text-[#ff6600]'
-                              : 'hover:bg-white/5 text-slate-300 hover:text-white'
+                              ? 'bg-white/10 text-[#ff6600]'
+                              : 'text-slate-300 hover:bg-white/5 hover:text-white'
                           }`}
                         >
-                          <AnimatedIcon animation="rotate" className="p-2 rounded-md bg-[#1a1a1a] text-[#ff6600] shrink-0 border border-white/5">
-                            <IconComponent className="w-4 h-4" />
-                          </AnimatedIcon>
-                          <div>
-                            <div className="font-semibold text-xs text-white leading-tight">{item.title}</div>
-                            <div className="text-[11px] text-slate-400 mt-0.5 line-clamp-1">{item.desc}</div>
-                          </div>
+                          {item.title}
                         </button>
-                      );
-                    })}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
 
-            {/* DSP Solutions Dropdown */}
-            <div 
-              className="relative"
-              onMouseEnter={() => setDspDropdown(true)}
-              onMouseLeave={() => setDspDropdown(false)}
-            >
+              {/* AFP Solutions Dropdown */}
+              <div 
+                data-id="afp"
+                className="relative"
+                onMouseEnter={() => setAfpDropdown(true)}
+                onMouseLeave={() => setAfpDropdown(false)}
+              >
+                <button
+                  type="button"
+                  onClick={() => handleNavClick('/afp-dispatch-support')}
+                  className={`flex items-center gap-1 px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
+                    currentTabId === 'afp'
+                      ? 'text-[#ff6600] font-bold'
+                      : 'text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white'
+                  }`}
+                >
+                  <span className="relative z-10">AFP Solutions</span>
+                  <ChevronDown className={`w-3.5 h-3.5 relative z-10 transition-transform duration-200 ${afpDropdown ? 'rotate-180 text-[#ff6600]' : 'text-slate-400'}`} />
+                </button>
+
+                <AnimatePresence>
+                  {afpDropdown && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                      transition={{ duration: 0.2, ease: 'easeOut' }}
+                      className="absolute top-full left-0 w-64 mt-1 bg-[#121212]/98 border border-[#ff6600]/30 rounded-xl shadow-2xl p-2 z-50 backdrop-blur-2xl"
+                    >
+                      {afpList.map((item) => (
+                        <button
+                          key={item.path}
+                          onClick={() => handleNavClick(item.path)}
+                          className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                            currentPath === item.path
+                              ? 'bg-white/10 text-[#ff6600]'
+                              : 'text-slate-300 hover:bg-white/5 hover:text-white'
+                          }`}
+                        >
+                          {item.title}
+                        </button>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* BPO Services Dropdown */}
+              <div 
+                data-id="bpo"
+                className="relative"
+                onMouseEnter={() => setBpoDropdown(true)}
+                onMouseLeave={() => setBpoDropdown(false)}
+              >
+                <button
+                  type="button"
+                  onClick={() => handleNavClick('/hr-bpo-services')}
+                  className={`flex items-center gap-1 px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
+                    currentTabId === 'bpo'
+                      ? 'text-[#ff6600] font-bold'
+                      : 'text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white'
+                  }`}
+                >
+                  <span className="relative z-10">BPO Services</span>
+                  <ChevronDown className={`w-3.5 h-3.5 relative z-10 transition-transform duration-200 ${bpoDropdown ? 'rotate-180 text-[#ff6600]' : 'text-slate-400'}`} />
+                </button>
+
+                <AnimatePresence>
+                  {bpoDropdown && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                      transition={{ duration: 0.2, ease: 'easeOut' }}
+                      className="absolute top-full left-0 w-60 mt-1 bg-[#121212]/98 border border-[#ff6600]/30 rounded-xl shadow-2xl p-2 z-50 backdrop-blur-2xl"
+                    >
+                      {bpoList.map((item) => (
+                        <button
+                          key={item.path}
+                          onClick={() => handleNavClick(item.path)}
+                          className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                            currentPath === item.path
+                              ? 'bg-white/10 text-[#ff6600]'
+                              : 'text-slate-300 hover:bg-white/5 hover:text-white'
+                          }`}
+                        >
+                          {item.title}
+                        </button>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* Website Design & Development */}
               <button
-                onClick={() => handleNavClick('/dsp-dispatch-support')}
-                className={`flex items-center gap-1 px-3.5 py-2 rounded-lg transition-all ${
-                  dspList.some(s => currentPath === s.path)
-                    ? 'bg-[#181818] text-[#ff6600] font-bold border border-white/5'
-                    : 'text-white hover:text-[#ff6600] hover:bg-white/5'
+                data-id="webdev"
+                type="button"
+                onClick={() => handleNavClick('/website-design-development')}
+                className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
+                  currentTabId === 'webdev'
+                    ? 'text-[#ff6600] font-bold'
+                    : 'text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white'
                 }`}
               >
-                <span>DSP Solutions</span>
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${dspDropdown ? 'rotate-180 text-[#ff6600]' : 'text-slate-400'}`} />
+                <span className="relative z-10">Website Development</span>
               </button>
 
-              <AnimatePresence>
-                {dspDropdown && (
-                  <motion.div 
-                    initial={{ opacity: 0, y: 10, scale: 0.98 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 8, scale: 0.98 }}
-                    transition={{ duration: 0.2, ease: 'easeOut' }}
-                    className="absolute top-full left-0 w-64 mt-1 bg-[#121212]/98 border border-[#ff6600]/30 rounded-xl shadow-2xl p-2 z-50 backdrop-blur-2xl"
-                  >
-                    {dspList.map((item) => (
-                      <button
-                        key={item.path}
-                        onClick={() => handleNavClick(item.path)}
-                        className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
-                          currentPath === item.path
-                            ? 'bg-white/10 text-[#ff6600]'
-                            : 'text-slate-300 hover:bg-white/5 hover:text-white'
-                        }`}
-                      >
-                        {item.title}
-                      </button>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            {/* AFP Solutions Dropdown */}
-            <div 
-              className="relative"
-              onMouseEnter={() => setAfpDropdown(true)}
-              onMouseLeave={() => setAfpDropdown(false)}
-            >
+              {/* Contact */}
               <button
-                onClick={() => handleNavClick('/afp-dispatch-support')}
-                className={`flex items-center gap-1 px-3.5 py-2 rounded-lg transition-all ${
-                  afpList.some(s => currentPath === s.path)
-                    ? 'bg-[#181818] text-[#ff6600] font-bold border border-white/5'
-                    : 'text-white hover:text-[#ff6600] hover:bg-white/5'
+                data-id="contact"
+                type="button"
+                onClick={() => handleNavClick('/contact')}
+                className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
+                  currentTabId === 'contact'
+                    ? 'text-[#ff6600] font-bold'
+                    : 'text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white'
                 }`}
               >
-                <span>AFP Solutions</span>
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${afpDropdown ? 'rotate-180 text-[#ff6600]' : 'text-slate-400'}`} />
+                <span className="relative z-10">Contact</span>
               </button>
-
-              <AnimatePresence>
-                {afpDropdown && (
-                  <motion.div 
-                    initial={{ opacity: 0, y: 10, scale: 0.98 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 8, scale: 0.98 }}
-                    transition={{ duration: 0.2, ease: 'easeOut' }}
-                    className="absolute top-full left-0 w-64 mt-1 bg-[#121212]/98 border border-[#ff6600]/30 rounded-xl shadow-2xl p-2 z-50 backdrop-blur-2xl"
-                  >
-                    {afpList.map((item) => (
-                      <button
-                        key={item.path}
-                        onClick={() => handleNavClick(item.path)}
-                        className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
-                          currentPath === item.path
-                            ? 'bg-white/10 text-[#ff6600]'
-                            : 'text-slate-300 hover:bg-white/5 hover:text-white'
-                        }`}
-                      >
-                        {item.title}
-                      </button>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            {/* BPO Services Dropdown */}
-            <div 
-              className="relative"
-              onMouseEnter={() => setBpoDropdown(true)}
-              onMouseLeave={() => setBpoDropdown(false)}
-            >
-              <button
-                onClick={() => handleNavClick('/hr-bpo-services')}
-                className={`flex items-center gap-1 px-3.5 py-2 rounded-lg transition-all ${
-                  bpoList.some(s => currentPath === s.path) || currentPath === '/hr-bpo-services'
-                    ? 'bg-[#181818] text-[#ff6600] font-bold border border-white/5'
-                    : 'text-white hover:text-[#ff6600] hover:bg-white/5'
-                }`}
-              >
-                <span>BPO Services</span>
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${bpoDropdown ? 'rotate-180 text-[#ff6600]' : 'text-slate-400'}`} />
-              </button>
-
-              <AnimatePresence>
-                {bpoDropdown && (
-                  <motion.div 
-                    initial={{ opacity: 0, y: 10, scale: 0.98 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 8, scale: 0.98 }}
-                    transition={{ duration: 0.2, ease: 'easeOut' }}
-                    className="absolute top-full left-0 w-60 mt-1 bg-[#121212]/98 border border-[#ff6600]/30 rounded-xl shadow-2xl p-2 z-50 backdrop-blur-2xl"
-                  >
-                    {bpoList.map((item) => (
-                      <button
-                        key={item.path}
-                        onClick={() => handleNavClick(item.path)}
-                        className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
-                          currentPath === item.path
-                            ? 'bg-white/10 text-[#ff6600]'
-                            : 'text-slate-300 hover:bg-white/5 hover:text-white'
-                        }`}
-                      >
-                        {item.title}
-                      </button>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            <button
-              onClick={() => handleNavClick('/website-design-development')}
-              className={`px-3.5 py-2 rounded-lg transition-all ${
-                isLinkActive('/website-design-development')
-                  ? 'bg-[#181818] text-[#ff6600] font-bold border border-white/5'
-                  : 'text-white hover:text-[#ff6600] hover:bg-white/5'
-              }`}
-            >
-              Website Design &amp; Development
-            </button>
+            </AnimatedBackground>
           </div>
 
           {/* Action CTA Button - Talk To Us, Theme Switcher & Audio Toggle */}
@@ -482,6 +538,14 @@ export const Header: React.FC<HeaderProps> = ({ currentPath, navigate }) => {
                   }`}
                 >
                   Careers
+                </button>
+                <button
+                  onClick={() => handleNavClick('/contact')}
+                  className={`w-full text-left px-3 py-2.5 rounded-lg text-sm font-semibold ${
+                    currentPath === '/contact' ? 'bg-white/10 text-[#ff6600]' : 'text-slate-200 hover:bg-white/5'
+                  }`}
+                >
+                  Contact Us
                 </button>
                 <button
                   onClick={() => handleNavClick('/raise-ticket')}

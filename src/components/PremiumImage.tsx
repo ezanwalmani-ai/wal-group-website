@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useInView } from 'motion/react';
+import { getOptimizedImageUrl, getResponsiveSrcSet } from '../lib/imageOptimizer';
 
 interface PremiumImageProps {
   src: string;
@@ -19,7 +20,7 @@ export const PremiumImage: React.FC<PremiumImageProps> = ({
   glow = true,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const isInView = useInView(containerRef, { once: true, margin: '-50px' });
+  const isInView = useInView(containerRef, { once: true, margin: '300px 0px 100px 0px' });
   const [isHovered, setIsHovered] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [reflectionKey, setReflectionKey] = useState(0);
@@ -74,7 +75,7 @@ export const PremiumImage: React.FC<PremiumImageProps> = ({
 
       {/* Main Image Container with Scroll Reveal & Parallax */}
       <motion.div
-        initial={{ opacity: 0, y: 30, scale: 0.97, filter: 'blur(8px)' }}
+        initial={{ opacity: 0, y: 16, scale: 0.99 }}
         animate={
           isInView
             ? {
@@ -82,26 +83,28 @@ export const PremiumImage: React.FC<PremiumImageProps> = ({
                 y: mousePos.y,
                 x: mousePos.x,
                 scale: isHovered ? 1.03 : 1,
-                filter: 'blur(0px)',
               }
-            : { opacity: 0, y: 30, scale: 0.97, filter: 'blur(8px)' }
+            : { opacity: 0, y: 16, scale: 0.99 }
         }
         transition={{
-          duration: 0.6,
-          ease: [0.16, 1, 0.3, 1],
+          duration: 0.35,
+          ease: [0.22, 1, 0.36, 1],
         }}
         className="relative overflow-hidden rounded-2xl z-10 w-full h-full border border-white/10"
         style={{
           boxShadow: isHovered
             ? `0 24px 48px -12px rgba(0, 0, 0, 0.85), ${mousePos.x * 2}px ${20 + mousePos.y * 2}px 30px rgba(255, 122, 0, 0.25)`
             : '0 16px 32px -10px rgba(0, 0, 0, 0.7)',
-          willChange: 'transform, opacity, filter',
+          willChange: 'transform, opacity',
         }}
       >
-        {/* Actual Image */}
+        {/* Actual Image with Dynamic WebP and Responsive SrcSet */}
         <motion.img
-          src={src}
+          src={getOptimizedImageUrl(src, 800, 80, 'webp')}
+          srcSet={getResponsiveSrcSet(src, [400, 800, 1200], 75, 'webp')}
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 60vw, 800px"
           alt={alt}
+          decoding="async"
           animate={{
             filter: isHovered
               ? 'brightness(1.04) contrast(1.03)'
