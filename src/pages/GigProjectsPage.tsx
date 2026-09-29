@@ -1,6 +1,7 @@
 import React from 'react';
 import { Database, ShieldCheck, Bot, CheckCircle2, ArrowRight, Clock, FileText, Calendar } from 'lucide-react';
 import { useBooking } from '../context/BookingContext';
+import { TextRoll } from '@/components/core/text-roll';
 
 interface Props {
   navigate: (path: string) => void;
@@ -17,7 +18,9 @@ export const GigProjectsPage: React.FC<Props> = ({ navigate }) => {
             One-Time Fixed Scope Engagements
           </span>
           <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">
-            Gig Projects for DSPs &amp; Trucking Companies
+            <TextRoll className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">
+              Gig Projects for DSPs &amp; Trucking Companies
+            </TextRoll>
           </h1>
           <p className="text-base sm:text-lg text-slate-300 max-w-3xl mx-auto font-normal">
             Targeted expertise for specific operational challenges. Fixed timeline, fixed price, immediate impact without long-term commitment.

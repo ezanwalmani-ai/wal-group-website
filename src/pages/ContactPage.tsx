@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { MotionSection } from '../components/MotionSection';
-import { AnimatedHeading } from '../components/AnimatedHeading';
+import { TextRoll } from '@/components/core/text-roll';
 import { DiscoveryCallWizard } from '../components/DiscoveryCallWizard';
 import { InteractiveOfficeLocations } from '../components/InteractiveOfficeLocations';
 import { SectionDivider } from '../components/SectionDivider';
@@ -146,7 +146,9 @@ export const ContactPage: React.FC<Props> = ({ navigate }) => {
             Get In Touch &amp; Consult
           </span>
           <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">
-            <AnimatedHeading text="Contact Us" highlightWord="Contact" />
+            <TextRoll className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">
+              Contact Us
+            </TextRoll>
           </h1>
           <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto font-normal">
             Schedule a Discovery Call or Send a Message to Our Operational Leadership Team.

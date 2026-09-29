@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { TextRoll } from '@/components/core/text-roll';
 import { 
   ShieldCheck, 
   Lock, 
@@ -341,7 +342,9 @@ export const AdminLoginPage: React.FC<Props> = ({ navigate }) => {
             {/* Heading & Subtitle */}
             <div className="mb-6 text-center sm:text-left">
               <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                Administrator Login
+                <TextRoll className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                  Administrator Login
+                </TextRoll>
               </h1>
               <p className="text-xs sm:text-sm text-slate-400 mt-1.5">
                 Enter your credentials to access the system.

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Users, Bot, Database, CheckCircle2, TrendingDown, ArrowRight } from 'lucide-react';
 import { AnimatedImage } from '../components/AnimatedImage';
+import { TextRoll } from '@/components/core/text-roll';
 
 interface Props {
   navigate: (path: string) => void;
@@ -16,7 +17,11 @@ export const DspHrPage: React.FC<Props> = ({ navigate }) => {
             <span className="px-3.5 py-1.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold uppercase tracking-wider">
               Amazon DSP Operations
             </span>
-            <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">DSP HR &amp; Recruitment Services</h1>
+            <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">
+              <TextRoll className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">
+                DSP HR &amp; Recruitment Services
+              </TextRoll>
+            </h1>
             <p className="text-lg text-slate-300">
               AI-Powered Hiring That Cuts Cost Per Hire by 30-40%. Certified SmartRecruiters specialists with bilingual AI voicebots handling 24×7 driver recruitment.
             </p>

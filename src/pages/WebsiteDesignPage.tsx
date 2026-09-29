@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { TextRoll } from '@/components/core/text-roll';
 import { 
   Monitor, 
   Laptop, 
@@ -520,7 +521,9 @@ export const WebsiteDesignPage: React.FC<Props> = ({ navigate }) => {
 
               {/* H1 */}
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.12]">
-                Professional websites built around your business.
+                <TextRoll className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.12]">
+                  Professional websites built around your business.
+                </TextRoll>
               </h1>
 
               {/* Supporting Copy */}

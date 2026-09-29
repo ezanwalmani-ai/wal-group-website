@@ -2,6 +2,7 @@ import React from 'react';
 import { IndustriesSlider } from '../components/IndustriesSlider';
 import { Globe, Search, Share2, Mail, Database, Target, Layers, ArrowRight } from 'lucide-react';
 import { AnimatedImage } from '../components/AnimatedImage';
+import { TextRoll } from '@/components/core/text-roll';
 
 interface Props {
   navigate: (path: string) => void;
@@ -17,7 +18,11 @@ export const DigitalMarketingPage: React.FC<Props> = ({ navigate }) => {
             <span className="px-3.5 py-1.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold uppercase tracking-wider">
               Digital Marketing Operations
             </span>
-            <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">Content-Driven Digital Marketing</h1>
+            <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">
+              <TextRoll className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">
+                Content-Driven Digital Marketing
+              </TextRoll>
+            </h1>
             <p className="text-lg text-slate-300">
               Cut Through the Digital Noise with Outcome-Based Growth Strategies. Full-stack marketing across SEO, social media, CRM, and email campaigns.
             </p>

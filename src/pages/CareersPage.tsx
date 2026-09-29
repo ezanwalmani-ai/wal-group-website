@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { JobApplication } from '../types';
 import { EmailLink } from '../components/EmailLink';
+import { TextRoll } from '@/components/core/text-roll';
 import { 
   CheckCircle2, 
   Upload, 
@@ -160,7 +161,9 @@ export const CareersPage: React.FC<Props> = ({ navigate }) => {
             Join Our Operational Team
           </span>
           <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">
-            Build Your Career with Wal Group
+            <TextRoll className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">
+              Build Your Career with Wal Group
+            </TextRoll>
           </h1>
           <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto font-normal">
             Remote-first culture, competitive compensation, continuous learning, and direct exposure to US logistics and corporate clients.

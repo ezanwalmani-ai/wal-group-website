@@ -1,6 +1,7 @@
 import React from 'react';
 import { Bot, Headphones, FileText, CheckCircle2, Globe, Clock } from 'lucide-react';
 import { AnimatedImage } from '../components/AnimatedImage';
+import { TextRoll } from '@/components/core/text-roll';
 
 interface Props {
   navigate: (path: string) => void;
@@ -16,7 +17,11 @@ export const VirtualAssistantsPage: React.FC<Props> = ({ navigate }) => {
             <span className="px-3.5 py-1.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold uppercase tracking-wider">
               BPO Services
             </span>
-            <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">Virtual Assistants</h1>
+            <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">
+              <TextRoll className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">
+                Virtual Assistants
+              </TextRoll>
+            </h1>
             <p className="text-lg text-slate-300">
               Professional Dedicated Remote Virtual Assistants. Administrative support, customer service ticketing, data entry, social media management, and research back-office.
             </p>

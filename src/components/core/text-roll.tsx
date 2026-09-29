@@ -39,6 +39,14 @@ export function TextRoll({
   variants,
   onAnimationComplete,
 }: TextRollProps) {
+  const prefersReducedMotion =
+    typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (prefersReducedMotion) {
+    return <span className={className}>{children}</span>;
+  }
+
   const defaultVariants = {
     enter: {
       initial: { rotateX: 0 },

@@ -1,6 +1,7 @@
 import React from 'react';
 import { MapPin, CheckCircle2, ShieldCheck, Clock, FileCheck } from 'lucide-react';
 import { AnimatedImage } from '../components/AnimatedImage';
+import { TextRoll } from '@/components/core/text-roll';
 
 interface Props {
   navigate: (path: string) => void;
@@ -31,7 +32,11 @@ export const DedicatedLanePage: React.FC<Props> = ({ navigate }) => {
             <span className="px-3.5 py-1.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold uppercase tracking-wider">
               Logistics Operations
             </span>
-            <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">Dedicated Lane Services</h1>
+            <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">
+              <TextRoll className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">
+                Dedicated Lane Services
+              </TextRoll>
+            </h1>
             <p className="text-lg text-slate-300">
               Complete Oversight from Pickup to Final Proof of Delivery. Executing Amazon's 12-Step POD Lifecycle with 100% Shift Visibility.
             </p>

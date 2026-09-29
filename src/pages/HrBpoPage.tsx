@@ -1,6 +1,7 @@
 import React from 'react';
 import { Users, ShieldCheck, Calculator, FileText, CheckCircle2 } from 'lucide-react';
 import { AnimatedImage } from '../components/AnimatedImage';
+import { TextRoll } from '@/components/core/text-roll';
 
 interface Props {
   navigate: (path: string) => void;
@@ -16,7 +17,11 @@ export const HrBpoPage: React.FC<Props> = ({ navigate }) => {
             <span className="px-3.5 py-1.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold uppercase tracking-wider">
               BPO Services
             </span>
-            <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">HR BPO Services</h1>
+            <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">
+              <TextRoll className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">
+                HR BPO Services
+              </TextRoll>
+            </h1>
             <p className="text-lg text-slate-300">
               Scale Operations Without Scaling Headcount. Comprehensive HR BPO handling payroll, benefits, employee records, compliance reporting, and HRIS maintenance.
             </p>

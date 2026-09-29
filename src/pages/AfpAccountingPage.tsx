@@ -1,6 +1,7 @@
 import React from 'react';
 import { BarChart3, Calculator, FileText, DollarSign, CheckCircle2 } from 'lucide-react';
 import { AnimatedImage } from '../components/AnimatedImage';
+import { TextRoll } from '@/components/core/text-roll';
 
 interface Props {
   navigate: (path: string) => void;
@@ -16,7 +17,11 @@ export const AfpAccountingPage: React.FC<Props> = ({ navigate }) => {
             <span className="px-3.5 py-1.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold uppercase tracking-wider">
               Amazon Freight Operations
             </span>
-            <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">AFP Accounting &amp; TMS Management</h1>
+            <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">
+              <TextRoll className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">
+                AFP Accounting &amp; TMS Management
+              </TextRoll>
+            </h1>
             <p className="text-lg text-slate-300">
               Financial Clarity and Operational Control for Freight Partners. Per-load profit visibility, IFTA tax compliance, and TMS management (Alvys &amp; AscendTMS).
             </p>

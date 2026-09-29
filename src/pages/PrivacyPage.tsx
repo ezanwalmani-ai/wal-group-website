@@ -1,4 +1,5 @@
 import React from 'react';
+import { TextRoll } from '@/components/core/text-roll';
 
 interface Props {
   navigate: (path: string) => void;
@@ -11,7 +12,11 @@ export const PrivacyPage: React.FC<Props> = () => {
         
         <div className="border-b border-slate-200 pb-6">
           <span className="text-xs font-bold text-[#2271B1] uppercase tracking-wider block mb-1">Data Governance</span>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-[#0A2647]">Privacy Policy</h1>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-[#0A2647]">
+            <TextRoll className="text-3xl sm:text-4xl font-extrabold text-[#0A2647] dark:text-white">
+              Privacy Policy
+            </TextRoll>
+          </h1>
           <p className="text-xs text-slate-500 mt-2">Effective Date: July 24, 2026 | Wal Group</p>
         </div>
 

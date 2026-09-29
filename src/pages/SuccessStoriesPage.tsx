@@ -1,5 +1,6 @@
 import React from 'react';
 import { Trophy, TrendingUp, CheckCircle2, Quote, Star } from 'lucide-react';
+import { TextRoll } from '@/components/core/text-roll';
 
 interface Props {
   navigate: (path: string) => void;
@@ -14,7 +15,11 @@ export const SuccessStoriesPage: React.FC<Props> = ({ navigate }) => {
           <span className="px-3.5 py-1.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold uppercase tracking-wider">
             Proven Operational Track Record
           </span>
-          <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">Client Success Stories</h1>
+          <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">
+            <TextRoll className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">
+              Client Success Stories
+            </TextRoll>
+          </h1>
           <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto font-normal">
             Real Results for Real Logistics Businesses Across the United States.
           </p>

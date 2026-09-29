@@ -1,5 +1,6 @@
 import React from 'react';
 import { TicketSystem } from '../components/TicketSystem';
+import { TextRoll } from '@/components/core/text-roll';
 
 interface Props {
   navigate: (path: string) => void;
@@ -13,7 +14,11 @@ export const RaiseTicketPage: React.FC<Props> = () => {
           <span className="px-3 py-1 rounded-full bg-blue-100 text-[#2271B1] text-xs font-bold uppercase tracking-wider">
             Client Support Portal
           </span>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-[#0A2647]">Welcome to the Support Center</h1>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-[#0A2647]">
+            <TextRoll className="text-3xl sm:text-4xl font-extrabold text-[#0A2647] dark:text-white">
+              Welcome to the Support Center
+            </TextRoll>
+          </h1>
           <p className="text-xs sm:text-sm text-slate-600 max-w-2xl mx-auto leading-relaxed">
             To streamline support requests and serve you better, we use a ticket-based support system. Each request is assigned a unique ticket number that you can use to track progress and responses online.
           </p>
