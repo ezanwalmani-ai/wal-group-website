@@ -46,66 +46,66 @@ export const TimelineSection: React.FC<{ navigate: (path: string) => void }> = (
   const steps: TimelineStep[] = [
     {
       number: '01',
-      title: 'The Operational Bottleneck',
+      title: 'Operational Bottleneck',
       icon: AlertTriangle,
       iconBg: 'bg-red-500/10 border-red-500/30',
       iconColor: 'text-red-400',
-      description: 'High-volume hiring pressures during peak season, complex Amazon compliance mandates, and rising overhead costs threatening fleet profitability.',
-      metrics: 'Overhead Pressure & Audit Risks',
+      description: 'Peak-season hiring pressure, compliance risks, and rising fleet overhead.',
+      metrics: 'Overhead & Audit Risks',
     },
     {
       number: '02',
-      title: 'Strategic Outsourcing & AI Voicebots',
+      title: 'AI Voicebots & Outsourcing',
       icon: Lightbulb,
       iconBg: 'bg-[#ff6600]/10 border-[#ff6600]/30',
       iconColor: 'text-[#ff6600]',
-      description: 'Deploying bilingual AI voicebots for driver screening combined with 24x7x365 Cortex dispatchers and certified QuickBooks payroll managers.',
-      metrics: '30-40% Cost per Hire Reduction',
+      description: 'Bilingual AI hiring, 24×7 Cortex dispatchers, and QBO payroll experts.',
+      metrics: '30–40% Lower Hiring Cost',
     },
     {
       number: '03',
-      title: 'Real-Time Dispatch & Compliance',
+      title: 'Real-Time Dispatch & Audits',
       icon: TrendingUp,
       iconBg: 'bg-blue-500/10 border-blue-500/30',
       iconColor: 'text-blue-400',
-      description: 'Netradyne violation mitigation, proactive timecard reconciliation before Amazon audits, and 100% on-time load dispatching.',
-      metrics: '50% Total Cost Savings Achieved',
+      description: 'Netradyne mitigation, timecard audits, and 100% on-time load dispatch.',
+      metrics: '50% Total Cost Savings',
     },
     {
       number: '04',
-      title: 'Scalable Growth & Zero Violations',
+      title: 'Scalable Zero-Violation Growth',
       icon: Trophy,
       iconBg: 'bg-emerald-500/10 border-emerald-500/30',
       iconColor: 'text-emerald-400',
-      description: 'Client seamlessly scales operations during peak season without expanding internal headcount, achieving Fantastic Plus scorecards.',
+      description: 'Scale peak volume without internal headcount and hit top scorecards.',
       metrics: 'Fantastic Plus Performance',
     },
   ];
 
   return (
-    <section ref={containerRef} className="py-24 px-4 sm:px-6 lg:px-8 bg-[#000000] border-y border-white/10 relative overflow-hidden">
+    <section ref={containerRef} className="py-12 sm:py-14 px-4 sm:px-6 lg:px-8 bg-[#000000] border-y border-white/10 relative overflow-hidden">
       {/* Background Radial Light Glow */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,102,0,0.12),transparent_70%)] pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto space-y-16 relative z-10">
+      <div className="max-w-7xl mx-auto space-y-8 relative z-10">
         
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-3">
+        <div className="text-center max-w-2xl mx-auto space-y-2">
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/5 border border-[#ff6600]/40 text-xs font-bold text-[#ff6600]"
+            className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-white/5 border border-[#ff6600]/40 text-[11px] font-bold text-[#ff6600]"
           >
             <ShieldCheck className="w-3.5 h-3.5 text-[#ff6600]" />
-            <span>5+ YEARS PROVEN WORKFLOW METHODOLOGY</span>
+            <span>5+ YEARS PROVEN WORKFLOW</span>
           </motion.div>
           
-          <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
             How We Transform <span className="gold-text italic font-serif">Logistics Operations</span>
           </h2>
-          <p className="text-base sm:text-lg text-slate-400 font-normal">
-            A continuous storytelling workflow driven by 24×7×365 backend excellence and real-time execution.
+          <p className="text-sm text-slate-400 font-normal">
+            24×7×365 backend execution from onboarding to peak-season scale.
           </p>
         </div>
 
@@ -113,15 +113,15 @@ export const TimelineSection: React.FC<{ navigate: (path: string) => void }> = (
         <div className="relative">
           
           {/* Horizontal Desktop Connecting Line */}
-          <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-[3px] bg-white/10 -translate-y-8 z-0">
+          <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-[2px] bg-white/10 -translate-y-4 z-0">
             {/* Drawing Line Progress */}
             <motion.div
               style={{ scaleX: pathLength }}
-              className="h-full bg-gradient-to-r from-[#ff8800] via-[#ff5500] to-[#e63e00] origin-left shadow-[0_0_15px_#ff6600]"
+              className="h-full bg-gradient-to-r from-[#ff8800] via-[#ff5500] to-[#e63e00] origin-left shadow-[0_0_12px_#ff6600]"
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative z-10">
             {steps.map((step, index) => {
               const Icon = step.icon;
               const isReached = activeStep >= index;
@@ -129,14 +129,14 @@ export const TimelineSection: React.FC<{ navigate: (path: string) => void }> = (
               return (
                 <motion.div
                   key={index}
-                  initial={{ opacity: 0, y: 16 }}
+                  initial={{ opacity: 0, y: 14 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: '200px 0px 50px 0px' }}
-                  transition={{ duration: 0.35, delay: index * 0.08 }}
-                  whileHover={{ y: -8, scale: 1.02 }}
-                  className={`glass-panel p-6 rounded-2xl border transition-all duration-500 relative flex flex-col justify-between cursor-default group shadow-2xl ${
+                  transition={{ duration: 0.3, delay: index * 0.06 }}
+                  whileHover={{ y: -4 }}
+                  className={`glass-panel p-4 sm:p-5 rounded-xl border transition-all duration-300 relative flex flex-col justify-between cursor-default group shadow-lg ${
                     isReached 
-                      ? 'border-[#ff6600]/50 shadow-[0_0_25px_rgba(255,102,0,0.25)] bg-[#121217]' 
+                      ? 'border-[#ff6600]/50 shadow-[0_0_20px_rgba(255,102,0,0.2)] bg-[#121217]' 
                       : 'border-white/10 bg-[#0d0d10]'
                   }`}
                 >
@@ -145,36 +145,36 @@ export const TimelineSection: React.FC<{ navigate: (path: string) => void }> = (
                     <motion.div 
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      className="absolute inset-0 bg-gradient-to-br from-[#ff6600]/15 via-transparent to-transparent pointer-events-none rounded-2xl"
+                      className="absolute inset-0 bg-gradient-to-br from-[#ff6600]/12 via-transparent to-transparent pointer-events-none rounded-xl"
                     />
                   )}
 
-                  <div>
+                  <div className="relative z-10">
                     {/* Step Top Bar */}
-                    <div className="flex items-center justify-between mb-4 border-b border-white/10 pb-3">
+                    <div className="flex items-center justify-between mb-2.5 border-b border-white/10 pb-2">
                       <motion.span 
                         animate={{ color: isReached ? '#ff6600' : '#475569' }}
-                        className="text-3xl font-black font-mono tracking-tighter"
+                        className="text-xl font-black font-mono tracking-tighter"
                       >
                         {step.number}
                       </motion.span>
                       
-                      <AnimatedIcon animation="rotate" className={`p-2.5 rounded-xl border ${step.iconBg} ${step.iconColor}`}>
-                        <Icon className="w-5 h-5" />
+                      <AnimatedIcon animation="rotate" className={`p-2 rounded-lg border ${step.iconBg} ${step.iconColor}`}>
+                        <Icon className="w-4 h-4" />
                       </AnimatedIcon>
                     </div>
 
-                    <h3 className="text-lg font-bold text-white group-hover:text-[#ff6600] transition-colors mb-2">
+                    <h3 className="text-sm sm:text-[15px] font-bold text-white group-hover:text-[#ff6600] transition-colors mb-1.5 leading-snug">
                       {step.title}
                     </h3>
 
-                    <p className="text-xs text-slate-400 leading-relaxed font-normal">
+                    <p className="text-xs text-slate-400 leading-relaxed font-normal line-clamp-2">
                       {step.description}
                     </p>
                   </div>
 
                   {/* Highlight Metric Badge */}
-                  <div className="mt-6 pt-3 border-t border-white/10 flex items-center gap-1.5 text-xs font-bold text-[#ff6600]">
+                  <div className="relative z-10 mt-3.5 pt-2.5 border-t border-white/10 flex items-center gap-1.5 text-[11px] font-semibold text-[#ff6600]">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                     <span>{step.metrics}</span>
                   </div>
@@ -186,12 +186,12 @@ export const TimelineSection: React.FC<{ navigate: (path: string) => void }> = (
         </div>
 
         {/* CTA Link */}
-        <div className="text-center pt-4">
+        <div className="text-center pt-1">
           <button
             onClick={() => navigate('/success-stories')}
-            className="inline-flex items-center gap-2 text-sm font-extrabold text-[#ff6600] hover:text-white transition-colors cursor-pointer"
+            className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-[#ff6600] hover:text-white transition-colors cursor-pointer"
           >
-            <span>Explore All 5+ Years Client Case Studies &amp; Success Stories</span>
+            <span>Explore Client Case Studies &amp; Success Stories</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
