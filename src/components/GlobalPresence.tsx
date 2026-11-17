@@ -3,24 +3,11 @@ import { motion, useInView, useScroll, useTransform, AnimatePresence } from 'mot
 import { 
   Globe, 
   MapPin, 
-  Sparkles, 
   ShieldCheck, 
   Clock, 
-  Headphones, 
-  Truck, 
-  Users, 
-  FileText, 
-  BarChart3, 
   Building2, 
   CheckCircle2, 
-  Zap, 
-  ArrowUpRight, 
-  Radio, 
-  Compass, 
-  Server,
-  Activity,
-  Layers,
-  ChevronRight
+  Radio
 } from 'lucide-react';
 import { soundFx } from '../utils/audio';
 
@@ -38,22 +25,11 @@ interface ServiceRegion {
   curveOffset: number; // For bezier arc curvature
 }
 
-// Interface for Global Service Badges
-interface ServiceCard {
-  id: string;
-  title: string;
-  tag: string;
-  icon: React.FC<{ className?: string }>;
-  color: string;
-  description: string;
-}
-
 export const GlobalPresence: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(containerRef, { once: true, margin: '200px 0px 50px 0px' });
 
   const [activeRegion, setActiveRegion] = useState<string | null>(null);
-  const [activeService, setActiveService] = useState<string | null>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
   // Parallax scroll effect
@@ -139,74 +115,6 @@ export const GlobalPresence: React.FC = () => {
     }
   ];
 
-  // Services Delivered Worldwide
-  const servicesList: ServiceCard[] = [
-    {
-      id: 'dsp',
-      title: 'Amazon DSP Operations',
-      tag: '24/7 Route Audit',
-      icon: Truck,
-      color: 'from-amber-500 to-orange-600',
-      description: 'Cortex route tracking, Cortex driver assistance, and Fantastic Plus scorecard management.'
-    },
-    {
-      id: 'dispatch',
-      title: 'Truck Dispatch',
-      tag: 'Linehaul & AFP',
-      icon: Zap,
-      color: 'from-orange-500 to-red-600',
-      description: '24/7 load assignment, Amazon Relay loadboard monitoring, and emergency road assistance.'
-    },
-    {
-      id: 'logistics',
-      title: 'Logistics Support',
-      tag: 'Route Optimization',
-      icon: Compass,
-      color: 'from-blue-500 to-indigo-600',
-      description: 'POD collection, 12-step verification, route re-sequencing, and fleet telemetry monitoring.'
-    },
-    {
-      id: 'hr',
-      title: 'HR Services',
-      tag: 'AI Driver ATS',
-      icon: Users,
-      color: 'from-emerald-500 to-teal-600',
-      description: 'Automated AI voicebot applicant screening, background checks, and driver onboarding.'
-    },
-    {
-      id: 'support',
-      title: 'Customer Support',
-      tag: 'Bilingual Escalations',
-      icon: Headphones,
-      color: 'from-purple-500 to-violet-600',
-      description: 'Multilingual customer dispatch lines, escalation resolution, and delivery exception logging.'
-    },
-    {
-      id: 'va',
-      title: 'Virtual Assistance',
-      tag: 'Dedicated Remote VAs',
-      icon: Radio,
-      color: 'from-[#ff6600] to-amber-600',
-      description: 'Dedicated executive virtual assistants for calendar, email, load booking, and vendor triage.'
-    },
-    {
-      id: 'admin',
-      title: 'Administrative Support',
-      tag: 'Audit & Compliance',
-      icon: FileText,
-      color: 'from-cyan-500 to-blue-600',
-      description: 'QuickBooks reconciliation, ADP payroll execution, timecard audits, and expense tagging.'
-    },
-    {
-      id: 'bpo',
-      title: 'Business Operations',
-      tag: 'Custom BPO Workflows',
-      icon: BarChart3,
-      color: 'from-rose-500 to-pink-600',
-      description: 'Custom operational telemetry, KPI dashboard maintenance, and backend software engineering.'
-    }
-  ];
-
   // Mouse tilt tracking
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -287,7 +195,7 @@ export const GlobalPresence: React.FC = () => {
         </div>
 
         {/* MAIN TWO-COLUMN LAYOUT */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
           {/* LEFT COLUMN: INTERACTIVE WORLD MAP (7 cols) */}
           <motion.div 
@@ -687,129 +595,9 @@ export const GlobalPresence: React.FC = () => {
               </div>
             </div>
 
-
-            {/* SERVICES DELIVERED WORLDWIDE */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <h4 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-[#ff6600]" />
-                  <span>Services Delivered Worldwide</span>
-                </h4>
-                <span className="text-xs text-slate-400 font-mono">8 Core Capabilities</span>
-              </div>
-
-              {/* 2-Column Grid of Interactive Glass Service Chips */}
-              <div className="grid grid-cols-2 gap-2.5">
-                {servicesList.map((srv, idx) => {
-                  const IconComp = srv.icon;
-                  const isSelected = activeService === srv.id;
-
-                  return (
-                    <motion.div
-                      key={srv.id}
-                      initial={{ opacity: 0, y: 15 }}
-                      animate={isInView ? { opacity: 1, y: 0 } : {}}
-                      transition={{ duration: 0.4, delay: 0.4 + idx * 0.05 }}
-                      whileHover={{ scale: 1.02, y: -2 }}
-                      onMouseEnter={() => {
-                        setActiveService(srv.id);
-                        soundFx.playHover();
-                      }}
-                      onMouseLeave={() => setActiveService(null)}
-                      onClick={() => soundFx.playClick()}
-                      className={`glass-panel p-3 rounded-2xl border transition-all duration-300 cursor-pointer relative overflow-hidden flex flex-col justify-between ${
-                        isSelected 
-                          ? 'border-[#ff6600] bg-[#1a120c] shadow-[0_0_20px_rgba(255,102,0,0.25)]' 
-                          : 'border-white/10 bg-[#0d0d12]/80 hover:border-white/25 hover:bg-white/5'
-                      }`}
-                    >
-                      {/* Glass Reflection Highlight */}
-                      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-
-                      <div className="flex items-start justify-between gap-2">
-                        <div className={`p-2 rounded-xl bg-gradient-to-br ${srv.color} text-black font-bold shrink-0 shadow-md`}>
-                          <IconComp className="w-4 h-4" />
-                        </div>
-                        <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded-full bg-white/5 text-slate-300 border border-white/10 shrink-0">
-                          {srv.tag}
-                        </span>
-                      </div>
-
-                      <div className="mt-2.5 space-y-0.5">
-                        <h5 className="text-xs font-bold text-white group-hover:text-[#ff6600] transition-colors">
-                          {srv.title}
-                        </h5>
-                        <p className="text-[11px] text-slate-400 line-clamp-1 leading-snug">
-                          {srv.description}
-                        </p>
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            </div>
-
           </motion.div>
 
         </div>
-
-
-        {/* ANIMATED STATISTICS COUNTERS ROW */}
-        <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.6 }}
-          className="pt-8 border-t border-white/10"
-        >
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 sm:gap-6">
-            
-            {/* Stat 1 */}
-            <div className="glass-panel p-5 rounded-2xl border border-white/10 bg-[#0b0b10] text-center space-y-1 relative overflow-hidden group hover:border-[#ff6600]/40 transition-all">
-              <div className="text-3xl sm:text-4xl font-extrabold text-white font-mono tracking-tight group-hover:text-[#ff6600] transition-colors">
-                1
-              </div>
-              <div className="text-xs font-bold text-slate-200">Headquarters</div>
-              <div className="text-[11px] text-slate-400">📍 Bangalore, India</div>
-            </div>
-
-            {/* Stat 2 */}
-            <div className="glass-panel p-5 rounded-2xl border border-white/10 bg-[#0b0b10] text-center space-y-1 relative overflow-hidden group hover:border-amber-500/40 transition-all">
-              <div className="text-3xl sm:text-4xl font-extrabold text-amber-400 font-mono tracking-tight">
-                100%
-              </div>
-              <div className="text-xs font-bold text-slate-200">Global Remote Team</div>
-              <div className="text-[11px] text-slate-400">Boundaryless Talent</div>
-            </div>
-
-            {/* Stat 3 */}
-            <div className="glass-panel p-5 rounded-2xl border border-white/10 bg-[#0b0b10] text-center space-y-1 relative overflow-hidden group hover:border-emerald-500/40 transition-all">
-              <div className="text-3xl sm:text-4xl font-extrabold text-emerald-400 font-mono tracking-tight">
-                24/7/365
-              </div>
-              <div className="text-xs font-bold text-slate-200">Worldwide Support</div>
-              <div className="text-[11px] text-slate-400">Zero Downtime</div>
-            </div>
-
-            {/* Stat 4 */}
-            <div className="glass-panel p-5 rounded-2xl border border-white/10 bg-[#0b0b10] text-center space-y-1 relative overflow-hidden group hover:border-blue-500/40 transition-all">
-              <div className="text-3xl sm:text-4xl font-extrabold text-blue-400 font-mono tracking-tight">
-                24+
-              </div>
-              <div className="text-xs font-bold text-slate-200">Time Zones Covered</div>
-              <div className="text-[11px] text-slate-400">US, EU &amp; APAC Sync</div>
-            </div>
-
-            {/* Stat 5 */}
-            <div className="col-span-2 md:col-span-1 glass-panel p-5 rounded-2xl border border-white/10 bg-[#0b0b10] text-center space-y-1 relative overflow-hidden group hover:border-purple-500/40 transition-all">
-              <div className="text-3xl sm:text-4xl font-extrabold text-purple-400 font-mono tracking-tight">
-                &lt; 60s
-              </div>
-              <div className="text-xs font-bold text-slate-200">Operational Response</div>
-              <div className="text-[11px] text-slate-400">Instant Escalation</div>
-            </div>
-
-          </div>
-        </motion.div>
 
       </div>
     </section>

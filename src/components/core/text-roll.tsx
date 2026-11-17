@@ -41,6 +41,7 @@ export function TextRoll({
 }: TextRollProps) {
   const prefersReducedMotion =
     typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   if (prefersReducedMotion) {

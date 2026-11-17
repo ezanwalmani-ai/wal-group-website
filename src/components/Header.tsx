@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Logo } from './Logo';
 import { AnimatedIcon } from './AnimatedIcon';
-import { AnimatedBackground } from './core/animated-background';
 import { soundFx } from '../utils/audio';
 import { useBooking } from '../context/BookingContext';
 import { useTheme } from '../context/ThemeContext';
@@ -132,37 +131,26 @@ export const Header: React.FC<HeaderProps> = ({ currentPath, navigate }) => {
           isScrolled ? 'py-3 shadow-[0_10px_30px_rgba(0,0,0,0.9)]' : 'py-4'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
           {/* Logo */}
-          <div className="cursor-pointer">
+          <div className="cursor-pointer shrink-0">
             <Logo onClick={() => handleNavClick('/')} />
           </div>
 
-          {/* Desktop Navigation Links with Animated Tabs Hover */}
-          <div className="hidden xl:flex items-center gap-1 text-sm font-semibold p-1 rounded-xl bg-black/20 dark:bg-white/[0.03] border border-white/5">
-            <AnimatedBackground
-              defaultValue={currentTabId}
-              value={currentTabId}
-              className="rounded-lg bg-zinc-200/90 dark:bg-zinc-800/90 border border-black/5 dark:border-white/10 shadow-sm"
-              transition={{
-                type: 'spring',
-                bounce: 0.2,
-                duration: 0.3,
-              }}
-              enableHover
-            >
+          {/* Desktop Navigation Links */}
+          <div className="hidden xl:flex items-center gap-1 2xl:gap-2 text-[13px] 2xl:text-sm font-medium">
               {/* Home */}
               <button
                 data-id="home"
                 type="button"
                 onClick={() => handleNavClick('/')}
-                className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
+                className={`px-2.5 py-1.5 whitespace-nowrap transition-colors cursor-pointer ${
                   currentTabId === 'home'
                     ? 'text-[#ff6600] font-bold'
-                    : 'text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white'
+                    : 'text-slate-200 hover:text-white'
                 }`}
               >
-                <span className="relative z-10">Home</span>
+                Home
               </button>
 
               {/* About Us */}
@@ -170,13 +158,13 @@ export const Header: React.FC<HeaderProps> = ({ currentPath, navigate }) => {
                 data-id="about"
                 type="button"
                 onClick={() => handleNavClick('/about')}
-                className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
+                className={`px-2.5 py-1.5 whitespace-nowrap transition-colors cursor-pointer ${
                   currentTabId === 'about'
                     ? 'text-[#ff6600] font-bold'
-                    : 'text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white'
+                    : 'text-slate-200 hover:text-white'
                 }`}
               >
-                <span className="relative z-10">About Us</span>
+                About Us
               </button>
 
               {/* Services Dropdown */}
@@ -189,14 +177,14 @@ export const Header: React.FC<HeaderProps> = ({ currentPath, navigate }) => {
                 <button
                   type="button"
                   onClick={() => handleNavClick('/services')}
-                  className={`flex items-center gap-1 px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
+                  className={`flex items-center gap-1 px-2.5 py-1.5 whitespace-nowrap transition-colors cursor-pointer ${
                     currentTabId === 'services'
                       ? 'text-[#ff6600] font-bold'
-                      : 'text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white'
+                      : 'text-slate-200 hover:text-white'
                   }`}
                 >
-                  <span className="relative z-10">Services</span>
-                  <ChevronDown className={`w-3.5 h-3.5 relative z-10 transition-transform duration-200 ${servicesDropdown ? 'rotate-180 text-[#ff6600]' : 'text-slate-400'}`} />
+                  <span>Services</span>
+                  <ChevronDown className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${servicesDropdown ? 'rotate-180 text-[#ff6600]' : 'text-slate-400'}`} />
                 </button>
 
                 {/* Services Dropdown Panel */}
@@ -255,14 +243,14 @@ export const Header: React.FC<HeaderProps> = ({ currentPath, navigate }) => {
                 <button
                   type="button"
                   onClick={() => handleNavClick('/dsp-dispatch-support')}
-                  className={`flex items-center gap-1 px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
+                  className={`flex items-center gap-1 px-2.5 py-1.5 whitespace-nowrap transition-colors cursor-pointer ${
                     currentTabId === 'dsp'
                       ? 'text-[#ff6600] font-bold'
-                      : 'text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white'
+                      : 'text-slate-200 hover:text-white'
                   }`}
                 >
-                  <span className="relative z-10">DSP Solutions</span>
-                  <ChevronDown className={`w-3.5 h-3.5 relative z-10 transition-transform duration-200 ${dspDropdown ? 'rotate-180 text-[#ff6600]' : 'text-slate-400'}`} />
+                  <span>DSP Solutions</span>
+                  <ChevronDown className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${dspDropdown ? 'rotate-180 text-[#ff6600]' : 'text-slate-400'}`} />
                 </button>
 
                 <AnimatePresence>
@@ -302,14 +290,14 @@ export const Header: React.FC<HeaderProps> = ({ currentPath, navigate }) => {
                 <button
                   type="button"
                   onClick={() => handleNavClick('/afp-dispatch-support')}
-                  className={`flex items-center gap-1 px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
+                  className={`flex items-center gap-1 px-2.5 py-1.5 whitespace-nowrap transition-colors cursor-pointer ${
                     currentTabId === 'afp'
                       ? 'text-[#ff6600] font-bold'
-                      : 'text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white'
+                      : 'text-slate-200 hover:text-white'
                   }`}
                 >
-                  <span className="relative z-10">AFP Solutions</span>
-                  <ChevronDown className={`w-3.5 h-3.5 relative z-10 transition-transform duration-200 ${afpDropdown ? 'rotate-180 text-[#ff6600]' : 'text-slate-400'}`} />
+                  <span>AFP Solutions</span>
+                  <ChevronDown className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${afpDropdown ? 'rotate-180 text-[#ff6600]' : 'text-slate-400'}`} />
                 </button>
 
                 <AnimatePresence>
@@ -349,14 +337,14 @@ export const Header: React.FC<HeaderProps> = ({ currentPath, navigate }) => {
                 <button
                   type="button"
                   onClick={() => handleNavClick('/hr-bpo-services')}
-                  className={`flex items-center gap-1 px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
+                  className={`flex items-center gap-1 px-2.5 py-1.5 whitespace-nowrap transition-colors cursor-pointer ${
                     currentTabId === 'bpo'
                       ? 'text-[#ff6600] font-bold'
-                      : 'text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white'
+                      : 'text-slate-200 hover:text-white'
                   }`}
                 >
-                  <span className="relative z-10">BPO Services</span>
-                  <ChevronDown className={`w-3.5 h-3.5 relative z-10 transition-transform duration-200 ${bpoDropdown ? 'rotate-180 text-[#ff6600]' : 'text-slate-400'}`} />
+                  <span>BPO Services</span>
+                  <ChevronDown className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${bpoDropdown ? 'rotate-180 text-[#ff6600]' : 'text-slate-400'}`} />
                 </button>
 
                 <AnimatePresence>
@@ -391,13 +379,13 @@ export const Header: React.FC<HeaderProps> = ({ currentPath, navigate }) => {
                 data-id="webdev"
                 type="button"
                 onClick={() => handleNavClick('/website-design-development')}
-                className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
+                className={`px-2.5 py-1.5 whitespace-nowrap transition-colors cursor-pointer ${
                   currentTabId === 'webdev'
                     ? 'text-[#ff6600] font-bold'
-                    : 'text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white'
+                    : 'text-slate-200 hover:text-white'
                 }`}
               >
-                <span className="relative z-10">Website Development</span>
+                Website Development
               </button>
 
               {/* Contact */}
@@ -405,19 +393,18 @@ export const Header: React.FC<HeaderProps> = ({ currentPath, navigate }) => {
                 data-id="contact"
                 type="button"
                 onClick={() => handleNavClick('/contact')}
-                className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
+                className={`px-2.5 py-1.5 whitespace-nowrap transition-colors cursor-pointer ${
                   currentTabId === 'contact'
                     ? 'text-[#ff6600] font-bold'
-                    : 'text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white'
+                    : 'text-slate-200 hover:text-white'
                 }`}
               >
-                <span className="relative z-10">Contact</span>
+                Contact
               </button>
-            </AnimatedBackground>
           </div>
 
           {/* Action CTA Button - Talk To Us, Theme Switcher & Audio Toggle */}
-          <div className="hidden sm:flex items-center gap-2.5">
+          <div className="hidden sm:flex items-center gap-2.5 shrink-0">
             {/* Theme Switcher Toggle (Light / Dark) */}
             <button
               onClick={() => {
@@ -452,7 +439,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPath, navigate }) => {
                 soundFx.playClick();
                 openBookDemo();
               }}
-              className="relative overflow-hidden bg-gradient-to-r from-[#e65c00] via-[#ff7700] to-[#ff8512] text-slate-950 font-semibold text-sm px-5 py-2.5 rounded-[14px] transition-all shadow-[0_4px_16px_rgba(255,119,0,0.22)] hover:shadow-[0_6px_22px_rgba(255,119,0,0.38)] cursor-pointer group flex items-center gap-2 border border-white/25"
+              className="relative overflow-hidden bg-gradient-to-r from-[#e65c00] via-[#ff7700] to-[#ff8512] text-slate-950 font-semibold text-sm px-4 2xl:px-5 py-2.5 rounded-[14px] transition-all shadow-[0_4px_16px_rgba(255,119,0,0.22)] hover:shadow-[0_6px_22px_rgba(255,119,0,0.38)] cursor-pointer group flex items-center gap-2 border border-white/25 whitespace-nowrap shrink-0"
             >
               {/* Subtle glass light sweep */}
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/35 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out pointer-events-none" />

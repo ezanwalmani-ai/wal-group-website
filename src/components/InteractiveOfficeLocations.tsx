@@ -35,7 +35,7 @@ export const InteractiveOfficeLocations: React.FC = () => {
     city: 'Indiranagar, Bengaluru',
     coords: { x: 68, y: 52 },
     address: '55, 100 Feet Road, HAL 2nd Stage, Indiranagar 12th Main, Bengaluru, Karnataka 560038',
-    phone: '+91 6363698148',
+    phone: '+91 9481078663',
     email: 'thewalgroupinfo@gmail.com',
     hours: 'Mon - Sat: 9:00 AM - 7:00 PM IST (24/7 Emergency Dispatch Support)',
     teamSize: 'Executive & Global Operations Leadership',

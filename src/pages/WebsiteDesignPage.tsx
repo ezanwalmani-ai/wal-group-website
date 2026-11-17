@@ -619,34 +619,39 @@ export const WebsiteDesignPage: React.FC<Props> = ({ navigate }) => {
                   </a>
                 </div>
 
-                {/* Website Preview Graphic — Strictly Preserves 16:9 Aspect Ratio with Dynamic WebP */}
+                {/* Website Preview Graphic — Strictly Preserves 16:9 Aspect Ratio with Production-Safe Static WebP & Fallbacks */}
                 <div className="relative rounded-xl overflow-hidden aspect-[16/9] bg-[#0c1829] border border-white/10 shadow-inner">
                   {(() => {
-                    const heroImgSrc = 
-                      heroActiveSector === 'southdekalb' 
-                        ? '/images/portfolio/southdekalb.webp' 
-                        : heroActiveSector === 'alpine-medical'
-                        ? '/images/portfolio/alpine-medical.webp'
-                        : heroActiveSector === 'abhijobs'
-                        ? '/images/portfolio/abhijobs.webp'
-                        : heroActiveSector === 'wal-groups'
-                        ? '/images/portfolio/wal-groups.webp'
-                        : '/images/portfolio/ml-worldwide.webp';
+                    const sectorKey = heroActiveSector || 'ml-worldwide';
+                    const webpSrcSet = `/images/portfolio/${sectorKey}-400.webp 400w, /images/portfolio/${sectorKey}-800.webp 800w, /images/portfolio/${sectorKey}-1200.webp 1200w, /images/portfolio/${sectorKey}.webp 1200w`;
+                    const defaultWebp = `/images/portfolio/${sectorKey}-800.webp`;
+                    const fallbackJpg = `/images/portfolio/${sectorKey}.jpg`;
+
                     return (
                       <picture className="w-full h-full block">
                         <source
                           type="image/webp"
-                          srcSet={getResponsiveSrcSet(heroImgSrc, [400, 800, 1200], 80, 'webp')}
+                          srcSet={webpSrcSet}
                           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 60vw, 800px"
                         />
+                        <source
+                          type="image/jpeg"
+                          srcSet={fallbackJpg}
+                        />
                         <img 
-                          src={getOptimizedImageUrl(heroImgSrc, 800, 80, 'webp')} 
+                          src={defaultWebp} 
                           alt="Custom Built Website Tailored to Your Sector Preview"
                           className="w-full h-full object-cover object-top transition-all duration-300"
                           loading="lazy"
                           decoding="async"
                           width={1200}
                           height={675}
+                          onError={(e) => {
+                            const target = e.currentTarget;
+                            if (target.src !== fallbackJpg && !target.src.endsWith('.jpg')) {
+                              target.src = fallbackJpg;
+                            }
+                          }}
                         />
                       </picture>
                     );
@@ -823,24 +828,43 @@ export const WebsiteDesignPage: React.FC<Props> = ({ navigate }) => {
                           </span>
                         </div>
 
-                        {/* Screenshot Image: 16:9 Aspect Ratio Maintained, Dynamic WebP & Resized */}
+                        {/* Screenshot Image: 16:9 Aspect Ratio Maintained, Production-Safe Static WebP & Fallback */}
                         <div className="relative aspect-[16/9] w-full bg-slate-950 overflow-hidden group">
-                          <picture className="w-full h-full block">
-                            <source
-                              type="image/webp"
-                              srcSet={getResponsiveSrcSet(item.image, [400, 800, 1200], 80, 'webp')}
-                              sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 650px"
-                            />
-                            <img 
-                              src={getOptimizedImageUrl(item.image, 800, 80, 'webp')} 
-                              alt={`${item.title} — ${item.industry} Custom Built Website Preview`}
-                              className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.01]"
-                              loading="lazy"
-                              decoding="async"
-                              width={1200}
-                              height={675}
-                            />
-                          </picture>
+                          {(() => {
+                            const itemKey = item.id;
+                            const webpSrcSet = `/images/portfolio/${itemKey}-400.webp 400w, /images/portfolio/${itemKey}-800.webp 800w, /images/portfolio/${itemKey}-1200.webp 1200w, /images/portfolio/${itemKey}.webp 1200w`;
+                            const defaultWebp = `/images/portfolio/${itemKey}-800.webp`;
+                            const fallbackJpg = `/images/portfolio/${itemKey}.jpg`;
+
+                            return (
+                              <picture className="w-full h-full block">
+                                <source
+                                  type="image/webp"
+                                  srcSet={webpSrcSet}
+                                  sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 650px"
+                                />
+                                <source
+                                  type="image/jpeg"
+                                  srcSet={fallbackJpg}
+                                />
+                                <img 
+                                  src={defaultWebp} 
+                                  alt={`${item.title} — ${item.industry} Custom Built Website Preview`}
+                                  className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.01]"
+                                  loading="lazy"
+                                  decoding="async"
+                                  width={1200}
+                                  height={675}
+                                  onError={(e) => {
+                                    const target = e.currentTarget;
+                                    if (target.src !== fallbackJpg && !target.src.endsWith('.jpg')) {
+                                      target.src = fallbackJpg;
+                                    }
+                                  }}
+                                />
+                              </picture>
+                            );
+                          })()}
 
                           {item.url && (
                             <a
@@ -1897,7 +1921,7 @@ export const WebsiteDesignPage: React.FC<Props> = ({ navigate }) => {
                 </button>
 
                 <a
-                  href="https://wa.me/916363698148?text=Hello%20Wal%20Groups%20Team%2C%20I%20am%20interested%20in%20a%20website%20design%20and%20development%20package."
+                  href="https://wa.me/919481078663?text=Hello%20Wal%20Groups%20Team%2C%20I%20am%20interested%20in%20a%20website%20design%20and%20development%20package."
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-[#25D366] hover:bg-[#20ba59] text-black font-bold text-sm sm:text-base px-6 py-3.5 rounded-xl transition-all cursor-pointer flex items-center gap-2 shadow-lg"
@@ -1928,8 +1952,8 @@ export const WebsiteDesignPage: React.FC<Props> = ({ navigate }) => {
               <div className="space-y-3 pt-3 border-t border-white/10 text-xs text-slate-200">
                 <div className="flex items-center gap-3">
                   <Phone className="w-4 h-4 text-[#ff8533] shrink-0" />
-                  <a href="tel:+916363698148" className="hover:text-white transition-colors">
-                    +91-636-369-8148
+                  <a href="tel:+919481078663" className="hover:text-white transition-colors">
+                    +91 9481078663
                   </a>
                 </div>
 

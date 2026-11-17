@@ -1480,5 +1480,221 @@
       "fleetSize": "30 vans"
     },
     "unansweredQuestions": []
+  },
+  "SESS-1790704536611-dym7": {
+    "sessionId": "SESS-1790704536611-dym7",
+    "createdAt": "2026-09-29T17:55:36.612Z",
+    "updatedAt": "2026-09-29T17:55:45.465Z",
+    "pageVisited": "/services/dsp-dispatch",
+    "userBehaviorSummary": "Pages: /, /services/dsp-dispatch | Services: Amazon DSP Dispatch | Time: 120s",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Hello, what services does Wal Group offer for Amazon DSPs?",
+        "timestamp": "05:55 PM"
+      },
+      {
+        "sender": "assistant",
+        "text": "The Wal Group provides 24/7 dedicated Amazon DSP dispatch operations. Our team manages live routing on Amazon Cortex, tracks vehicle telematics via Geotab & Netradyne, oversees safety event coaching, coordinates on-road rescues, and resolves roadside emergencies.\n\nWe maintain a strict focus on Amazon Super Fantastic scorecards to protect your margins. How many routes or vans do you currently operate in your DSP station?",
+        "timestamp": "05:55 PM"
+      },
+      {
+        "sender": "user",
+        "text": "We manage 30 vans in Dallas. You can reach me at robert@dallasdispatch.com or +1 214-555-0199 to discuss booking a demo.",
+        "timestamp": "05:55 PM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Hello Robert! It’s a pleasure to connect with you. Managing a 30-van Amazon DSP fleet in Dallas is no small feat—between optimizing your safety scorecard on Cortex, tracking routing delays in real-time, and handling daily driver communications, keeping everything running smoothly around the clock requires a massive operational lift.\n\nWe specialize in taking the heavy lifting off your plate with our 24/7 dedicated dispatch, driver management, and line-by-line settlement reconciliation services. By partnering with us, DSP owners typically see a 35% to 50% reduction in back-office overhead while drastically improving their safety and dispatch metrics.\n\nI have securely noted your contact details (`robert@dallasdispatch.com` and +1 214-555-0199). One of our senior logistics executives will reach out to you shortly to schedule your personalized demo and discuss how we can support your 30 vans in Dallas. \n\nIf you'd like to lock in a specific time right away, you can also reach us directly at **+91 6363698148** or email us at **thewalgroupinfo@gmail.com**. Is there a specific pain point—like scorecard management, after-hours dispatch coverage, or weekly settlement audits—that you're looking to solve first?",
+        "timestamp": "05:55 PM"
+      }
+    ],
+    "leadDetails": {
+      "company": "Amazon DSPs",
+      "email": "robert@dallasdispatch.com",
+      "phone": "+1 214-555-0199",
+      "fleetSize": "30 vans"
+    },
+    "unansweredQuestions": []
+  },
+  "SESS-1790772988189-dkyl": {
+    "sessionId": "SESS-1790772988189-dkyl",
+    "createdAt": "2026-09-30T12:56:28.190Z",
+    "updatedAt": "2026-09-30T12:56:34.861Z",
+    "pageVisited": "/services/dsp-dispatch",
+    "userBehaviorSummary": "Pages: /, /services/dsp-dispatch | Services: Amazon DSP Dispatch | Time: 120s",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Hello, what services does Wal Group offer for Amazon DSPs?",
+        "timestamp": "12:56 PM"
+      },
+      {
+        "sender": "assistant",
+        "text": "The Wal Group provides 24/7 dedicated Amazon DSP dispatch operations. Our team manages live routing on Amazon Cortex, tracks vehicle telematics via Geotab & Netradyne, oversees safety event coaching, coordinates on-road rescues, and resolves roadside emergencies.\n\nWe maintain a strict focus on Amazon Super Fantastic scorecards to protect your margins. How many routes or vans do you currently operate in your DSP station?",
+        "timestamp": "12:56 PM"
+      },
+      {
+        "sender": "user",
+        "text": "We manage 30 vans in Dallas. You can reach me at robert@dallasdispatch.com or +1 214-555-0199 to discuss booking a demo.",
+        "timestamp": "12:56 PM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Hello Robert, and thank you for reaching out to The Wal Group! Managing a 30-van DSP fleet in Dallas is no small feat, and we would love to show you how our 24/7 live dispatch, scorecard optimization (handling those tricky Netradyne and Cortex events), and 14-day payroll reconciliation can save your team significant time while cutting operational overhead by 35% to 50%.\n\nI have noted your contact details (**robert@dallasdispatch.com** and **+1 214-555-0199**). One of our senior logistics consultants will reach out to you shortly to coordinate a live demo tailored specifically to your Dallas operations. \n\nTo help us make the demo as targeted as possible for your team, could you share whether your primary focus right now is improving your safety scorecard/compliance, or optimizing live route dispatch and driver retention?",
+        "timestamp": "12:56 PM"
+      }
+    ],
+    "leadDetails": {
+      "company": "Amazon DSPs",
+      "email": "robert@dallasdispatch.com",
+      "phone": "+1 214-555-0199",
+      "fleetSize": "30 vans"
+    },
+    "unansweredQuestions": []
+  },
+  "SESS-1790773083835-kwiq": {
+    "sessionId": "SESS-1790773083835-kwiq",
+    "createdAt": "2026-09-30T12:58:03.835Z",
+    "updatedAt": "2026-09-30T12:58:09.564Z",
+    "pageVisited": "/services/dsp-dispatch",
+    "userBehaviorSummary": "Pages: /, /services/dsp-dispatch | Services: Amazon DSP Dispatch | Time: 120s",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Hello, what services does Wal Group offer for Amazon DSPs?",
+        "timestamp": "12:58 PM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Hello! Welcome to The Wal Group. I see you are exploring our **Amazon DSP Support & Dispatch** solutions—you are in the exact right place. \n\nAs a dedicated operational backbone for Amazon Delivery Service Partners (DSPs), we specialize in driving down your overhead while maximizing your safety scores and route efficiency. Our comprehensive DSP-specific services include:\n\n*   **24/7 Live Dispatch & Command:** Real-time route delay tracking, roadside assistance coordination, and package rescue routing using official portals like Amazon Cortex, Geotab, and Netradyne.\n*   **Driver & Fleet Management:** Live driver communication, shift scheduling, and rapid-response incident management.\n*   **Super Fantastic Scorecard Optimization:** Proactive safety monitoring, targeted remediation for distraction or seatbelt events, and strategies to keep your standing in the top tiers.\n*   **14-Day Pay Statement Reconciliation:** Line-by-line auditing of your Amazon weekly settlements, catching van damage deductions, fuel card variances, and route adjustments to protect your margins.\n*   **AI-Driven Recruitment & Onboarding:** Building robust driver pipelines, handling initial candidate screenings, and managing compliance documentation.\n\nBy partnering with us, DSP owners typically see **35% to 50% in operational cost savings** while gaining round-the-clock peace of mind. \n\nTo help me tailor this for you, **how many vans or routes are you currently operating in your DSP fleet?**",
+        "timestamp": "12:58 PM"
+      },
+      {
+        "sender": "user",
+        "text": "We manage 30 vans in Dallas. You can reach me at robert@dallasdispatch.com or +1 214-555-0199 to discuss booking a demo.",
+        "timestamp": "12:58 PM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Hello Robert! Thank you for reaching out and sharing your details. Managing a 30-van Amazon DSP fleet in Dallas is no small feat, and having reliable 24/7 dispatch, scorecard optimization, and payroll reconciliation can make a massive difference in your daily margins and safety scores. \n\nI’ve noted your contact details (`robert@dallasdispatch.com` and `+1 214-555-0199`). One of our senior logistics consultants will reach out to you shortly to set up a personalized demo. \n\nIn the meantime, so we can tailor the demo precisely to your operations, **are you currently looking to cover the overnight/off-hours dispatch shifts, or are you seeking a full 24/7 operational backbone to handle everything from Cortex monitoring to 14-day settlement reconciliations?** \n\nWe look forward to partnering with Dallas Dispatch to help you scale efficiently!",
+        "timestamp": "12:58 PM"
+      }
+    ],
+    "leadDetails": {
+      "company": "Amazon DSPs",
+      "email": "robert@dallasdispatch.com",
+      "phone": "+1 214-555-0199",
+      "fleetSize": "30 vans"
+    },
+    "unansweredQuestions": []
+  },
+  "SESS-1794911998545-cu2w": {
+    "sessionId": "SESS-1794911998545-cu2w",
+    "createdAt": "2026-11-17T10:39:58.546Z",
+    "updatedAt": "2026-11-17T10:39:58.614Z",
+    "pageVisited": "/services/dsp-dispatch",
+    "userBehaviorSummary": "Pages: /, /services/dsp-dispatch | Services: Amazon DSP Dispatch | Time: 120s",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Hello, what services does Wal Group offer for Amazon DSPs?",
+        "timestamp": "10:39 AM"
+      },
+      {
+        "sender": "assistant",
+        "text": "The Wal Group provides 24/7 dedicated Amazon DSP dispatch operations. Our team manages live routing on Amazon Cortex, tracks vehicle telematics via Geotab & Netradyne, oversees safety event coaching, coordinates on-road rescues, and resolves roadside emergencies.\n\nWe maintain a strict focus on Amazon Super Fantastic scorecards to protect your margins. How many routes or vans do you currently operate in your DSP station?",
+        "timestamp": "10:39 AM"
+      },
+      {
+        "sender": "user",
+        "text": "We manage 30 vans in Dallas. You can reach me at robert@dallasdispatch.com or +1 214-555-0199 to discuss booking a demo.",
+        "timestamp": "10:39 AM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Our Dedicated Virtual Assistants and 24/7 BPO teams handle inbox management, CRM maintenance, order processing, customer support ticketing (Zendesk/Freshdesk), and data entry with guaranteed SLAs.\n\nYou receive dedicated, rigorously trained specialists starting at 35–50% cost savings compared to domestic hiring. What core tasks would you like your VA to take over?",
+        "timestamp": "10:39 AM"
+      }
+    ],
+    "leadDetails": {
+      "company": "Amazon DSPs",
+      "email": "robert@dallasdispatch.com",
+      "phone": "+1 214-555-0199",
+      "fleetSize": "30 vans"
+    },
+    "unansweredQuestions": []
+  },
+  "SESS-1794912396408-z2ql": {
+    "sessionId": "SESS-1794912396408-z2ql",
+    "createdAt": "2026-11-17T10:46:36.410Z",
+    "updatedAt": "2026-11-17T10:46:36.518Z",
+    "pageVisited": "/services/dsp-dispatch",
+    "userBehaviorSummary": "Pages: /, /services/dsp-dispatch | Services: Amazon DSP Dispatch | Time: 120s",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Hello, what services does Wal Group offer for Amazon DSPs?",
+        "timestamp": "10:46 AM"
+      },
+      {
+        "sender": "assistant",
+        "text": "The Wal Group provides 24/7 dedicated Amazon DSP dispatch operations. Our team manages live routing on Amazon Cortex, tracks vehicle telematics via Geotab & Netradyne, oversees safety event coaching, coordinates on-road rescues, and resolves roadside emergencies.\n\nWe maintain a strict focus on Amazon Super Fantastic scorecards to protect your margins. How many routes or vans do you currently operate in your DSP station?",
+        "timestamp": "10:46 AM"
+      },
+      {
+        "sender": "user",
+        "text": "We manage 30 vans in Dallas. You can reach me at robert@dallasdispatch.com or +1 214-555-0199 to discuss booking a demo.",
+        "timestamp": "10:46 AM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Our Dedicated Virtual Assistants and 24/7 BPO teams handle inbox management, CRM maintenance, order processing, customer support ticketing (Zendesk/Freshdesk), and data entry with guaranteed SLAs.\n\nYou receive dedicated, rigorously trained specialists starting at 35–50% cost savings compared to domestic hiring. What core tasks would you like your VA to take over?",
+        "timestamp": "10:46 AM"
+      }
+    ],
+    "leadDetails": {
+      "company": "Amazon DSPs",
+      "email": "robert@dallasdispatch.com",
+      "phone": "+1 214-555-0199",
+      "fleetSize": "30 vans"
+    },
+    "unansweredQuestions": []
+  },
+  "SESS-1794912917856-a6om": {
+    "sessionId": "SESS-1794912917856-a6om",
+    "createdAt": "2026-11-17T10:55:17.857Z",
+    "updatedAt": "2026-11-17T10:55:17.927Z",
+    "pageVisited": "/services/dsp-dispatch",
+    "userBehaviorSummary": "Pages: /, /services/dsp-dispatch | Services: Amazon DSP Dispatch | Time: 120s",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Hello, what services does Wal Group offer for Amazon DSPs?",
+        "timestamp": "10:55 AM"
+      },
+      {
+        "sender": "assistant",
+        "text": "The Wal Group provides 24/7 dedicated Amazon DSP dispatch operations. Our team manages live routing on Amazon Cortex, tracks vehicle telematics via Geotab & Netradyne, oversees safety event coaching, coordinates on-road rescues, and resolves roadside emergencies.\n\nWe maintain a strict focus on Amazon Super Fantastic scorecards to protect your margins. How many routes or vans do you currently operate in your DSP station?",
+        "timestamp": "10:55 AM"
+      },
+      {
+        "sender": "user",
+        "text": "We manage 30 vans in Dallas. You can reach me at robert@dallasdispatch.com or +1 214-555-0199 to discuss booking a demo.",
+        "timestamp": "10:55 AM"
+      },
+      {
+        "sender": "assistant",
+        "text": "Our Dedicated Virtual Assistants and 24/7 BPO teams handle inbox management, CRM maintenance, order processing, customer support ticketing (Zendesk/Freshdesk), and data entry with guaranteed SLAs.\n\nYou receive dedicated, rigorously trained specialists starting at 35–50% cost savings compared to domestic hiring. What core tasks would you like your VA to take over?",
+        "timestamp": "10:55 AM"
+      }
+    ],
+    "leadDetails": {
+      "company": "Amazon DSPs",
+      "email": "robert@dallasdispatch.com",
+      "phone": "+1 214-555-0199",
+      "fleetSize": "30 vans"
+    },
+    "unansweredQuestions": []
   }
 }

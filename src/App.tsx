@@ -13,6 +13,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { BookDemoModal } from './components/BookDemoModal';
 import { AdminDashboardModal } from './components/AdminDashboardModal';
 import { JsonLdHead } from './components/JsonLdHead';
+import { LogoRevealPreloader } from './components/LogoRevealPreloader';
 
 // Code-split pages for instant initial bundle loading
 const HomePage = lazy(() => import('./pages/HomePage').then(m => ({ default: m.HomePage })));
@@ -234,6 +235,9 @@ function AppContent() {
 
   return (
     <div className="relative min-h-screen flex flex-col bg-black text-slate-100 selection:bg-[#ff7700] selection:text-black font-sans overflow-x-hidden">
+      {/* Premium Cinematic Logo Reveal Preloader */}
+      <LogoRevealPreloader />
+
       {/* Dynamic JSON-LD Structured Data Injection */}
       <JsonLdHead currentPath={currentPath} />
 

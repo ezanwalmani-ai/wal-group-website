@@ -1,17 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { 
-  ShieldCheck, 
-  Award, 
-  CheckCircle, 
-  Truck, 
-  Clock, 
-  TrendingUp, 
-  Users, 
-  Database, 
-  Bot 
-} from 'lucide-react';
-import { AnimatedIcon } from './AnimatedIcon';
+import { ShieldCheck } from 'lucide-react';
 
 export const TrustMarquee: React.FC = () => {
   const ecosystemBadges = [
@@ -23,13 +12,6 @@ export const TrustMarquee: React.FC = () => {
     { name: 'ADP & Paycom', category: 'Driver Weekly Payroll' },
     { name: 'Alvys & AscendTMS', category: 'TMS & Route Management' },
     { name: 'Samsara & Motive', category: 'ELDs & Fleet Compliance' },
-  ];
-
-  const trustMetrics = [
-    { label: 'Operational Experience', value: '5+ Years', desc: 'Managing DSP & AFP Back-Office', icon: Clock },
-    { label: 'Dispatch Coverage', value: '24×7×365', desc: 'No Load Left Unmonitored', icon: Truck },
-    { label: 'Driver Hiring Cost Reduction', value: '30–40%', desc: 'Bilingual AI Voicebot ATS', icon: TrendingUp },
-    { label: 'Audit & Invoice Accuracy', value: '100%', desc: 'Verified Amazon Weekly Payroll', icon: ShieldCheck },
   ];
 
   return (
@@ -86,44 +68,6 @@ export const TrustMarquee: React.FC = () => {
               </div>
             ))}
           </motion.div>
-        </div>
-
-        {/* 4 Interactive KPI Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {trustMetrics.map((metric, index) => {
-            const Icon = metric.icon;
-            return (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                whileHover={{ y: -6, scale: 1.02 }}
-                className="glass-panel p-6 border border-white/10 hover:border-[#ff6600]/60 transition-all group flex flex-col justify-between cursor-default shadow-xl relative overflow-hidden"
-              >
-                <div className="absolute top-0 right-0 w-24 h-24 bg-[#ff6600]/10 rounded-full blur-xl group-hover:bg-[#ff6600]/25 transition-all pointer-events-none" />
-                
-                <div>
-                  <AnimatedIcon animation="rotate" className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 text-[#ff6600] mb-4 flex items-center justify-center group-hover:border-[#ff6600]/50 transition-all">
-                    <Icon className="w-5 h-5 text-[#ff6600]" />
-                  </AnimatedIcon>
-
-                  <div className="text-3xl font-black text-white group-hover:text-[#ff6600] transition-colors tracking-tight">
-                    {metric.value}
-                  </div>
-                  <div className="text-xs font-bold text-[#ff6600] uppercase tracking-wider mt-1">
-                    {metric.label}
-                  </div>
-                </div>
-
-                <div className="text-xs text-slate-400 mt-3 pt-3 border-t border-white/10 flex items-center gap-1.5">
-                  <CheckCircle className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                  <span>{metric.desc}</span>
-                </div>
-              </motion.div>
-            );
-          })}
         </div>
 
       </div>

@@ -323,7 +323,7 @@ export const AdminOverviewView: React.FC<OverviewProps> = ({
                 <span className="w-2 h-2 rounded-full bg-[#25D366] animate-pulse" />
                 WhatsApp Direct Desk
               </span>
-              <span className="text-[10px] font-mono text-slate-400">+91 6363698148</span>
+              <span className="text-[10px] font-mono text-slate-400">+91 9481078663</span>
             </div>
             <div className="flex items-baseline gap-2">
               <span className="text-3xl font-black text-white">{contactPrefs.whatsappClicks}</span>

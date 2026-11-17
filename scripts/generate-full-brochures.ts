@@ -187,7 +187,7 @@ async function generateAllBrochures() {
 
   addMasterPage('16 — READY TO BUILD YOUR WEBSITE?', 'Tell us about your business and we\'ll help determine the right solution.', [
     { heading: 'WAL GROUPS', body: 'Professional websites built for businesses that move.\nServing: USA · Canada · UK · Australia · Worldwide' },
-    { heading: 'Contact Information', body: '• Website: thewalgroup.in\n• Email: thewalgroups@gmail.com\n• Phone / WhatsApp: +91-636-369-8148\n\nTransparent pricing. No hidden fees. Structured delivery.' }
+    { heading: 'Contact Information', body: '• Website: thewalgroup.in\n• Email: thewalgroups@gmail.com\n• Phone / WhatsApp: +91 9481078663\n\nTransparent pricing. No hidden fees. Structured delivery.' }
   ], 18);
 
   const masterBytes = await masterDoc.save();
@@ -226,7 +226,7 @@ async function generateAllBrochures() {
       cY -= 20;
     }
 
-    p1.drawText('thewalgroup.in  |  thewalgroups@gmail.com  |  +91-636-369-8148', { x: 50, y: 60, size: 9, font: h, color: rgb(0.7, 0.75, 0.8) });
+    p1.drawText('thewalgroup.in  |  thewalgroups@gmail.com  |  +91 9481078663', { x: 50, y: 60, size: 9, font: h, color: rgb(0.7, 0.75, 0.8) });
 
     // Pages 2 to 10
     for (let pIdx = 1; pIdx < pagesData.length; pIdx++) {
@@ -368,7 +368,7 @@ async function generateAllBrochures() {
       subtitle: 'Starter Website — $399',
       content: [
         { h: 'Simple Two-Part Payment', b: '50% at project start before build begins, and 50% on approval before final launch.' },
-        { h: 'Contact WAL GROUPS', b: 'Phone / WhatsApp: +91-636-369-8148\nEmail: thewalgroups@gmail.com\nWebsite: thewalgroup.in' },
+        { h: 'Contact WAL GROUPS', b: 'Phone / WhatsApp: +91 9481078663\nEmail: thewalgroups@gmail.com\nWebsite: thewalgroup.in' },
         { h: 'Our Guarantee of Transparency', b: 'No hidden setup fees. No recurring lock-ins. Pure professional craftsmanship.' }
       ]
     }
@@ -463,7 +463,7 @@ async function generateAllBrochures() {
       subtitle: 'Business Website — $699',
       content: [
         { h: 'Transparent Terms', b: '50% project start / 50% upon completion. Hosting renewal $99/yr from year two.' },
-        { h: 'Contact WAL GROUPS', b: 'Phone / WhatsApp: +91-636-369-8148\nEmail: thewalgroups@gmail.com\nWebsite: thewalgroup.in' }
+        { h: 'Contact WAL GROUPS', b: 'Phone / WhatsApp: +91 9481078663\nEmail: thewalgroups@gmail.com\nWebsite: thewalgroup.in' }
       ]
     }
   ]);
@@ -553,7 +553,7 @@ async function generateAllBrochures() {
       subtitle: 'Growth Website — $999',
       content: [
         { h: 'Two-Part Payment', b: '50% project start / 50% upon completion. Hosting renewal $129/yr after year one.' },
-        { h: 'Contact WAL GROUPS', b: 'Phone / WhatsApp: +91-636-369-8148\nEmail: thewalgroups@gmail.com\nWebsite: thewalgroup.in' }
+        { h: 'Contact WAL GROUPS', b: 'Phone / WhatsApp: +91 9481078663\nEmail: thewalgroups@gmail.com\nWebsite: thewalgroup.in' }
       ]
     }
   ]);
@@ -642,7 +642,7 @@ async function generateAllBrochures() {
       subtitle: 'Custom Website — $1,499+ Starting from',
       content: [
         { h: 'Tell Us What You Need', b: 'We will help scope, quote and architect the right digital solution.' },
-        { h: 'Contact WAL GROUPS', b: 'Phone / WhatsApp: +91-636-369-8148\nEmail: thewalgroups@gmail.com\nWebsite: thewalgroup.in' }
+        { h: 'Contact WAL GROUPS', b: 'Phone / WhatsApp: +91 9481078663\nEmail: thewalgroups@gmail.com\nWebsite: thewalgroup.in' }
       ]
     }
   ]);

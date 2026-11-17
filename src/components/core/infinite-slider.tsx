@@ -1,125 +1,61 @@
-import React, { ReactNode, useRef, useState, useEffect } from 'react';
-import { motion, useMotionValue, useAnimationFrame } from 'motion/react';
+import React from 'react';
+import { motion, useReducedMotion } from 'motion/react';
 
-export interface InfiniteSliderProps {
-  children: ReactNode;
+interface InfiniteSliderProps {
+  children: React.ReactNode;
   gap?: number;
-  speed?: number;
-  speedOnHover?: number;
+  duration?: number;
+  durationOnHover?: number;
   direction?: 'horizontal' | 'vertical';
   reverse?: boolean;
   className?: string;
 }
 
-export function InfiniteSlider({
+export const InfiniteSlider: React.FC<InfiniteSliderProps> = ({
   children,
-  gap = 24,
-  speed = 40,
-  speedOnHover,
-  direction = 'horizontal',
+  gap = 28,
+  duration = 35,
   reverse = false,
   className = '',
-}: InfiniteSliderProps) {
-  const [isHovered, setIsHovered] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
-  const [contentSize, setContentSize] = useState(0);
+}) => {
+  const prefersReduced = useReducedMotion();
 
-  const translation = useMotionValue(0);
-
-  useEffect(() => {
-    const updateSize = () => {
-      if (contentRef.current) {
-        const size = direction === 'horizontal' 
-          ? contentRef.current.scrollWidth 
-          : contentRef.current.scrollHeight;
-        setContentSize(size + gap);
-      }
-    };
-
-    updateSize();
-    const ro = new ResizeObserver(updateSize);
-    if (contentRef.current) {
-      ro.observe(contentRef.current);
-    }
-
-    window.addEventListener('resize', updateSize);
-    return () => {
-      ro.disconnect();
-      window.removeEventListener('resize', updateSize);
-    };
-  }, [children, gap, direction]);
-
-  const prefersReducedMotion = typeof window !== 'undefined' && 
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  useAnimationFrame((_, delta) => {
-    if (prefersReducedMotion || contentSize === 0) return;
-
-    const currentSpeed = isHovered && speedOnHover !== undefined ? speedOnHover : speed;
-    if (currentSpeed === 0) return;
-
-    const moveBy = (currentSpeed * (delta / 1000));
-    let nextValue = translation.get();
-
-    if (reverse) {
-      nextValue += moveBy;
-      if (nextValue >= 0) {
-        nextValue -= contentSize;
-      }
-    } else {
-      nextValue -= moveBy;
-      if (nextValue <= -contentSize) {
-        nextValue += contentSize;
-      }
-    }
-
-    translation.set(nextValue);
-  });
+  if (prefersReduced) {
+    return (
+      <div className={`flex overflow-x-auto py-2 no-scrollbar ${className}`} style={{ gap: `${gap}px` }}>
+        {children}
+      </div>
+    );
+  }
 
   return (
-    <div
-      ref={containerRef}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      className={`overflow-hidden select-none w-full ${className}`}
-    >
+    <div className={`relative overflow-hidden w-full select-none ${className}`}>
+      {/* Left/Right Progressive Fade Mask */}
+      <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-16 sm:w-28 z-10 bg-gradient-to-r from-black via-black/80 to-transparent" />
+      <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 sm:w-28 z-10 bg-gradient-to-l from-black via-black/80 to-transparent" />
+
       <motion.div
-        style={{
-          display: 'flex',
-          flexDirection: direction === 'horizontal' ? 'row' : 'column',
-          gap: `${gap}px`,
-          x: direction === 'horizontal' ? translation : 0,
-          y: direction === 'vertical' ? translation : 0,
-          width: direction === 'horizontal' ? 'max-content' : undefined,
-          height: direction === 'vertical' ? 'max-content' : undefined,
-          willChange: 'transform',
+        className="flex w-max items-center"
+        style={{ gap: `${gap}px` }}
+        animate={{
+          x: reverse ? ['0%', '-50%'] : ['-50%', '0%'],
+        }}
+        transition={{
+          repeat: Infinity,
+          repeatType: 'loop',
+          duration: duration,
+          ease: 'linear',
         }}
       >
-        <div 
-          ref={contentRef} 
-          className={`flex ${direction === 'horizontal' ? 'flex-row' : 'flex-col'} shrink-0`}
-          style={{ gap: `${gap}px` }}
-        >
+        <div className="flex items-center shrink-0" style={{ gap: `${gap}px` }}>
           {children}
         </div>
-        <div 
-          className={`flex ${direction === 'horizontal' ? 'flex-row' : 'flex-col'} shrink-0`}
-          style={{ gap: `${gap}px` }}
-          aria-hidden="true"
-        >
-          {children}
-        </div>
-        <div 
-          className={`flex ${direction === 'horizontal' ? 'flex-row' : 'flex-col'} shrink-0`}
-          style={{ gap: `${gap}px` }}
-          aria-hidden="true"
-        >
+        <div className="flex items-center shrink-0" style={{ gap: `${gap}px` }} aria-hidden="true">
           {children}
         </div>
       </motion.div>
     </div>
   );
-}
+};
 
 export default InfiniteSlider;

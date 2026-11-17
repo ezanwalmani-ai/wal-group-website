@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { useBooking } from '../context/BookingContext';
-import { AnimatedWhiteLinesBackground } from '../components/AnimatedWhiteLinesBackground';
+import { Motion1CinematicBackground } from '../components/Motion1CinematicBackground';
 import { CinematicHeroScanLight } from '../components/CinematicHeroScanLight';
 import { StatsCounter } from '../components/StatsCounter';
 import { TextRoll } from '@/components/core/text-roll';
@@ -71,8 +71,8 @@ export const HomePage: React.FC<HomePageProps> = ({ navigate }) => {
             transition={{ repeat: Infinity, duration: 8, ease: "easeInOut" }}
             className="absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-[#ff7700]/10 rounded-full blur-[120px] pointer-events-none"
           />
-          {/* Network of thin animated white lines with ambient pulse & cursor interaction */}
-          <AnimatedWhiteLinesBackground />
+          {/* Motion #1 abstract cinematic background: thin amber architectural lines, flowing curves, dark glass-like nodes */}
+          <Motion1CinematicBackground />
           {/* Ultra-premium cinematic scanning light sweep with dust particles */}
           <CinematicHeroScanLight />
         </div>
@@ -85,25 +85,25 @@ export const HomePage: React.FC<HomePageProps> = ({ navigate }) => {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/5 border border-[#ff7700]/40 text-xs sm:text-sm font-bold text-[#ff7700] backdrop-blur-md shadow-lg"
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/60 border border-[#ff7700]/40 text-xs sm:text-sm font-bold text-[#ff7700] backdrop-blur-md shadow-lg"
             >
               <span className="w-2 h-2 rounded-full bg-[#ff7700] animate-pulse"></span>
               <span>24×7×365 BACKEND OPERATIONS &amp; OUTSOURCING</span>
             </motion.div>
 
-            {/* H1 Headline with TextRoll */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.1]">
+            {/* H1 Headline with TextRoll - Premium Contrast Over Cinematic Motion */}
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.1] drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)]">
               <TextRoll className="text-4xl text-black dark:text-white">
                 We Run the Backend. So You Can Run the Business.
               </TextRoll>
             </h1>
 
-            {/* Subheadline Fade */}
+            {/* Subheadline Fade with High-Legibility Dark Drop Shadow */}
             <motion.p 
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, delay: 0.2 }}
-              className="text-lg sm:text-xl text-slate-300 max-w-2xl leading-relaxed font-normal"
+              className="text-lg sm:text-xl text-slate-200 max-w-2xl leading-relaxed font-normal drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]"
             >
               Smart outsourcing, streamlined delivery services, and professional websites — all in one place. Engineered for Amazon DSPs, Amazon Freight Partners, and growing logistics fleets.
             </motion.p>
@@ -149,14 +149,14 @@ export const HomePage: React.FC<HomePageProps> = ({ navigate }) => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 1, delay: 0.8 }}
-              className="pt-6 border-t border-white/10 flex flex-wrap items-center gap-6 text-xs text-slate-400"
+              className="pt-6 border-t border-white/10 flex flex-wrap lg:flex-nowrap items-center gap-2 xl:gap-2.5 text-[11px] xl:text-xs text-slate-400"
             >
-              <span className="font-bold text-[#ff7700] uppercase tracking-wider">Ecosystem Experts:</span>
-              <span className="bg-white/5 px-3 py-1 rounded-md border border-white/10 hover:border-[#ff7700]/40 transition-colors">Amazon Cortex</span>
-              <span className="bg-white/5 px-3 py-1 rounded-md border border-white/10 hover:border-[#ff7700]/40 transition-colors">Netradyne</span>
-              <span className="bg-white/5 px-3 py-1 rounded-md border border-white/10 hover:border-[#ff7700]/40 transition-colors">SmartRecruiters</span>
-              <span className="bg-white/5 px-3 py-1 rounded-md border border-white/10 hover:border-[#ff7700]/40 transition-colors">Amazon Relay</span>
-              <span className="bg-white/5 px-3 py-1 rounded-md border border-white/10 hover:border-[#ff7700]/40 transition-colors">QuickBooks &amp; ADP</span>
+              <span className="font-bold text-[#ff7700] uppercase tracking-wider whitespace-nowrap shrink-0">PROVEN ECOSYSTEM FLUENCY:</span>
+              <span className="bg-white/5 px-2 xl:px-2.5 py-1 rounded-md border border-white/10 hover:border-[#ff7700]/40 transition-colors whitespace-nowrap">Amazon Cortex</span>
+              <span className="bg-white/5 px-2 xl:px-2.5 py-1 rounded-md border border-white/10 hover:border-[#ff7700]/40 transition-colors whitespace-nowrap">Netradyne</span>
+              <span className="bg-white/5 px-2 xl:px-2.5 py-1 rounded-md border border-white/10 hover:border-[#ff7700]/40 transition-colors whitespace-nowrap">SmartRecruiters</span>
+              <span className="bg-white/5 px-2 xl:px-2.5 py-1 rounded-md border border-white/10 hover:border-[#ff7700]/40 transition-colors whitespace-nowrap">Amazon Relay</span>
+              <span className="bg-white/5 px-2 xl:px-2.5 py-1 rounded-md border border-white/10 hover:border-[#ff7700]/40 transition-colors whitespace-nowrap">QuickBooks &amp; ADP</span>
             </motion.div>
 
           </div>
@@ -867,22 +867,14 @@ export const HomePage: React.FC<HomePageProps> = ({ navigate }) => {
           <p className="text-base sm:text-lg text-slate-400 max-w-2xl mx-auto">
             Book a 30-minute consultation with our operations team and explore how Wal Group can cut your operational costs while driving 100% compliance.
           </p>
-          <div className="pt-2 flex flex-col sm:flex-row justify-center gap-4">
+          <div className="pt-2 flex justify-center">
             <motion.button
               whileHover={{ scale: 1.03, y: -2 }}
               whileTap={{ scale: 0.97 }}
               onClick={() => navigate('/contact')}
-              className="bg-[#ff7700] hover:bg-[#ff8811] text-black font-extrabold text-sm px-8 py-4 rounded-xl shadow-[0_0_20px_rgba(255,119,0,0.3)] hover:shadow-[0_0_30px_rgba(255,119,0,0.5)] transition-all cursor-pointer"
+              className="bg-[#ff7700] hover:bg-[#ff8811] text-black font-extrabold text-sm px-9 py-4 rounded-xl shadow-[0_0_20px_rgba(255,119,0,0.3)] hover:shadow-[0_0_30px_rgba(255,119,0,0.5)] transition-all cursor-pointer"
             >
               Schedule Consultation
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.03, y: -2 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={() => navigate('/raise-ticket')}
-              className="bg-white/5 hover:bg-white/10 text-[#ff7700] font-bold text-sm px-8 py-4 rounded-xl border border-[#ff7700]/30 hover:border-[#ff7700]/60 transition-all cursor-pointer"
-            >
-              Raise a Support Ticket
             </motion.button>
           </div>
         </div>

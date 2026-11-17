@@ -138,16 +138,36 @@ export function getServiceCardImages(name: string, alt: string): ServiceCardImag
 }
 
 /**
+ * Direct static production paths for portfolio screenshots.
+ * Guaranteed to load on static hosts (Netlify, Vercel, Cloud Run, CDNs) with zero server dependencies.
+ */
+export function getStaticPortfolioItemImages(id: string) {
+  const cleanId = id.replace('/images/portfolio/', '').replace('.webp', '').replace('.jpg', '');
+  return {
+    webpSrcSet: `/images/portfolio/${cleanId}-400.webp 400w, /images/portfolio/${cleanId}-800.webp 800w, /images/portfolio/${cleanId}-1200.webp 1200w, /images/portfolio/${cleanId}.webp 1200w`,
+    defaultWebp: `/images/portfolio/${cleanId}-800.webp`,
+    masterWebp: `/images/portfolio/${cleanId}.webp`,
+    fallbackJpg: `/images/portfolio/${cleanId}.jpg`,
+    width: 1200,
+    height: 675,
+  };
+}
+
+/**
  * Generates full responsive WebP and fallback variants for portfolio cards
  */
 export function getPortfolioCardImages(name: string, alt: string) {
   const baseLocal = `/images/portfolio/${name}.webp`;
+  const staticVariants = getStaticPortfolioItemImages(name);
   return {
     name,
     alt,
     webpSrcSet: `${getOptimizedImageUrl(baseLocal, 400, 75, 'webp')} 400w, ${getOptimizedImageUrl(baseLocal, 800, 80, 'webp')} 800w, ${getOptimizedImageUrl(baseLocal, 1200, 85, 'webp')} 1200w`,
     defaultWebp: getOptimizedImageUrl(baseLocal, 800, 80, 'webp'),
     fallback: baseLocal,
+    staticWebpSrcSet: staticVariants.webpSrcSet,
+    staticDefaultWebp: staticVariants.defaultWebp,
+    fallbackJpg: staticVariants.fallbackJpg,
     width: 1200,
     height: 675,
   };

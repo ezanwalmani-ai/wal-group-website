@@ -339,7 +339,7 @@ export const BehaviorProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const { lastPageVisited, servicesViewed, contactPreferences } = behavior;
 
     if (contactPreferences?.preferredMethod === 'whatsapp') {
-      return "Welcome back to Wal Group! We noted your preference for WhatsApp dispatch updates. Reach our active desk anytime at +91 6363698148, or let me know how I can assist your operations today!";
+      return "Welcome back to Wal Group! We noted your preference for WhatsApp dispatch updates. Reach our active desk anytime at +91 9481078663, or let me know how I can assist your operations today!";
     }
     if (contactPreferences?.preferredMethod === 'email') {
       return "Welcome back to Wal Group! We noted your preference for direct email correspondence. Send inquiries directly to thewalgroups@gmail.com, or ask me any question right now!";

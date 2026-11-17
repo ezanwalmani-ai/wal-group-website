@@ -208,7 +208,7 @@ async function generateAllBrochures() {
   // Page 18: Final CTA
   addMasterPage('Ready to Build Your Website?', 'Tell us about your business and we will help you determine the right solution.', [
     { heading: 'WAL GROUPS', body: 'Professional websites built for businesses that move.\nServing: USA · Canada · UK · Australia · Worldwide' },
-    { heading: 'Contact Information', body: '• Website: thewalgroup.in\n• Email: thewalgroups@gmail.com\n• Phone / WhatsApp: +91-636-369-8148\n\nTransparent pricing. No hidden fees. Structured delivery.' }
+    { heading: 'Contact Information', body: '• Website: thewalgroup.in\n• Email: thewalgroups@gmail.com\n• Phone / WhatsApp: +91 9481078663\n\nTransparent pricing. No hidden fees. Structured delivery.' }
   ], 18);
 
   const masterPdfBytes = await masterDoc.save();
@@ -239,7 +239,7 @@ async function generateAllBrochures() {
       p1.drawText(`• ${d}`, { x: 70, y, size: 10, font: h, color: rgb(1, 1, 1) });
       y -= 22;
     }
-    p1.drawText('thewalgroup.in  |  thewalgroups@gmail.com  |  +91-636-369-8148', { x: 50, y: 60, size: 9, font: h, color: rgb(0.7, 0.75, 0.8) });
+    p1.drawText('thewalgroup.in  |  thewalgroups@gmail.com  |  +91 9481078663', { x: 50, y: 60, size: 9, font: h, color: rgb(0.7, 0.75, 0.8) });
 
     // Page 2: What's Included
     const p2 = doc.addPage([595.28, 841.89]);

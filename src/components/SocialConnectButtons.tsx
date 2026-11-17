@@ -11,9 +11,9 @@ interface SocialConnectButtonsProps {
   source?: string;
 }
 
-export const WHATSAPP_NUMBER = '6363698148';
-export const WHATSAPP_INTERNATIONAL = '+91 6363698148';
-export const WHATSAPP_URL = 'https://wa.me/916363698148';
+export const WHATSAPP_NUMBER = '9481078663';
+export const WHATSAPP_INTERNATIONAL = '+91 9481078663';
+export const WHATSAPP_URL = 'https://wa.me/919481078663';
 export const OFFICIAL_EMAIL = 'thewalgroups@gmail.com';
 export const LINKEDIN_URL = 'https://www.linkedin.com/company/wal-groups/';
 

@@ -8,14 +8,8 @@ import { WhatsAppLink } from './WhatsAppLink';
 import { useBehavior } from '../context/BehaviorContext';
 import { 
   MapPin, 
-  Mail, 
   Phone, 
-  Ticket, 
-  ArrowUpRight,
-  Instagram,
-  Lock,
-  MessageCircle,
-  Activity
+  Lock
 } from 'lucide-react';
 
 interface FooterProps {
@@ -23,7 +17,7 @@ interface FooterProps {
 }
 
 export const Footer: React.FC<FooterProps> = ({ navigate }) => {
-  const { trackContactClick, trackCtaClick, behavior } = useBehavior();
+  const { trackContactClick } = useBehavior();
 
   const handleNavClick = (path: string) => {
     navigate(path);
@@ -32,6 +26,16 @@ export const Footer: React.FC<FooterProps> = ({ navigate }) => {
 
   return (
     <footer className="bg-[#000000] text-slate-100 border-t border-white/10 pt-16 pb-12 font-sans relative overflow-hidden">
+      {/* Subtle Amber Horizon Line Animation - Minimal and Controlled */}
+      <div className="absolute top-0 left-0 right-0 h-[1.5px] overflow-hidden bg-white/5 pointer-events-none">
+        <motion.div
+          initial={{ x: '-100%' }}
+          animate={{ x: '100%' }}
+          transition={{ repeat: Infinity, duration: 6, ease: 'easeInOut' }}
+          className="w-1/3 h-full bg-gradient-to-r from-transparent via-[#ff7700] to-transparent shadow-[0_0_8px_#ff7700]"
+        />
+      </div>
+
       {/* Decorative gradient overlays */}
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#ff7700]/5 rounded-full blur-3xl pointer-events-none animate-pulse"></div>
       <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-white/5 rounded-full blur-3xl pointer-events-none"></div>
@@ -139,11 +143,11 @@ export const Footer: React.FC<FooterProps> = ({ navigate }) => {
               <div className="flex items-center gap-2.5">
                 <Phone className="w-4 h-4 text-[#ff7700] shrink-0" />
                 <a 
-                  href="tel:6363698148" 
-                  onClick={() => trackContactClick('phone', { source: 'footer_contact_info', target: '+91 6363698148', label: 'Office Phone' })}
+                  href="tel:+919481078663" 
+                  onClick={() => trackContactClick('phone', { source: 'footer_contact_info', target: '+91 9481078663', label: 'Office Phone' })}
                   className="hover:text-[#ff7700] transition-colors font-medium"
                 >
-                  +91 6363698148
+                  +91 9481078663
                 </a>
               </div>
             </div>
@@ -154,47 +158,6 @@ export const Footer: React.FC<FooterProps> = ({ navigate }) => {
               <EmailLink email="thewalgroups@gmail.com" variant="inline" source="footer_contact_column" />
               <WhatsAppLink variant="inline" source="footer_contact_column" />
               <InstagramLink variant="inline" source="footer_contact_column" />
-            </div>
-
-            {/* Live Contact Preference Monitor (BehaviorProvider State) */}
-            {behavior.contactPreferences && (behavior.contactPreferences.totalContactClicks > 0) && (
-              <motion.div 
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-2.5 p-2.5 rounded-xl bg-white/[0.03] border border-[#ff7700]/20 flex flex-col gap-1.5 text-[11px]"
-              >
-                <div className="flex items-center justify-between text-slate-300 font-semibold">
-                  <span className="flex items-center gap-1.5 text-[#ff7700]">
-                    <Activity className="w-3.5 h-3.5 animate-pulse" />
-                    <span>Contact Preference:</span>
-                  </span>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white/10 text-white">
-                    {behavior.contactPreferences.preferredMethod === 'whatsapp' ? '🟢 WhatsApp Preferred' :
-                     behavior.contactPreferences.preferredMethod === 'email' ? '🟠 Email Preferred' :
-                     `${behavior.contactPreferences.preferredMethod} Preferred`}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between text-[10px] text-slate-400 font-mono">
-                  <span>WhatsApp: {behavior.contactPreferences.whatsappClicks} clicks</span>
-                  <span>Email: {behavior.contactPreferences.emailClicks} clicks</span>
-                </div>
-              </motion.div>
-            )}
-
-            <div className="pt-2">
-              <motion.button
-                whileHover={{ scale: 1.02, translateY: -2 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => {
-                  trackCtaClick('Footer Submit Support Ticket');
-                  handleNavClick('/raise-ticket');
-                }}
-                className="w-full bg-white/5 hover:bg-white/10 text-[#ff7700] border border-[#ff7700]/30 hover:border-[#ff7700]/60 font-semibold text-xs py-2.5 px-3 rounded-lg transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(255,119,0,0.1)]"
-              >
-                <Ticket className="w-4 h-4 text-[#ff7700]" />
-                <span>Submit Support Ticket</span>
-                <ArrowUpRight className="w-3.5 h-3.5 opacity-70" />
-              </motion.button>
             </div>
           </div>
 
